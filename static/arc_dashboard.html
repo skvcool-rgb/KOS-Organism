@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOS-Organism | Bio-Monitor HUD</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --panel: #12121a;
+    --border: #1e1e2e;
+    --text: #c8c8d4;
+    --dim: #555566;
+    --accent: #00ff88;
+    --warn: #ff6644;
+    --info: #44aaff;
+    --purple: #aa66ff;
+    --yellow: #ffcc00;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    overflow-x: hidden;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 16px; color: var(--accent); font-weight: 600; }
+  .header .status { display: flex; gap: 15px; align-items: center; }
+  .pulse {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .panel h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel.full { grid-column: span 2; }
+
+  /* Tensions */
+  .tension-bar {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+    gap: 8px;
+  }
+  .tension-label { width: 90px; color: var(--dim); font-size: 11px; }
+  .tension-track { flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; }
+  .tension-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+  .tension-val { width: 45px; text-align: right; font-size: 11px; }
+
+  /* Stats */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .stat { display: flex; justify-content: space-between; padding: 3px 0; }
+  .stat .k { color: var(--dim); font-size: 11px; }
+  .stat .v { color: var(--accent); font-weight: 600; font-size: 11px; }
+
+  /* 3-col stat grid for Performance */
+  .stat-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 12px; }
+
+  /* Log */
+  .log {
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .log-entry { padding: 2px 0; border-bottom: 1px solid #111118; }
+  .log-entry.solved { color: var(--accent); }
+  .log-entry.failed { color: var(--dim); }
+  .log-entry.dream { color: var(--info); }
+  .log-entry.repair { color: var(--warn); }
+  .log-entry.meta { color: var(--yellow); }
+  .log-entry.cycle { color: var(--purple); }
+  .log-entry.forage { color: #88ccff; }
+  .log-entry.self_code { color: #ff88cc; }
+
+  /* Actions */
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .btn {
+    padding: 6px 14px;
+    background: #1a1a2e;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn:hover { background: var(--accent); color: #000; }
+  .btn.active { background: var(--accent); color: #000; }
+
+  /* Top activations */
+  .act-list { font-size: 11px; }
+  .act-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid #111118;
+  }
+  .act-name { color: var(--info); }
+  .act-val { color: var(--accent); }
+
+  /* Beliefs */
+  .belief-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 11px;
+    border-bottom: 1px solid #111118;
+  }
+
+  /* Benchmark */
+  .benchmark-bar {
+    width: 100%;
+    height: 6px;
+    background: #1a1a2a;
+    border-radius: 3px;
+    margin: 6px 0;
+    overflow: hidden;
+  }
+  .benchmark-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  .progress-section {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background: #0e0e16;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .progress-section.visible { display: block; }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0;
+  }
+  .progress-label { width: 100px; font-size: 11px; color: var(--dim); }
+  .progress-bar-track {
+    flex: 1;
+    height: 14px;
+    background: #1a1a2a;
+    border-radius: 7px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 7px;
+    transition: width 0.3s;
+    position: relative;
+  }
+  .progress-bar-fill::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 6px;
+    top: 0;
+    line-height: 14px;
+    font-size: 10px;
+    color: #000;
+    font-weight: bold;
+  }
+  .progress-value {
+    width: 120px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .big-accuracy {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 4px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .big-accuracy .label {
+    font-size: 11px;
+    color: var(--dim);
+    font-weight: 400;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  input[type="text"] {
+    background: #1a1a2e;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  /* Responsive: on very wide screens, go 3-col for top row */
+  @media (min-width: 1400px) {
+    .top-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      grid-column: span 2;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>KOS-ORGANISM | Bio-Monitor HUD</h1>
+  <div class="status">
+    <div class="pulse" id="heartbeat"></div>
+    <span id="status-text">CONNECTING...</span>
+    <span id="tick-count" style="color:var(--dim)">tick: 0</span>
+  </div>
+</div>
+
+<div class="grid-layout">
+  <!-- Row 1: Tensions + Graph Stats (side by side) -->
+  <div class="panel">
+    <h2>Biological Tensions</h2>
+    <div id="tensions"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Graph Statistics</h2>
+    <div class="stat-grid" id="graph-stats"></div>
+  </div>
+
+  <!-- Row 1.5: Neuro-Architecture (4 lobes + 5 observers) -->
+  <div class="panel full">
+    <h2>Neuro-Architecture (Human Brain Map)</h2>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div>
+        <h3 style="color:#0ff; font-size:13px; margin:5px 0;">4 Processing Lobes</h3>
+        <div id="neuro-lobes" style="font-size:12px;"></div>
+      </div>
+      <div>
+        <h3 style="color:#f80; font-size:13px; margin:5px 0;">5 Observers</h3>
+        <div id="neuro-observers" style="font-size:12px;"></div>
+      </div>
+    </div>
+    <div id="neuro-strategy" style="margin-top:8px; font-size:12px;"></div>
+  </div>
+
+  <!-- Row 2: Performance (FULL WIDTH with 3-col stats) -->
+  <div class="panel full">
+    <h2>Performance Metrics</h2>
+    <div class="stat-grid-3" id="perf-stats"></div>
+  </div>
+
+  <!-- Row 3: Top Activations + Action Nodes -->
+  <div class="panel">
+    <h2>Top Activations</h2>
+    <div class="act-list" id="activations"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Endogenous Actions + Beliefs</h2>
+    <div class="act-list" id="action-nodes" style="margin-bottom:10px;"></div>
+    <h2 style="margin-top:8px;">Learned Beliefs (P(prim|feat))</h2>
+    <div id="beliefs"></div>
+  </div>
+
+  <!-- Controls (full width) -->
+  <div class="panel full">
+    <h2>Controls</h2>
+    <div style="display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap;">
+      <div style="flex:1; min-width:200px;">
+        <label style="color:var(--dim);font-size:11px;">ARC Data Directory</label>
+        <input type="text" id="data-dir" value="C:/Users/suraj/Downloads/Claud Code/KOS-Organism/.cache/arc_agi/training">
+      </div>
+      <div style="flex:0 0 100px;">
+        <label style="color:var(--dim);font-size:11px;">Max Tasks</label>
+        <input type="text" id="max-tasks" value="400">
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="runBenchmark()" id="btn-benchmark">Run Benchmark</button>
+        <button class="btn" onclick="startContinuous()" id="btn-continuous" style="background:#1a3a1a;border-color:#00ff88;">Start Continuous</button>
+        <button class="btn" onclick="stopContinuous()" style="background:#3a1a1a;border-color:#ff4444;">Stop</button>
+        <button class="btn" onclick="solveRandom()">Inject Random</button>
+        <button class="btn" onclick="consolidate()">Consolidate</button>
+        <button class="btn" onclick="forgeKnowledge()">Forge Knowledge</button>
+        <button class="btn" onclick="resetBrain()">Reset</button>
+      </div>
+    </div>
+    <div class="progress-section" id="progress-section">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="big-accuracy" id="big-accuracy">
+          <span class="label">ACCURACY</span>
+          0.0%
+        </div>
+        <div style="text-align:center;">
+          <div class="big-accuracy" id="big-solved" style="color:var(--info);font-size:22px;">
+            <span class="label">SOLVED</span>
+            0 / 0
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="big-accuracy" id="big-cycle" style="color:var(--purple);font-size:22px;">
+            <span class="label">CYCLE</span>
+            0
+          </div>
+        </div>
+      </div>
+      <div class="progress-row">
+        <span class="progress-label">Progress</span>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-bar-tasks" style="width:0%;background:var(--info);" data-label="0%"></div>
+        </div>
+        <span class="progress-value" id="progress-tasks-val" style="color:var(--info);">0 / 0</span>
+      </div>
+      <div class="progress-row">
+        <span class="progress-label">Solve Rate</span>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-bar-solved" style="width:0%;background:var(--accent);" data-label="0%"></div>
+        </div>
+        <span class="progress-value" id="progress-solved-val" style="color:var(--accent);">0 / 0</span>
+      </div>
+      <div id="progress-details" style="color:var(--dim);font-size:11px;text-align:center;margin-top:6px;"></div>
+    </div>
+    <div class="benchmark-bar" style="margin-top:8px;"><div class="benchmark-bar-fill" id="bench-bar" style="width:0%"></div></div>
+    <div id="bench-status" style="color:var(--dim);font-size:11px;text-align:center;"></div>
+    <div id="continuous-status" style="color:var(--accent);font-size:12px;margin-top:5px;"></div>
+  </div>
+
+  <!-- Chat with Organism (full width) -->
+  <div class="panel full">
+    <h2 style="color:var(--purple);">Ask the Organism <span style="color:var(--dim);font-size:10px;font-weight:normal;">(Natural Language Interface)</span></h2>
+    <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:10px;">
+      <div style="flex:1;">
+        <textarea id="chat-input" rows="2" placeholder="Ask anything... chemistry, physics, biology, finance, math, solar materials, research topics..."
+          style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:8px;font-family:inherit;font-size:13px;resize:vertical;"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+      </div>
+      <button class="btn" onclick="sendChat()" style="background:#1a1a3a;border-color:var(--purple);height:40px;padding:0 20px;">
+        Send
+      </button>
+      <select id="chat-domain" style="background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px;font-family:inherit;font-size:11px;height:40px;">
+        <option value="auto">Auto-Route</option>
+        <option value="chemistry">Chemistry</option>
+        <option value="physics">Physics</option>
+        <option value="biology">Biology</option>
+        <option value="finance">Finance</option>
+        <option value="math">Math</option>
+        <option value="research">Research</option>
+        <option value="md">MD Simulation</option>
+        <option value="dft">DFT Screen</option>
+        <option value="materials">Material Discovery</option>
+      </select>
+    </div>
+    <div id="chat-loading" style="display:none;color:var(--info);font-size:12px;margin-bottom:8px;">
+      <span class="pulse" style="display:inline-block;width:8px;height:8px;margin-right:6px;"></span> Organism is thinking...
+    </div>
+    <!-- Response Window -->
+    <div id="chat-responses" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;background:var(--bg);padding:0;">
+      <div id="chat-welcome" style="padding:15px;color:var(--dim);text-align:center;font-size:12px;">
+        <div style="color:var(--purple);font-size:14px;margin-bottom:8px;">KOS-Organism v4.0 — Living Intelligence</div>
+        <div>9 domain drivers | MD/DFT simulation | Internet research | Material discovery</div>
+        <div style="margin-top:6px;">Type a question or task below. Examples:</div>
+        <div style="color:var(--text);margin-top:4px;font-size:11px;">
+          "What is the bandgap of CsSnI3?" | "Calculate 345000 * 0.0825" | "Translate codon AUG"<br>
+          "Research lead-free perovskite solar cells" | "Check toxicity of lead" | "Find new solar materials"
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Solve Pool Status -->
+  <div class="panel full" id="pool-panel" style="display:none;">
+    <h2>Solve Pool <span id="pool-running" style="color:var(--accent);font-size:11px;"></span></h2>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <h3 style="color:var(--accent);font-size:12px;margin-bottom:5px;">Recently Solved</h3>
+        <div id="solved-list" style="font-size:11px; max-height:150px; overflow-y:auto;"></div>
+      </div>
+      <div>
+        <h3 style="color:var(--yellow);font-size:12px;margin-bottom:5px;">Near Misses (closest to solving)</h3>
+        <div id="nearmiss-list" style="font-size:11px; max-height:150px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SELF-IMPROVEMENT & EVOLUTION MONITORING (v4.3.4)  -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <!-- ACC Inner Critic (full width) -->
+  <div class="panel full" id="acc-panel" style="border-left: 3px solid #ff4444;">
+    <h2>Inner Critic (ACC) <span id="acc-status" style="color:#ff4444;font-size:10px;font-weight:normal;text-transform:none;letter-spacing:0;"></span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+      <div style="text-align:center;">
+        <div style="font-size:32px;font-weight:800;" id="acc-dissatisfaction">0.0</div>
+        <div style="font-size:10px;color:var(--dim);">DISSATISFACTION /10</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:32px;font-weight:800;" id="acc-plateau">0</div>
+        <div style="font-size:10px;color:var(--dim);">PLATEAU CYCLES</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:32px;font-weight:800;" id="acc-pressure">0.0</div>
+        <div style="font-size:10px;color:var(--dim);">RESTRUCTURE PRESSURE</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:24px;font-weight:800;" id="acc-alarm" style="color:#555;">OFF</div>
+        <div style="font-size:10px;color:var(--dim);">STAGNATION ALARM</div>
+      </div>
+    </div>
+    <div id="acc-demands" style="margin-top:10px;padding:8px;background:#1a0a0a;border-radius:4px;font-size:11px;color:#ff6644;min-height:20px;"></div>
+    <div id="acc-targets" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- Self-Improvement Activity + Failure Analysis (side by side) -->
+  <div class="panel" style="border-left: 3px solid var(--accent);">
+    <h2>Self-Improvement Activity</h2>
+    <div class="stat-grid" id="self-improve-stats">
+      <div class="stat"><span class="k">Self-coded prims</span><span class="v" id="si-coded">0</span></div>
+      <div class="stat"><span class="k">Self-repair cycles</span><span class="v" id="si-repair">0</span></div>
+      <div class="stat"><span class="k">Dream cycles</span><span class="v" id="si-dream">0</span></div>
+      <div class="stat"><span class="k">Consolidation</span><span class="v" id="si-consolidate">0</span></div>
+      <div class="stat"><span class="k">Forage cycles</span><span class="v" id="si-forage">0</span></div>
+      <div class="stat"><span class="k">Hypotheses tested</span><span class="v" id="si-hypotheses">0</span></div>
+      <div class="stat"><span class="k">Meta adaptations</span><span class="v" id="si-meta">0</span></div>
+      <div class="stat"><span class="k">MiroFish discoveries</span><span class="v" id="si-mirofish">0</span></div>
+      <div class="stat"><span class="k">Agents spawned</span><span class="v" id="si-agents">0</span></div>
+      <div class="stat"><span class="k">Self tunings</span><span class="v" id="si-tunings">0</span></div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:var(--dim);">
+      <span id="si-velocity" style="color:var(--accent);"></span>
+    </div>
+  </div>
+
+  <div class="panel" style="border-left: 3px solid var(--warn);">
+    <h2>Failure Analysis</h2>
+    <div id="failure-types" style="font-size:11px;">
+      <div style="color:var(--dim);font-style:italic;">Loading...</div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">TOP NEAR-MISSES (>80% correct)</div>
+      <div id="near-misses" style="font-size:11px;max-height:120px;overflow-y:auto;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Synthesized Primitives + Learning Curve (side by side) -->
+  <div class="panel" style="border-left: 3px solid #ff88cc;">
+    <h2>Evolved Primitives <span id="synth-count" style="color:var(--accent);font-size:10px;font-weight:normal;text-transform:none;letter-spacing:0;"></span></h2>
+    <div id="synth-list" style="font-size:11px;max-height:200px;overflow-y:auto;">
+      <div style="color:var(--dim);font-style:italic;">Loading...</div>
+    </div>
+  </div>
+
+  <div class="panel" style="border-left: 3px solid var(--info);">
+    <h2>Learning Curve & Strategy</h2>
+    <div id="learning-curve" style="display:flex;gap:4px;align-items:flex-end;height:60px;margin-bottom:8px;">
+    </div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:8px;">Accuracy per cycle (bar height = %)</div>
+    <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">STRATEGY PERFORMANCE</div>
+    <div id="strategy-perf" style="font-size:11px;">
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--dim);margin-bottom:4px;">META PARAMETERS</div>
+    <div id="meta-params-display" style="font-size:11px;">
+    </div>
+  </div>
+
+  <!-- Organism Thoughts + Improvement Timeline (full width) -->
+  <div class="panel full" style="border-left: 3px solid var(--purple);">
+    <h2>Organism Internal Thoughts <span style="color:var(--dim);font-size:10px;font-weight:normal;text-transform:none;letter-spacing:0;">(what the brain is thinking when failing)</span></h2>
+    <div id="thoughts-log" style="font-size:11px;max-height:150px;overflow-y:auto;">
+      <div style="color:var(--dim);font-style:italic;">Waiting for thoughts...</div>
+    </div>
+  </div>
+
+  <div class="panel full" style="border-left: 3px solid var(--yellow);">
+    <h2>Improvement Timeline <span style="color:var(--dim);font-size:10px;font-weight:normal;text-transform:none;letter-spacing:0;">(structural changes & adaptations)</span></h2>
+    <div id="improvement-timeline" style="font-size:11px;max-height:150px;overflow-y:auto;">
+      <div style="color:var(--dim);font-style:italic;">Waiting for improvements...</div>
+    </div>
+  </div>
+
+  <!-- Cognitive Activity Log (full width) -->
+  <div class="panel full">
+    <h2>Cognitive Activity Log <span id="log-status" style="color:var(--accent);font-size:10px;font-weight:normal;text-transform:none;letter-spacing:0;">(auto-updating)</span></h2>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let _lastEventSeq = 0;  // Track last seen event for incremental polling
+
+// ── Tension Colors ──
+const tensionColors = {
+  entropy: '#ff4444',
+  curiosity: '#44aaff',
+  frustration: '#ff6644',
+  compression: '#aa66ff',
+  frontier: '#ffcc00',
+  self_repair: '#ff88cc'
+};
+
+const eventClasses = {
+  solved: 'solved',
+  failed: 'failed',
+  dream: 'dream',
+  consolidate: 'dream',
+  repair: 'repair',
+  forage: 'forage',
+  cycle: 'cycle',
+  meta_learn: 'meta',
+  self_code: 'self_code',
+  discovery: 'self_code',
+  evolve: 'self_code',
+  web_learn: 'meta',
+  synthesize: 'self_code',
+  repair_sweep: 'repair',
+};
+
+// ── Poll /health every 500ms ──
+async function pollHealth() {
+  try {
+    const r = await fetch(API + '/health');
+    const d = await r.json();
+
+    document.getElementById('status-text').textContent = d.status;
+    document.getElementById('status-text').style.color = d.status === 'ALIVE' ? '#00ff88' : '#ff4444';
+    document.getElementById('tick-count').textContent = `tick: ${d.ticks}`;
+
+    // Tensions
+    const tEl = document.getElementById('tensions');
+    let html = '';
+    for (const [k, v] of Object.entries(d.tensions)) {
+      const pct = Math.min(v / 3.0 * 100, 100);
+      const color = tensionColors[k] || '#888';
+      html += `<div class="tension-bar">
+        <span class="tension-label">${k}</span>
+        <div class="tension-track"><div class="tension-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="tension-val" style="color:${color}">${v.toFixed(3)}</span>
+      </div>`;
+    }
+    tEl.innerHTML = html;
+
+    // Graph stats
+    const gs = document.getElementById('graph-stats');
+    const g = d.graph;
+    gs.innerHTML = `
+      <div class="stat"><span class="k">Nodes</span><span class="v">${g.nodes?.toFixed(0)||0}</span></div>
+      <div class="stat"><span class="k">Edges</span><span class="v">${g.edges?.toFixed(0)||0}</span></div>
+      <div class="stat"><span class="k">Activation</span><span class="v">${g.total_activation?.toFixed(2)||0}</span></div>
+      <div class="stat"><span class="k">Fuel</span><span class="v">${g.total_fuel?.toFixed(2)||0}</span></div>
+      <div class="stat"><span class="k">Myelin</span><span class="v">${g.total_myelin?.toFixed(2)||0}</span></div>
+      <div class="stat"><span class="k">Actions</span><span class="v">${g.action_nodes?.toFixed(0)||0}</span></div>
+    `;
+
+    // Neuro-Architecture (from health endpoint)
+    const lobeColors = {occipital:'#f0f',parietal:'#0ff',temporal:'#ff0',frontal:'#0f0'};
+    const lobeNames = {occipital:'Occipital (Visual)',parietal:'Parietal (Spatial)',temporal:'Temporal (Memory)',frontal:'Frontal (Executive)'};
+    const lobeEl = document.getElementById('neuro-lobes');
+    const obsEl = document.getElementById('neuro-observers');
+    const stratEl = document.getElementById('neuro-strategy');
+    if (lobeEl && d.lobe_loads) {
+      let lhtml = '';
+      for (const [name, load] of Object.entries(d.lobe_loads)) {
+        const pct = Math.min(load * 100, 100);
+        const color = lobeColors[name] || '#888';
+        lhtml += `<div style="margin:2px 0;display:flex;align-items:center;gap:6px;">
+          <span style="color:${color};width:130px;font-size:11px;">${lobeNames[name]||name}</span>
+          <div style="flex:1;height:8px;background:#222;border-radius:4px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${color};transition:width 0.3s;"></div>
+          </div>
+          <span style="width:40px;text-align:right;color:#aaa;font-size:10px;">${(load*100).toFixed(1)}%</span>
+        </div>`;
+      }
+      lobeEl.innerHTML = lhtml;
+    }
+    if (obsEl) {
+      const arousalColors = {DORMANT:'#444',IDLE:'#666',ALERT:'#8f8',FOCUSED:'#ff0',HYPERFOCUSED:'#f44'};
+      const arousal = d.arousal || 'ALERT';
+      const nm = d.neuromodulators || {};
+      let ohtml = `<div style="margin:2px 0;"><span style="color:${arousalColors[arousal]||'#aaa'};font-weight:bold;">RAS: ${arousal}</span></div>`;
+      ohtml += `<div style="margin:2px 0;color:#aaa;">DA: <b style="color:#f80">${nm.dopamine?.toFixed(2)||'?'}</b> NE: <b style="color:#f44">${nm.norepinephrine?.toFixed(2)||'?'}</b> 5HT: <b style="color:#88f">${nm.serotonin?.toFixed(2)||'?'}</b> ACh: <b style="color:#8f8">${nm.acetylcholine?.toFixed(2)||'?'}</b></div>`;
+      ohtml += `<div style="margin:2px 0;color:#aaa;">Cerebellum PredError: <b style="color:#ff0">${d.prediction_error?.toFixed(4)||'0'}</b></div>`;
+      ohtml += `<div style="margin:2px 0;color:#aaa;">Basal Ganglia DA: <b style="color:#f80">${d.dopamine?.toFixed(3)||'?'}</b></div>`;
+      obsEl.innerHTML = ohtml;
+    }
+    if (stratEl) {
+      const stratColors = {fast_recall:'#0f0',balanced:'#0ff',deep_search:'#ff0',exploratory:'#f0f',emergency:'#f44'};
+      const strat = d.strategy || 'balanced';
+      const conf = d.confidence || 0;
+      stratEl.innerHTML = `<span style="color:${stratColors[strat]||'#aaa'};">Strategy: <b>${strat.toUpperCase()}</b></span> | Confidence: <b>${(conf*100).toFixed(1)}%</b>`;
+    }
+  } catch(e) {
+    document.getElementById('status-text').textContent = 'DISCONNECTED';
+    document.getElementById('status-text').style.color = '#ff4444';
+  }
+}
+
+// ── Poll /brain/state every 2s ──
+async function pollState() {
+  try {
+    const r = await fetch(API + '/brain/state');
+    const d = await r.json();
+
+    // Performance stats (3-column layout)
+    const ps = document.getElementById('perf-stats');
+    ps.innerHTML = `
+      <div class="stat"><span class="k">Tasks Seen</span><span class="v">${d.stats.tasks_seen}</span></div>
+      <div class="stat"><span class="k">Solved</span><span class="v" style="color:var(--accent)">${d.stats.tasks_solved}</span></div>
+      <div class="stat"><span class="k">Best Acc</span><span class="v" style="color:var(--yellow)">${(d.stats.best_accuracy||0).toFixed(1)}%</span></div>
+      <div class="stat"><span class="k">Epoch</span><span class="v">${d.stats.benchmark_epoch||0}</span></div>
+      <div class="stat"><span class="k">Dreams</span><span class="v">${d.stats.dream_cycles}</span></div>
+      <div class="stat"><span class="k">Repairs</span><span class="v" style="color:var(--warn)">${d.stats.self_repair_cycles||0}</span></div>
+      <div class="stat"><span class="k">Forages</span><span class="v">${d.stats.forage_cycles||0}</span></div>
+      <div class="stat"><span class="k">MiroFish</span><span class="v">${d.stats.mirofish_discoveries}</span></div>
+      <div class="stat"><span class="k">Beliefs</span><span class="v">${d.belief_observations}</span></div>
+      <div class="stat"><span class="k">Rules</span><span class="v" style="color:var(--purple)">${d.procedural_memory_size}</span></div>
+      <div class="stat"><span class="k">SelfCoded</span><span class="v" style="color:#ff88cc">${d.stats.self_coded_prims||0}</span></div>
+      <div class="stat"><span class="k">Agents</span><span class="v">${d.stats.agents_spawned||0}</span></div>
+      <div class="stat"><span class="k">Hypotheses</span><span class="v">${d.stats.hypotheses_tested||0}</span></div>
+      <div class="stat"><span class="k">MetaAdapt</span><span class="v" style="color:var(--yellow)">${d.stats.meta_adaptations||0}</span></div>
+      <div class="stat"><span class="k">Episodes</span><span class="v">${d.episodic_memory_size}</span></div>
+    `;
+
+    // Top activations
+    const aEl = document.getElementById('activations');
+    let aHtml = '';
+    for (const a of (d.top_activations || []).slice(0, 12)) {
+      aHtml += `<div class="act-item">
+        <span class="act-name">${a.name}</span>
+        <span class="act-val">a=${a.activation.toFixed(3)} f=${a.fuel.toFixed(3)}</span>
+      </div>`;
+    }
+    aEl.innerHTML = aHtml || '<div style="color:var(--dim)">No activations</div>';
+
+    // Action nodes
+    const anEl = document.getElementById('action-nodes');
+    let anHtml = '';
+    for (const a of (d.action_nodes || [])) {
+      anHtml += `<div class="act-item">
+        <span class="act-name">${a.name}</span>
+        <span class="act-val" style="color:${a.fuel > 1.5 ? '#ff4444' : '#888'}">fuel=${a.fuel.toFixed(3)}</span>
+      </div>`;
+    }
+    anEl.innerHTML = anHtml || '<div style="color:var(--dim)">No action nodes</div>';
+
+    // Top beliefs
+    const bEl = document.getElementById('beliefs');
+    let bHtml = '';
+    for (const b of (d.top_beliefs || []).slice(0, 8)) {
+      const pct = (b.posterior * 100).toFixed(1);
+      bHtml += `<div class="belief-item">
+        <span>${b.feature} -> ${b.primitive}</span>
+        <span style="color:var(--accent)">${pct}% (n=${b.observations.toFixed(0)})</span>
+      </div>`;
+    }
+    bEl.innerHTML = bHtml || '<div style="color:var(--dim)">No beliefs yet</div>';
+
+  } catch(e) {}
+}
+
+// ── Poll /brain/events every 1.5s for auto-updating log ──
+async function pollEvents() {
+  try {
+    const r = await fetch(API + '/brain/events?since=' + _lastEventSeq);
+    const d = await r.json();
+    if (d.events && d.events.length > 0) {
+      for (const evt of d.events) {
+        const cls = eventClasses[evt.type] || '';
+        addLog(`[${evt.type.toUpperCase()}] ${evt.msg}`, cls, new Date(evt.ts * 1000));
+      }
+      _lastEventSeq = d.latest_seq;
+    }
+  } catch(e) {}
+}
+
+// ── Log ──
+function addLog(msg, cls='', timestamp=null) {
+  const log = document.getElementById('log');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry ' + cls;
+  const ts = timestamp ? timestamp.toLocaleTimeString() : new Date().toLocaleTimeString();
+  entry.textContent = `[${ts}] ${msg}`;
+  log.prepend(entry);
+  if (log.children.length > 300) log.lastChild.remove();
+}
+
+// ── Actions ──
+let _benchmarkRunning = false;
+
+async function runBenchmark() {
+  if (_benchmarkRunning) {
+    addLog('Benchmark already running...', 'failed');
+    return;
+  }
+  const dataDir = document.getElementById('data-dir').value;
+  const maxTasks = parseInt(document.getElementById('max-tasks').value) || 0;
+
+  _benchmarkRunning = true;
+  document.getElementById('btn-benchmark').classList.add('active');
+  addLog(`Starting benchmark: ${dataDir} (max=${maxTasks || 'all'})`);
+  document.getElementById('bench-status').textContent = 'Starting...';
+  document.getElementById('bench-bar').style.width = '0%';
+
+  try {
+    const response = await fetch(API + '/benchmark/stream', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({data_dir: dataDir, max_tasks: maxTasks})
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errText}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const d = JSON.parse(line.slice(6));
+          if (d.event === 'complete') {
+            document.getElementById('bench-status').textContent =
+              `Complete: ${d.solved}/${d.total} (${d.accuracy.toFixed(1)}%) in ${d.elapsed_s.toFixed(1)}s`;
+            document.getElementById('bench-bar').style.width = '100%';
+            addLog(`Benchmark complete: ${d.solved}/${d.total} (${d.accuracy.toFixed(1)}%)`, 'solved');
+          } else {
+            const pct = (d.i / d.total * 100).toFixed(1);
+            document.getElementById('bench-bar').style.width = pct + '%';
+            document.getElementById('bench-status').textContent =
+              `${d.i}/${d.total} | ${d.solved_count} solved (${d.accuracy.toFixed(1)}%) | ${d.task_id}`;
+            if (d.solved) {
+              addLog(`SOLVED ${d.task_id} via ${d.program} (${d.time_ms.toFixed(0)}ms)`, 'solved');
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  } catch(e) {
+    addLog(`Benchmark error: ${e.message}`, 'failed');
+    document.getElementById('bench-status').textContent = 'Error: ' + e.message;
+  } finally {
+    _benchmarkRunning = false;
+    document.getElementById('btn-benchmark').classList.remove('active');
+  }
+}
+
+async function solveRandom() {
+  addLog('Injecting random test task...');
+  try {
+    const r = await fetch(API + '/solve', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        task: {
+          train: [{input: [[1,0],[0,1]], output: [[0,1],[1,0]]}],
+          test: [{input: [[1,0,1],[0,1,0]], output: [[0,1,0],[1,0,1]]}]
+        }
+      })
+    });
+    const d = await r.json();
+    addLog(`Result: ${d.solved ? 'SOLVED' : 'FAILED'} (${d.candidates_tried} candidates, ${d.time_ms.toFixed(0)}ms)`,
+           d.solved ? 'solved' : 'failed');
+  } catch(e) {
+    addLog(`Error: ${e.message}`, 'failed');
+  }
+}
+
+async function consolidate() {
+  addLog('Forcing consolidation cycle...');
+  try {
+    const r = await fetch(API + '/brain/consolidate', {method:'POST'});
+    const d = await r.json();
+    addLog(`Consolidated. Nodes=${d.graph.nodes}, Edges=${d.graph.edges}`);
+  } catch(e) {
+    addLog(`Error: ${e.message}`, 'failed');
+  }
+}
+
+async function resetBrain() {
+  addLog('Resetting activations...');
+  try {
+    const r = await fetch(API + '/brain/reset', {method:'POST'});
+    addLog('Brain activations reset.');
+  } catch(e) {
+    addLog(`Error: ${e.message}`, 'failed');
+  }
+}
+
+// ── Continuous Mode ──
+let _continuousPolling = false;
+
+async function startContinuous() {
+  const dataDir = document.getElementById('data-dir').value;
+  addLog('Starting CONTINUOUS SOLVE mode...');
+  try {
+    const r = await fetch(API + '/benchmark/continuous/start', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({data_dir: dataDir})
+    });
+    const d = await r.json();
+    addLog('Pool: ' + (d.unsolved_pool||0) + ' unsolved, ' + (d.already_solved||0) + ' solved. Status: ' + d.status);
+    document.getElementById('pool-panel').style.display = 'block';
+    document.getElementById('btn-continuous').classList.add('active');
+    if (!_continuousPolling) {
+      _continuousPolling = true;
+      pollContinuous();
+    }
+  } catch(e) {
+    addLog(`Error: ${e.message}`, 'failed');
+  }
+}
+
+async function stopContinuous() {
+  try {
+    const r = await fetch(API + '/benchmark/continuous/stop', {method:'POST'});
+    const d = await r.json();
+    addLog('Stopped. Solved: ' + (d.solved||0) + ' | Unsolved: ' + (d.unsolved||0));
+    document.getElementById('continuous-status').textContent = 'STOPPED';
+    document.getElementById('btn-continuous').classList.remove('active');
+    _continuousPolling = false;
+  } catch(e) {
+    addLog(`Error: ${e.message}`, 'failed');
+  }
+}
+
+async function pollContinuous() {
+  if (!_continuousPolling) return;
+  try {
+    const r = await fetch(API + '/benchmark/continuous/status');
+    const d = await r.json();
+    const el = document.getElementById('continuous-status');
+    document.getElementById('pool-panel').style.display = 'block';
+
+    const pct = (d.accuracy||0).toFixed(1);
+    const progSection = document.getElementById('progress-section');
+    progSection.classList.add('visible');
+
+    // Big numbers
+    document.getElementById('big-accuracy').innerHTML =
+      '<span class="label">ACCURACY</span>' + pct + '%';
+    document.getElementById('big-solved').innerHTML =
+      '<span class="label">SOLVED</span>' + (d.solved||0) + ' / ' + (d.total||0);
+    document.getElementById('big-cycle').innerHTML =
+      '<span class="label">CYCLE</span>' + (d.cycle||0);
+
+    // Task progress bar (how far through the current cycle)
+    const attemptedCycle = d.attempted_this_cycle || 0;
+    const totalCycle = d.total_in_cycle || d.unsolved || 1;
+    const taskPct = Math.min(attemptedCycle / totalCycle * 100, 100).toFixed(1);
+    const taskBar = document.getElementById('progress-bar-tasks');
+    taskBar.style.width = taskPct + '%';
+    taskBar.setAttribute('data-label', taskPct + '%');
+    document.getElementById('progress-tasks-val').textContent =
+      attemptedCycle + ' / ' + totalCycle;
+
+    // Solve rate bar
+    const solvePct = d.total > 0 ? (d.solved / d.total * 100).toFixed(1) : '0.0';
+    const solveBar = document.getElementById('progress-bar-solved');
+    solveBar.style.width = solvePct + '%';
+    solveBar.setAttribute('data-label', solvePct + '%');
+    document.getElementById('progress-solved-val').textContent =
+      (d.solved||0) + ' / ' + (d.total||0);
+
+    // Details line
+    document.getElementById('progress-details').textContent =
+      (d.running ? 'SOLVING' : 'PAUSED') +
+      ' | Prims: ' + (d.total_primitives||0) +
+      ' | SelfCoded: ' + (d.self_coded_prims||0) +
+      ' | Unsolved: ' + (d.unsolved||0);
+
+    // Compact status text
+    el.innerHTML = (d.running ? '<span style="color:#00ff88;">SOLVING</span>' : '<span style="color:#ff6644;">PAUSED</span>') +
+      ' | Cycle ' + (d.cycle||0) +
+      ' | <span style="color:#00ff88;">' + pct + '%</span>' +
+      ' | Prims: ' + (d.total_primitives||0);
+
+    // Update bench bar too
+    if (d.total > 0) {
+      document.getElementById('bench-bar').style.width = solvePct + '%';
+      document.getElementById('bench-status').textContent =
+        d.solved + '/' + d.total + ' solved (' + pct + '%) - Cycle ' + (d.cycle||0) + ' [' + attemptedCycle + '/' + totalCycle + ' tasks]';
+    }
+
+    // Update solved list
+    const solvedEl = document.getElementById('solved-list');
+    if (d.solved_tasks) {
+      let html = '';
+      for (const [tid, info] of Object.entries(d.solved_tasks)) {
+        html += '<div style="margin-bottom:3px;">' +
+          '<span style="color:var(--accent);">' + tid + '</span> = ' +
+          '<span style="color:var(--info);">' + (info.program||'?') + '</span>' +
+          ' <span style="color:var(--dim);">(#' + (info.attempt||1) + ', ' + (info.mode||'?') + ')</span></div>';
+      }
+      solvedEl.innerHTML = html || '<span style="color:var(--dim);">None yet...</span>';
+    }
+
+    // Update near-miss list
+    const nmEl = document.getElementById('nearmiss-list');
+    if (d.near_misses && d.near_misses.length) {
+      let html = '';
+      for (const nm of d.near_misses) {
+        const barW = Math.round(nm.score * 100);
+        html += '<div style="margin-bottom:3px;">' +
+          '<span style="color:var(--yellow);">' + nm.task_id + '</span> ' +
+          '<span style="color:var(--dim);">' + (nm.score*100).toFixed(0) + '%</span> ' +
+          '<div style="height:3px;background:#333;margin-top:2px;">' +
+            '<div style="height:3px;background:var(--yellow);width:' + barW + '%;"></div>' +
+          '</div>' +
+          '</div>';
+      }
+      nmEl.innerHTML = html;
+    }
+
+    if (!d.running) {
+      _continuousPolling = false;
+      document.getElementById('btn-continuous').classList.remove('active');
+    }
+  } catch(e) {}
+
+  if (_continuousPolling) {
+    setTimeout(pollContinuous, 2000);
+  }
+}
+
+// ── Knowledge Forging ──
+async function forgeKnowledge() {
+  const urls = [
+    'https://raw.githubusercontent.com/fchollet/ARC-AGI/master/README.md',
+    'https://raw.githubusercontent.com/michaelhodel/arc-dsl/master/arc_dsl/dsl.py',
+  ];
+  addLog('Forging knowledge from ' + urls.length + ' sources...');
+  let totalNodes = 0, totalEdges = 0;
+  for (const url of urls) {
+    try {
+      const r = await fetch(API + '/brain/forge', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: url})
+      });
+      const d = await r.json();
+      totalNodes += d.injected_nodes || 0;
+      totalEdges += d.injected_edges || 0;
+      if (d.patterns && d.patterns.length) {
+        addLog('Forged from ' + url.split('/').pop() + ': +' + d.injected_nodes + ' nodes, +' + d.injected_edges + ' edges');
+      }
+    } catch(e) {
+      addLog('Forge error: ' + e.message, 'failed');
+    }
+  }
+  addLog('Knowledge forge complete: +' + totalNodes + ' nodes, +' + totalEdges + ' edges');
+}
+
+// ── Check if continuous mode is already running on page load ──
+async function checkContinuousOnLoad() {
+  try {
+    const r = await fetch(API + '/benchmark/continuous/status');
+    const d = await r.json();
+    if (d.running) {
+      document.getElementById('pool-panel').style.display = 'block';
+      document.getElementById('btn-continuous').classList.add('active');
+      _continuousPolling = true;
+      pollContinuous();
+      addLog('Reconnected to running continuous solve loop (cycle ' + d.cycle + ')');
+    }
+  } catch(e) {}
+}
+
+// ── Evolution & Self-Improvement Monitor ──
+async function pollEvolution() {
+  try {
+    const r = await fetch(API + '/brain/evolution');
+    if (!r.ok) return;
+    const d = await r.json();
+
+    // ACC Inner Critic
+    const acc = d.acc || {};
+    const dissEl = document.getElementById('acc-dissatisfaction');
+    const disVal = (acc.dissatisfaction || 0).toFixed(1);
+    dissEl.textContent = disVal;
+    dissEl.style.color = disVal > 7 ? '#ff2222' : disVal > 4 ? '#ff6644' : disVal > 2 ? '#ffcc00' : 'var(--accent)';
+
+    document.getElementById('acc-plateau').textContent = acc.plateau_cycles || 0;
+    document.getElementById('acc-pressure').textContent = (acc.restructure_pressure || 0).toFixed(1);
+
+    const alarmEl = document.getElementById('acc-alarm');
+    alarmEl.textContent = acc.stagnation_alarm ? 'ACTIVE' : 'OFF';
+    alarmEl.style.color = acc.stagnation_alarm ? '#ff2222' : '#555';
+
+    const accStatus = document.getElementById('acc-status');
+    accStatus.textContent = disVal > 7 ? '(FURIOUS)' : disVal > 4 ? '(UNHAPPY)' : disVal > 2 ? '(CONCERNED)' : '(CALM)';
+
+    // ACC demands
+    const demandsEl = document.getElementById('acc-demands');
+    const demands = acc.demands || [];
+    demandsEl.innerHTML = demands.length ? demands.map(d =>
+      `<div style="margin:2px 0;">&gt; ${d}</div>`
+    ).join('') : '<span style="color:#555;">No demands (satisfied)</span>';
+
+    // ACC targets bar
+    const targetsEl = document.getElementById('acc-targets');
+    const targets = acc.cycle_targets || {};
+    targetsEl.innerHTML = Object.entries(targets).map(([cy, tgt]) => {
+      const lc = d.learning_curve || [];
+      const actual = lc.find(l => l.cycle == cy);
+      const actualPct = actual ? actual.accuracy : 0;
+      const met = actualPct >= tgt * 100;
+      return `<div style="padding:3px 8px;border-radius:3px;font-size:10px;background:${met ? '#0a2a0a' : '#2a0a0a'};border:1px solid ${met ? '#00ff88' : '#ff4444'};">
+        C${cy}: ${(tgt*100).toFixed(0)}% ${actual ? `(got ${actualPct.toFixed(1)}%)` : ''}
+      </div>`;
+    }).join('');
+
+    // Self-Improvement Stats
+    const cy = d.internal_cycles || {};
+    document.getElementById('si-coded').textContent = (cy.self_coded_prims || 0).toLocaleString();
+    document.getElementById('si-repair').textContent = (cy.self_repair_cycles || 0).toLocaleString();
+    document.getElementById('si-dream').textContent = (cy.dream_cycles || 0).toLocaleString();
+    document.getElementById('si-consolidate').textContent = (cy.consolidation_cycles || 0).toLocaleString();
+    document.getElementById('si-forage').textContent = (cy.forage_cycles || 0).toLocaleString();
+    document.getElementById('si-hypotheses').textContent = (cy.hypotheses_tested || 0).toLocaleString();
+    document.getElementById('si-meta').textContent = (cy.meta_adaptations || 0).toLocaleString();
+    document.getElementById('si-mirofish').textContent = (cy.mirofish_discoveries || 0).toLocaleString();
+    document.getElementById('si-agents').textContent = (cy.agents_spawned || 0).toLocaleString();
+    document.getElementById('si-tunings').textContent = (cy.self_tunings || 0).toLocaleString();
+
+    const totalTasks = cy.tasks_seen || 1;
+    const totalSolved = cy.tasks_solved || 0;
+    document.getElementById('si-velocity').textContent =
+      `Lifetime: ${totalSolved}/${totalTasks} tasks solved (${(totalSolved/totalTasks*100).toFixed(1)}%)`;
+
+    // Failure Analysis
+    const ftEl = document.getElementById('failure-types');
+    const ft = d.failure_types || {};
+    const ftTotal = Object.values(ft).reduce((a,b) => a+b, 0) || 1;
+    const ftColors = {object_gap:'#ff6644', composition_gap:'#ffcc00', almost_solved:'#44aaff', unknown:'#555'};
+    ftEl.innerHTML = Object.entries(ft).sort((a,b) => b[1]-a[1]).map(([type, count]) => {
+      const pct = (count/ftTotal*100).toFixed(0);
+      const color = ftColors[type] || '#888';
+      return `<div style="margin:4px 0;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+          <span style="color:${color};">${type}</span>
+          <span>${count} (${pct}%)</span>
+        </div>
+        <div style="height:6px;background:#1a1a2a;border-radius:3px;overflow:hidden;">
+          <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div>
+        </div>
+      </div>`;
+    }).join('') || '<span style="color:#555;">No failures yet</span>';
+
+    // Near misses
+    const nmEl = document.getElementById('near-misses');
+    const nm = d.near_misses || [];
+    nmEl.innerHTML = nm.slice(0, 10).map(n =>
+      `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #111118;">
+        <span style="color:var(--info);">${n.task_id.slice(0,8)}</span>
+        <span style="color:${n.score > 0.95 ? 'var(--accent)' : '#ffcc00'};">${(n.score*100).toFixed(1)}%</span>
+        <span style="color:var(--dim);font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;">${n.best_program}</span>
+      </div>`
+    ).join('') || '<span style="color:#555;">None yet</span>';
+
+    // Synthesized Primitives
+    const synthEl = document.getElementById('synth-list');
+    const synth = d.synthesized_primitives || [];
+    document.getElementById('synth-count').textContent = `(${d.total_synthesized || 0} total)`;
+    const sourceColors = {
+      self_improve_object_gap: '#ff6644',
+      self_improve_near_miss_repair: '#44aaff',
+      reverse_engineer: '#aa66ff',
+      mirofish_evolve: '#ff88cc',
+      composition_synthesis: '#ffcc00',
+      self_code_60hz: '#00ff88',
+    };
+    synthEl.innerHTML = synth.slice(0, 25).map(s => {
+      const color = Object.entries(sourceColors).find(([k]) => (s.source||'').includes(k));
+      const c = color ? color[1] : '#888';
+      return `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #111118;">
+        <span style="color:${c};max-width:200px;overflow:hidden;text-overflow:ellipsis;" title="${s.name}">${s.name}</span>
+        <span style="color:var(--dim);font-size:10px;">${s.source || '?'}</span>
+      </div>`;
+    }).join('') || '<span style="color:#555;">None yet</span>';
+
+    // Learning Curve
+    const lcEl = document.getElementById('learning-curve');
+    const lc = d.learning_curve || [];
+    if (lc.length > 0) {
+      const maxAcc = Math.max(...lc.map(l => l.accuracy), 1);
+      lcEl.innerHTML = lc.map(l => {
+        const h = Math.max(4, (l.accuracy / Math.max(maxAcc, 25)) * 60);
+        const color = l.accuracy > 20 ? 'var(--accent)' : l.accuracy > 15 ? '#ffcc00' : '#ff6644';
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+          <div style="font-size:9px;color:var(--dim);">${l.accuracy.toFixed(0)}%</div>
+          <div style="width:100%;height:${h}px;background:${color};border-radius:2px;margin-top:2px;"></div>
+          <div style="font-size:9px;color:var(--dim);">C${l.cycle}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Strategy Performance
+    const spEl = document.getElementById('strategy-perf');
+    const sp = d.strategy_performance || {};
+    const stratColors = {fast_recall:'#00ff88', balanced:'#44aaff', deep_search:'#ffcc00', exploratory:'#aa66ff', emergency:'#ff4444'};
+    spEl.innerHTML = Object.entries(sp).map(([strat, data]) =>
+      `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #111118;">
+        <span style="color:${stratColors[strat]||'#888'};">${strat}</span>
+        <span>${data.success_rate}% (${data.attempts} tasks)</span>
+        <span style="color:var(--dim);">${data.avg_time_ms.toFixed(0)}ms</span>
+      </div>`
+    ).join('') || '<span style="color:#555;">No data</span>';
+
+    // Meta Params
+    const mpEl = document.getElementById('meta-params-display');
+    const mp = d.meta_params || {};
+    mpEl.innerHTML = Object.entries(mp).map(([k,v]) =>
+      `<span style="display:inline-block;padding:2px 6px;margin:2px;background:#1a1a2e;border-radius:3px;font-size:10px;">
+        <span style="color:var(--dim);">${k.replace('mirofish_','mf_')}:</span>
+        <span style="color:var(--accent);">${typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(2)) : v}</span>
+      </span>`
+    ).join('');
+
+    // Thoughts
+    const thoughtsEl = document.getElementById('thoughts-log');
+    const thoughts = d.recent_thoughts || [];
+    if (thoughts.length > 0) {
+      thoughtsEl.innerHTML = thoughts.slice().reverse().map(t => {
+        const ts = t.thoughts || [];
+        const rate = t.solve_rate || 0;
+        return `<div style="padding:3px 0;border-bottom:1px solid #111118;">
+          <span style="color:${rate > 0.2 ? 'var(--accent)' : rate > 0.1 ? '#ffcc00' : '#ff6644'};font-size:10px;">[${(rate*100).toFixed(0)}% solve]</span>
+          ${ts.map(th => `<span style="margin-left:6px;">${th}</span>`).join('')}
+        </div>`;
+      }).join('');
+    }
+
+    // Improvement Timeline
+    const timelineEl = document.getElementById('improvement-timeline');
+    const events = d.improvement_events || [];
+    if (events.length > 0) {
+      const typeColors = {
+        metacognitive_adaptation: '#ffcc00',
+        self_profile_tune: '#44aaff',
+        self_improve: '#00ff88',
+        primitive_synthesis: '#ff88cc',
+      };
+      timelineEl.innerHTML = events.slice().reverse().map(e => {
+        const color = typeColors[e.type] || '#888';
+        const time = e.time ? new Date(e.time * 1000).toLocaleTimeString() : '';
+        return `<div style="padding:3px 0;border-bottom:1px solid #111118;">
+          <span style="color:var(--dim);font-size:10px;">${time}</span>
+          <span style="color:${color};margin-left:6px;font-weight:600;">[${e.type}]</span>
+          <span style="margin-left:4px;">${e.detail}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // Panel border pulse based on dissatisfaction
+    const accPanel = document.getElementById('acc-panel');
+    if (disVal > 7) {
+      accPanel.style.borderLeftColor = '#ff2222';
+      accPanel.style.boxShadow = '0 0 15px rgba(255,34,34,0.3)';
+    } else if (disVal > 4) {
+      accPanel.style.borderLeftColor = '#ff6644';
+      accPanel.style.boxShadow = '0 0 8px rgba(255,102,68,0.2)';
+    } else {
+      accPanel.style.borderLeftColor = '#555';
+      accPanel.style.boxShadow = 'none';
+    }
+
+  } catch(e) { /* evolution endpoint may not exist yet */ }
+}
+
+// ── Start Polling ──
+setInterval(pollHealth, 500);
+setInterval(pollState, 2000);
+setInterval(pollEvents, 1500);  // Auto-update cognitive activity log
+setInterval(pollEvolution, 3000);  // Self-improvement monitor
+pollHealth();
+pollState();
+pollEvents();
+pollEvolution();
+checkContinuousOnLoad();
+
+// ── Chat with Organism ──────────────────────────────────
+let chatMsgCount = 0;
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const domain = document.getElementById('chat-domain').value;
+  const loading = document.getElementById('chat-loading');
+  const responses = document.getElementById('chat-responses');
+  const welcome = document.getElementById('chat-welcome');
+
+  // Hide welcome
+  if (welcome) welcome.style.display = 'none';
+
+  // Show user message
+  chatMsgCount++;
+  const userDiv = document.createElement('div');
+  userDiv.style.cssText = 'padding:10px 15px;border-bottom:1px solid var(--border);';
+  userDiv.innerHTML = `<span style="color:var(--info);font-size:10px;">YOU</span><br><span style="color:var(--text);">${escapeHtml(msg)}</span>`;
+  responses.appendChild(userDiv);
+
+  // Show loading
+  loading.style.display = 'block';
+  input.value = '';
+  input.focus();
+
+  try {
+    let result;
+    const t0 = Date.now();
+
+    if (domain === 'auto') {
+      // Route through /chat endpoint
+      const resp = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: msg}),
+      });
+      result = await resp.json();
+    } else if (domain === 'research') {
+      const resp = await fetch('/research', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({topic: msg, depth: 'standard'}),
+      });
+      result = await resp.json();
+      result.domain = 'research';
+      result.solved = true;
+    } else if (domain === 'materials') {
+      const resp = await fetch('/materials/discover', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({target: 'solar', n_steps_per: 200}),
+      });
+      result = await resp.json();
+      result.domain = 'material_discovery';
+      result.solved = true;
+    } else {
+      // Route through universal solver with domain hint
+      const resp = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: msg, context: domain}),
+      });
+      result = await resp.json();
+    }
+
+    const elapsed = Date.now() - t0;
+
+    // Show response
+    const respDiv = document.createElement('div');
+    respDiv.style.cssText = 'padding:10px 15px;border-bottom:1px solid var(--border);background:#0d0d15;';
+
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">`;
+    html += `<span style="color:var(--accent);font-size:10px;">ORGANISM</span>`;
+    html += `<span style="color:var(--dim);font-size:10px;">${result.domain || 'general'} | ${elapsed}ms</span>`;
+    html += `</div>`;
+
+    if (result.solved || result.output || result.synthesis) {
+      html += `<div style="color:var(--accent);font-size:11px;margin-bottom:6px;">[SOLVED]</div>`;
+    }
+
+    // ── PRIMARY: Show natural language response text ──
+    if (result.response && typeof result.response === 'string' && result.response.length > 5) {
+      // Format the response with proper styling
+      const formatted = escapeHtml(result.response)
+        .replace(/^## (.+)$/gm, '<h4 style="color:var(--purple);margin:12px 0 4px;font-size:13px;">$1</h4>')
+        .replace(/^# (.+)$/gm, '<h3 style="color:var(--accent);margin:10px 0 6px;font-size:15px;">$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--accent);">$1</strong>')
+        .replace(/^  - (.+)$/gm, '<div style="margin-left:12px;color:var(--text);">&bull; $1</div>')
+        .replace(/^  (\d+)\. (.+)$/gm, '<div style="margin-left:12px;color:var(--text);"><span style="color:var(--info);">$1.</span> $2</div>')
+        .replace(/\n\n/g, '</p><p style="margin:8px 0;">')
+        .replace(/\n/g, '<br>');
+      html += `<div style="color:var(--text);font-size:13px;line-height:1.6;padding:8px 0;">
+        <p style="margin:0;">${formatted}</p>
+      </div>`;
+    }
+    // ── FALLBACK: Show raw structured output if no readable response ──
+    else {
+      const output = result.output || result.solution_output;
+      if (output && typeof output === 'object') {
+        html += `<pre style="color:var(--text);font-size:11px;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-top:4px;">${escapeHtml(JSON.stringify(output, null, 2)).substring(0, 5000)}</pre>`;
+      } else if (output && typeof output === 'string') {
+        html += `<div style="color:var(--text);white-space:pre-wrap;">${escapeHtml(String(output))}</div>`;
+      }
+    }
+
+    // Show structured data in a collapsible section (when there's also a text response)
+    if (result.response && result.output && typeof result.output === 'object') {
+      const dataId = 'data-' + Date.now();
+      html += `<details style="margin-top:8px;"><summary style="color:var(--dim);font-size:10px;cursor:pointer;">Show raw data</summary>`;
+      html += `<pre style="color:var(--dim);font-size:10px;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-top:4px;">${escapeHtml(JSON.stringify(result.output, null, 2)).substring(0, 3000)}</pre>`;
+      html += `</details>`;
+    }
+
+    // Show code if available
+    if (result.code || result.solution_code) {
+      html += `<div style="margin-top:6px;padding:6px;background:var(--panel);border-radius:3px;"><span style="color:var(--dim);font-size:10px;">CODE:</span><br><code style="color:var(--yellow);font-size:11px;">${escapeHtml(result.code || result.solution_code || '')}</code></div>`;
+    }
+
+    // Show emotions as subtle indicators
+    if (result.emotions) {
+      const emos = result.emotions;
+      const activeEmos = Object.entries(emos).filter(([k,v]) => v > 0.1);
+      if (activeEmos.length > 0) {
+        html += `<div style="margin-top:6px;font-size:10px;color:var(--dim);border-top:1px solid var(--border);padding-top:4px;">`;
+        html += activeEmos.map(([k,v]) => {
+          const colors = {satisfaction:'#4ade80',empathy:'#60a5fa',caution:'#f59e0b',wonder:'#c084fc',determination:'#f43f5e'};
+          return `<span style="color:${colors[k]||'var(--dim)'};">${k}: ${(v*100).toFixed(0)}%</span>`;
+        }).join(' &middot; ');
+        html += `</div>`;
+      }
+    }
+
+    respDiv.innerHTML = html;
+    responses.appendChild(respDiv);
+
+  } catch (err) {
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'padding:10px 15px;border-bottom:1px solid var(--border);color:var(--warn);';
+    errDiv.textContent = `Error: ${err.message}`;
+    responses.appendChild(errDiv);
+  }
+
+  loading.style.display = 'none';
+  responses.scrollTop = responses.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+def optimized_propagate(e, w): return e * w * 0.99

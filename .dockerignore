@@ -1,0 +1,8 @@
+__pycache__
+*.pyc
+kos_rust/target
+.cache/organism
+.cache/brain
+*.log
+server_log.txt
+.git

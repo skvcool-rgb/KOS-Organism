@@ -1,0 +1,948 @@
+======================================================================
+  KOS VSA BENCHMARK — 403 ARC Training Tasks
+======================================================================
+[OBJECT-VSA] Analyzing 5 examples at object level...
+  Example 0: 6 input objects, 8 output objects
+  Example 1: 9 input objects, 10 output objects
+  Example 2: 11 input objects, 13 output objects
+  Example 3: 5 input objects, 8 output objects
+  Example 4: 14 input objects, 19 output objects
+[OBJECT-VSA] No consistent rule found. 1.8ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 8 input objects, 5 output objects
+  Example 1: 6 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 5.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 7 output objects
+  Example 1: 4 input objects, 8 output objects
+  Example 2: 5 input objects, 12 output objects
+[OBJECT-VSA] No consistent rule found. 2.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 6 input objects, 49 output objects
+  Example 1: 12 input objects, 49 output objects
+  Example 2: 15 input objects, 49 output objects
+[OBJECT-VSA] No consistent rule found. 1.0ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 2 input objects, 2 output objects
+  Example 2: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 7 input objects, 12 output objects
+  Example 1: 9 input objects, 18 output objects
+  Example 2: 7 input objects, 16 output objects
+[OBJECT-VSA] No consistent rule found. 3.3ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 4 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 45 input objects, 5 output objects
+  Example 1: 45 input objects, 5 output objects
+  Example 2: 45 input objects, 5 output objects
+  Example 3: 45 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 1.7ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 10 input objects, 26 output objects
+  Example 1: 10 input objects, 26 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 2 input objects, 10 output objects
+  Example 1: 2 input objects, 6 output objects
+  Example 2: 2 input objects, 9 output objects
+  Example 3: 2 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 10 output objects
+  Example 1: 5 input objects, 21 output objects
+  Example 2: 3 input objects, 11 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 3 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 3 input objects, 3 output objects
+  Example 3: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 395 input objects, 441 output objects
+  Example 1: 286 input objects, 324 output objects
+  Example 2: 368 input objects, 441 output objects
+[OBJECT-VSA] No consistent rule found. 36.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 18 input objects, 12 output objects
+  Example 1: 9 input objects, 6 output objects
+  Example 2: 11 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 10 input objects, 13 output objects
+  Example 1: 10 input objects, 13 output objects
+  Example 2: 10 input objects, 13 output objects
+[OBJECT-VSA] No consistent rule found. 1.0ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 5 output objects
+  Example 1: 1 input objects, 6 output objects
+  Example 2: 2 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 1.1ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 5 output objects
+  Example 1: 4 input objects, 7 output objects
+  Example 2: 5 input objects, 11 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 7 input objects, 2 output objects
+  Example 1: 8 input objects, 2 output objects
+  Example 2: 6 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 2 output objects
+  Example 1: 1 input objects, 2 output objects
+  Example 2: 1 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 3 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 4 output objects
+  Example 1: 5 input objects, 4 output objects
+  Example 2: 6 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 1.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 16 output objects
+  Example 1: 9 input objects, 21 output objects
+  Example 2: 11 input objects, 37 output objects
+[OBJECT-VSA] No consistent rule found. 1.7ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 2 input objects, 1 output objects
+  Example 1: 2 input objects, 1 output objects
+  Example 2: 4 input objects, 1 output objects
+  Example 3: 2 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 7 output objects
+  Example 1: 6 input objects, 11 output objects
+  Example 2: 7 input objects, 13 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 6 input objects, 13 output objects
+  Example 1: 8 input objects, 18 output objects
+  Example 2: 8 input objects, 19 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 5 output objects
+  Example 1: 7 input objects, 7 output objects
+  Example 2: 8 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 7 input objects, 1 output objects
+  Example 1: 10 input objects, 2 output objects
+  Example 2: 12 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 8 output objects
+  Example 1: 2 input objects, 4 output objects
+  Example 2: 2 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 11 output objects
+  Example 1: 6 input objects, 15 output objects
+  Example 2: 6 input objects, 15 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 8 output objects
+  Example 1: 7 input objects, 7 output objects
+  Example 2: 8 input objects, 8 output objects
+[OBJECT-VSA] RULE VERIFIED in 9.6ms: MOVE all color-3 objects by (-4,1)
+  Worst VSA error across 3 examples: 0.1991
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 7 output objects
+  Example 1: 10 input objects, 8 output objects
+  Example 2: 8 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 8 output objects
+  Example 1: 2 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 2.4ms
+[OBJECT-VSA] Analyzing 8 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 4 input objects, 6 output objects
+  Example 2: 4 input objects, 6 output objects
+  Example 3: 2 input objects, 3 output objects
+  Example 4: 1 input objects, 1 output objects
+  Example 5: 2 input objects, 2 output objects
+  Example 6: 3 input objects, 4 output objects
+  Example 7: 5 input objects, 7 output objects
+[OBJECT-VSA] No consistent rule found. 1.4ms
+  --- Progress: 50/403 | Solved: 0 | Failed: 34 | Skipped: 16 | Errors: 0 | 486.6 tasks/sec ---
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 2 input objects, 3 output objects
+  Example 2: 2 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.6ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 4 input objects, 1 output objects
+  Example 1: 5 input objects, 1 output objects
+  Example 2: 5 input objects, 1 output objects
+  Example 3: 3 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 1 input objects, 1 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 1 input objects, 1 output objects
+  Example 3: 1 input objects, 1 output objects
+[OBJECT-VSA] RULE VERIFIED in 1.0ms: MOVE ALL objects by (1,0)
+  Worst VSA error across 4 examples: 0.0000
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 1 input objects, 1 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 1 input objects, 1 output objects
+  Example 3: 1 input objects, 1 output objects
+[OBJECT-VSA] RULE VERIFIED in 0.8ms: MOVE ALL objects by (1,0)
+  Worst VSA error across 4 examples: 0.0000
+[WAKE] Solved 25ff71a9: MOVE ALL objects by (1,0) (acc=1.0000, buffer=1)
+  [  1] SOLVED 25ff71a9: MOVE ALL objects by (1,0)
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 14 input objects, 27 output objects
+  Example 1: 11 input objects, 27 output objects
+  Example 2: 13 input objects, 28 output objects
+[OBJECT-VSA] No consistent rule found. 93.2ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 1 input objects, 6 output objects
+  Example 1: 1 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 1.0ms
+[OBJECT-VSA] Analyzing 5 examples at object level...
+  Example 0: 0 input objects, 1 output objects
+  Example 1: 0 input objects, 1 output objects
+  Example 2: 0 input objects, 1 output objects
+  Example 3: 0 input objects, 1 output objects
+  Example 4: 0 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 9 input objects, 2 output objects
+  Example 1: 11 input objects, 3 output objects
+  Example 2: 10 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 2 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.1ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 180 input objects, 197 output objects
+  Example 1: 200 input objects, 226 output objects
+  Example 2: 191 input objects, 226 output objects
+  Example 3: 205 input objects, 226 output objects
+[OBJECT-VSA] No consistent rule found. 17.9ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 2 input objects, 2 output objects
+  Example 2: 2 input objects, 2 output objects
+  Example 3: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 2 input objects, 3 output objects
+  Example 2: 2 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 5 input objects, 5 output objects
+  Example 3: 7 input objects, 7 output objects
+[OBJECT-VSA] No consistent rule found. 10.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 38 input objects, 38 output objects
+  Example 1: 11 input objects, 11 output objects
+  Example 2: 32 input objects, 32 output objects
+[OBJECT-VSA] No consistent rule found. 1.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 16 input objects, 2 output objects
+  Example 1: 26 input objects, 2 output objects
+  Example 2: 15 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 7 input objects, 12 output objects
+  Example 1: 5 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 1.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 41 input objects, 44 output objects
+  Example 1: 46 input objects, 48 output objects
+  Example 2: 112 input objects, 115 output objects
+[OBJECT-VSA] No consistent rule found. 3.7ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 3 input objects, 1 output objects
+  Example 1: 3 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 4 output objects
+  Example 1: 3 input objects, 7 output objects
+  Example 2: 3 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 1.2ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 178 input objects, 200 output objects
+  Example 1: 215 input objects, 222 output objects
+  Example 2: 209 input objects, 213 output objects
+  Example 3: 214 input objects, 220 output objects
+[OBJECT-VSA] No consistent rule found. 23.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 10 input objects, 25 output objects
+  Example 1: 11 input objects, 30 output objects
+  Example 2: 11 input objects, 30 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 11 input objects, 21 output objects
+  Example 1: 9 input objects, 15 output objects
+  Example 2: 9 input objects, 15 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 41 input objects, 47 output objects
+  Example 1: 30 input objects, 35 output objects
+  Example 2: 31 input objects, 35 output objects
+[OBJECT-VSA] No consistent rule found. 2.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 4 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 7 input objects, 10 output objects
+  Example 1: 8 input objects, 14 output objects
+  Example 2: 12 input objects, 23 output objects
+[OBJECT-VSA] No consistent rule found. 7.1ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 4 output objects
+  Example 1: 3 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 18 output objects
+  Example 1: 1 input objects, 9 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 16 output objects
+  Example 1: 1 input objects, 4 output objects
+  Example 2: 1 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 1.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 6 output objects
+  Example 1: 2 input objects, 6 output objects
+  Example 2: 2 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 6 input objects, 6 output objects
+  Example 1: 6 input objects, 6 output objects
+  Example 2: 3 input objects, 3 output objects
+  Example 3: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 2.2ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 4 input objects, 6 output objects
+  Example 1: 6 input objects, 12 output objects
+  Example 2: 8 input objects, 12 output objects
+  Example 3: 8 input objects, 12 output objects
+[OBJECT-VSA] No consistent rule found. 1.1ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 10 input objects, 11 output objects
+  Example 1: 8 input objects, 9 output objects
+  Example 2: 7 input objects, 8 output objects
+  Example 3: 9 input objects, 10 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 10 input objects, 7 output objects
+  Example 1: 10 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 2.0ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 1 output objects
+  Example 1: 12 input objects, 1 output objects
+  Example 2: 10 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 3 input objects, 14 output objects
+  Example 1: 5 input objects, 27 output objects
+[OBJECT-VSA] No consistent rule found. 1.5ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 3 input objects, 5 output objects
+  Example 1: 4 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 18 input objects, 7 output objects
+  Example 1: 24 input objects, 11 output objects
+  Example 2: 28 input objects, 18 output objects
+  Example 3: 24 input objects, 16 output objects
+[OBJECT-VSA] No consistent rule found. 1.1ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 4 input objects, 4 output objects
+  Example 2: 4 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 6 output objects
+  Example 1: 7 input objects, 9 output objects
+  Example 2: 3 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 5 output objects
+  Example 1: 3 input objects, 6 output objects
+  Example 2: 3 input objects, 4 output objects
+  Example 3: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 16 output objects
+  Example 1: 7 input objects, 15 output objects
+  Example 2: 10 input objects, 20 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 782 input objects, 841 output objects
+  Example 1: 542 input objects, 590 output objects
+  Example 2: 735 input objects, 841 output objects
+[OBJECT-VSA] No consistent rule found. 136.1ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 5 output objects
+  Example 1: 3 input objects, 9 output objects
+  Example 2: 9 input objects, 9 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 4 output objects
+  Example 1: 2 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 17 output objects
+  Example 1: 6 input objects, 9 output objects
+  Example 2: 8 input objects, 17 output objects
+[OBJECT-VSA] No consistent rule found. 0.6ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 66 input objects, 72 output objects
+  Example 1: 36 input objects, 51 output objects
+  Example 2: 26 input objects, 33 output objects
+  Example 3: 20 input objects, 22 output objects
+[OBJECT-VSA] No consistent rule found. 3.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 13 output objects
+  Example 1: 4 input objects, 13 output objects
+  Example 2: 4 input objects, 13 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 6 output objects
+  Example 1: 2 input objects, 4 output objects
+  Example 2: 3 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 7 input objects, 7 output objects
+  Example 1: 8 input objects, 8 output objects
+  Example 2: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 5 input objects, 8 output objects
+  Example 1: 6 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 2.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 4 output objects
+  Example 1: 1 input objects, 2 output objects
+  Example 2: 2 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 5 input objects, 5 output objects
+  Example 1: 5 input objects, 5 output objects
+  Example 2: 5 input objects, 5 output objects
+  Example 3: 7 input objects, 7 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 3 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 1.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 1 output objects
+  Example 1: 8 input objects, 1 output objects
+  Example 2: 8 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 2 input objects, 3 output objects
+  Example 2: 2 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 4 input objects, 2 output objects
+  Example 1: 4 input objects, 2 output objects
+  Example 2: 2 input objects, 1 output objects
+  Example 3: 2 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 6 input objects, 6 output objects
+  Example 2: 4 input objects, 4 output objects
+  Example 3: 8 input objects, 12 output objects
+[OBJECT-VSA] No consistent rule found. 2.0ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 6 output objects
+  Example 1: 2 input objects, 14 output objects
+  Example 2: 2 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 6 output objects
+  Example 1: 3 input objects, 7 output objects
+  Example 2: 3 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 12.0ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 3 input objects, 7 output objects
+  Example 1: 2 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 2.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 21 output objects
+  Example 1: 1 input objects, 21 output objects
+  Example 2: 1 input objects, 11 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 6 input objects, 6 output objects
+  Example 1: 6 input objects, 6 output objects
+  Example 2: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 1 input objects, 4 output objects
+  Example 1: 1 input objects, 3 output objects
+  Example 2: 1 input objects, 5 output objects
+  Example 3: 1 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 1.6ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 3 output objects
+  Example 1: 4 input objects, 4 output objects
+  Example 2: 3 input objects, 3 output objects
+  Example 3: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 5 output objects
+  Example 1: 4 input objects, 8 output objects
+  Example 2: 5 input objects, 9 output objects
+[OBJECT-VSA] No consistent rule found. 0.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 8 output objects
+  Example 1: 20 input objects, 20 output objects
+  Example 2: 24 input objects, 24 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+  --- Progress: 150/403 | Solved: 1 | Failed: 101 | Skipped: 48 | Errors: 0 | 295.5 tasks/sec ---
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 4 output objects
+  Example 1: 3 input objects, 6 output objects
+  Example 2: 3 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 1.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 4 input objects, 4 output objects
+  Example 2: 4 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 16 input objects, 16 output objects
+  Example 1: 21 input objects, 21 output objects
+  Example 2: 37 input objects, 37 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 4 output objects
+  Example 1: 2 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 10 output objects
+  Example 1: 8 input objects, 11 output objects
+  Example 2: 8 input objects, 10 output objects
+[OBJECT-VSA] No consistent rule found. 4.6ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 5 input objects, 5 output objects
+  Example 1: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 43 input objects, 1 output objects
+  Example 1: 24 input objects, 2 output objects
+  Example 2: 36 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 11 input objects, 12 output objects
+  Example 1: 29 input objects, 30 output objects
+  Example 2: 30 input objects, 32 output objects
+[OBJECT-VSA] No consistent rule found. 2.9ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 37 input objects, 5 output objects
+  Example 1: 21 input objects, 4 output objects
+  Example 2: 28 input objects, 5 output objects
+  Example 3: 23 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 8.0ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 11 input objects, 11 output objects
+  Example 1: 14 input objects, 14 output objects
+  Example 2: 23 input objects, 21 output objects
+[OBJECT-VSA] No consistent rule found. 1.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 3 output objects
+  Example 1: 1 input objects, 3 output objects
+  Example 2: 1 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 5 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 1 input objects, 1 output objects
+  Example 3: 1 input objects, 1 output objects
+  Example 4: 2 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 8 output objects
+  Example 1: 2 input objects, 10 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 6 input objects, 6 output objects
+  Example 1: 5 input objects, 5 output objects
+  Example 2: 4 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 0 input objects, 1 output objects
+  Example 1: 0 input objects, 1 output objects
+  Example 2: 0 input objects, 1 output objects
+  Example 3: 0 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.1ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 17 input objects, 30 output objects
+  Example 1: 7 input objects, 12 output objects
+  Example 2: 10 input objects, 15 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 60 input objects, 65 output objects
+  Example 1: 68 input objects, 65 output objects
+  Example 2: 64 input objects, 65 output objects
+[OBJECT-VSA] No consistent rule found. 5.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 10 input objects, 12 output objects
+  Example 1: 15 input objects, 18 output objects
+  Example 2: 18 input objects, 22 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 6 input objects, 6 output objects
+  Example 1: 4 input objects, 4 output objects
+  Example 2: 6 input objects, 6 output objects
+  Example 3: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 3.1ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 4 output objects
+  Example 1: 2 input objects, 2 output objects
+  Example 2: 4 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 6 input objects, 6 output objects
+  Example 1: 6 input objects, 6 output objects
+  Example 2: 8 input objects, 8 output objects
+  Example 3: 8 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 1.6ms
+[OBJECT-VSA] Analyzing 10 examples at object level...
+  Example 0: 1 input objects, 1 output objects
+  Example 1: 2 input objects, 1 output objects
+  Example 2: 2 input objects, 1 output objects
+  Example 3: 2 input objects, 1 output objects
+  Example 4: 1 input objects, 1 output objects
+  Example 5: 2 input objects, 1 output objects
+  Example 6: 1 input objects, 1 output objects
+  Example 7: 3 input objects, 1 output objects
+  Example 8: 1 input objects, 1 output objects
+  Example 9: 2 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 6 output objects
+  Example 1: 1 input objects, 5 output objects
+  Example 2: 1 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 5.0ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 7 output objects
+  Example 1: 3 input objects, 7 output objects
+  Example 2: 3 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 18 input objects, 19 output objects
+  Example 1: 26 input objects, 27 output objects
+  Example 2: 42 input objects, 44 output objects
+  Example 3: 38 input objects, 40 output objects
+[OBJECT-VSA] No consistent rule found. 4.4ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 20 input objects, 4 output objects
+  Example 1: 15 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 3 output objects
+  Example 1: 12 input objects, 4 output objects
+  Example 2: 5 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 1.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 8 input objects, 8 output objects
+  Example 1: 4 input objects, 4 output objects
+  Example 2: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 1.3ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 9 input objects, 15 output objects
+  Example 1: 10 input objects, 18 output objects
+  Example 2: 13 input objects, 28 output objects
+  Example 3: 7 input objects, 10 output objects
+[OBJECT-VSA] No consistent rule found. 1.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 19 output objects
+  Example 1: 4 input objects, 17 output objects
+  Example 2: 6 input objects, 14 output objects
+[OBJECT-VSA] No consistent rule found. 7.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 2 output objects
+  Example 1: 1 input objects, 4 output objects
+  Example 2: 1 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 9 output objects
+  Example 1: 1 input objects, 5 output objects
+  Example 2: 1 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+  --- Progress: 200/403 | Solved: 1 | Failed: 134 | Skipped: 65 | Errors: 0 | 340.0 tasks/sec ---
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 6 output objects
+  Example 1: 2 input objects, 4 output objects
+  Example 2: 3 input objects, 7 output objects
+  Example 3: 3 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 2.4ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 6 input objects, 6 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 4 input objects, 4 output objects
+  Example 3: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 1.1ms
+[OBJECT-VSA] Analyzing 5 examples at object level...
+  Example 0: 3 input objects, 6 output objects
+  Example 1: 2 input objects, 4 output objects
+  Example 2: 5 input objects, 10 output objects
+  Example 3: 3 input objects, 6 output objects
+  Example 4: 2 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 1.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 8 output objects
+  Example 1: 4 input objects, 6 output objects
+  Example 2: 4 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 53 input objects, 54 output objects
+  Example 1: 117 input objects, 112 output objects
+  Example 2: 100 input objects, 96 output objects
+[OBJECT-VSA] No consistent rule found. 6.7ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 8 input objects, 8 output objects
+  Example 1: 11 input objects, 11 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 11 output objects
+  Example 1: 5 input objects, 11 output objects
+  Example 2: 5 input objects, 11 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 1 input objects, 8 output objects
+  Example 1: 1 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 1.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 12 output objects
+  Example 1: 2 input objects, 8 output objects
+  Example 2: 3 input objects, 13 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 7 input objects, 9 output objects
+  Example 1: 4 input objects, 7 output objects
+  Example 2: 18 input objects, 30 output objects
+[OBJECT-VSA] No consistent rule found. 1.4ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 6 output objects
+  Example 1: 1 input objects, 2 output objects
+  Example 2: 2 input objects, 4 output objects
+  Example 3: 1 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 83 input objects, 1 output objects
+  Example 1: 81 input objects, 1 output objects
+  Example 2: 59 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 2.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 6 output objects
+  Example 1: 5 input objects, 6 output objects
+  Example 2: 5 input objects, 6 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 8 output objects
+  Example 1: 4 input objects, 8 output objects
+  Example 2: 4 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 4 output objects
+  Example 1: 1 input objects, 4 output objects
+  Example 2: 1 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 5 input objects, 5 output objects
+  Example 1: 5 input objects, 5 output objects
+  Example 2: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 2.5ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 2 output objects
+  Example 1: 4 input objects, 2 output objects
+  Example 2: 2 input objects, 2 output objects
+  Example 3: 5 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 5 output objects
+  Example 1: 2 input objects, 10 output objects
+  Example 2: 4 input objects, 20 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 11 output objects
+  Example 1: 3 input objects, 27 output objects
+  Example 2: 1 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 2 input objects, 2 output objects
+  Example 2: 2 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 1.5ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 2 input objects, 2 output objects
+  Example 3: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 36 output objects
+  Example 1: 4 input objects, 28 output objects
+  Example 2: 5 input objects, 40 output objects
+[OBJECT-VSA] No consistent rule found. 2.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 6 input objects, 6 output objects
+  Example 2: 8 input objects, 8 output objects
+[OBJECT-VSA] No consistent rule found. 2.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 71 input objects, 69 output objects
+  Example 1: 99 input objects, 91 output objects
+  Example 2: 132 input objects, 128 output objects
+[OBJECT-VSA] No consistent rule found. 4.7ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 5 input objects, 5 output objects
+  Example 1: 5 input objects, 5 output objects
+  Example 2: 5 input objects, 5 output objects
+  Example 3: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.5ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 2 input objects, 3 output objects
+  Example 2: 2 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.7ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 10 output objects
+  Example 1: 1 input objects, 10 output objects
+  Example 2: 1 input objects, 10 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 4 input objects, 4 output objects
+  Example 1: 5 input objects, 5 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+  --- Progress: 250/403 | Solved: 1 | Failed: 162 | Skipped: 87 | Errors: 0 | 385.8 tasks/sec ---
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 2 input objects, 3 output objects
+  Example 1: 3 input objects, 4 output objects
+  Example 2: 4 input objects, 7 output objects
+[OBJECT-VSA] No consistent rule found. 0.9ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 3 input objects, 3 output objects
+  Example 1: 10 input objects, 10 output objects
+  Example 2: 7 input objects, 7 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 5 input objects, 2 output objects
+  Example 1: 4 input objects, 2 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 61 input objects, 62 output objects
+  Example 1: 60 input objects, 61 output objects
+  Example 2: 72 input objects, 73 output objects
+[OBJECT-VSA] No consistent rule found. 6.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 3 output objects
+  Example 1: 1 input objects, 3 output objects
+  Example 2: 1 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 6 output objects
+  Example 1: 10 input objects, 16 output objects
+  Example 2: 11 input objects, 17 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 11 input objects, 16 output objects
+  Example 1: 6 input objects, 14 output objects
+  Example 2: 11 input objects, 20 output objects
+[OBJECT-VSA] No consistent rule found. 1.2ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 1 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 1 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.2ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 3 input objects, 3 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 3 input objects, 3 output objects
+  Example 3: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 14 input objects, 19 output objects
+  Example 1: 26 input objects, 31 output objects
+  Example 2: 11 input objects, 14 output objects
+[OBJECT-VSA] No consistent rule found. 4.2ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 1 input objects, 4 output objects
+  Example 1: 1 input objects, 1 output objects
+  Example 2: 1 input objects, 2 output objects
+  Example 3: 1 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 2 examples at object level...
+  Example 0: 2 input objects, 1 output objects
+  Example 1: 2 input objects, 1 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 1 input objects, 6 output objects
+  Example 1: 1 input objects, 6 output objects
+  Example 2: 1 input objects, 4 output objects
+[OBJECT-VSA] No consistent rule found. 0.6ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 10 input objects, 10 output objects
+  Example 1: 8 input objects, 8 output objects
+  Example 2: 7 input objects, 7 output objects
+[OBJECT-VSA] No consistent rule found. 0.8ms
+[OBJECT-VSA] Analyzing 4 examples at object level...
+  Example 0: 2 input objects, 2 output objects
+  Example 1: 3 input objects, 3 output objects
+  Example 2: 3 input objects, 3 output objects
+  Example 3: 3 input objects, 3 output objects
+[OBJECT-VSA] No consistent rule found. 0.3ms
+[OBJECT-VSA] Analyzing 3 examples at object level...
+  Example 0: 4 input objects, 5 output objects
+  Example 1: 4 input objects, 5 output objects
+  Example 2: 8 input objects, 10 output objects
+[OBJECT-VSA] No consistent rule found. 0.4ms
+Traceback (most recent call last):
+  File "C:\Users\suraj\Downloads\Claud Code\KOS-Organism\benchmark_vsa.py", line 195, in <module>
+    run_benchmark()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\suraj\Downloads\Claud Code\KOS-Organism\benchmark_vsa.py", line 66, in run_benchmark
+    train = task.get("train", [])
+            ^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "organism",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-u", "organism_api.py"],
+      "port": 8090
+    }
+  ]
+}
