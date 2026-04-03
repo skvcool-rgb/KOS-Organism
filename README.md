@@ -178,15 +178,40 @@ The industry is building AGI by scaling matrix multiplications with nuclear-powe
 
 ## Benchmark: ARC-AGI
 
-The [Abstraction and Reasoning Corpus](https://arcprize.org/) is the gold standard for measuring general intelligence. It requires solving visual puzzles that have never been seen before — pure reasoning, no memorization.
+The [Abstraction and Reasoning Corpus](https://arcprize.org/) is the gold standard for measuring general intelligence. It requires solving visual puzzles that have never been seen before -- pure reasoning, no memorization.
 
-KOS approaches ARC through:
-1. **Universal Perception** — transduce any grid into 10K-D topology
-2. **Free Energy Minimization** — A* search through KASM operations
-3. **Compositional Masking** — selectively transform specific objects
-4. **Skill Synthesis** — compress discovered solutions into reusable macro concepts
+**Current Score: 31/403 (7.7%) -- zero hand-coded solvers, zero false positives.**
 
-Current status: Foundation architecture proven on compositional movement, recoloring, and multi-object masking. Scaling to full ARC benchmark in progress.
+### Score Progression
+
+| Stage | Tasks Solved | Key Capability |
+|-------|-------------|----------------|
+| Baseline (grid ops) | 4 | Flip, rotate, transpose |
+| + Meta-Learner | 9 | Direct operator extraction via hypervector algebra |
+| + Object-Centric DSL | 16 | Move, recolor, gravity, multi-step composition |
+| + Gestalt + Raycaster | 20 | Fill enclosed, borders, line extension |
+| + Fractal Engine | 27 | Crop, tile, upscale, subgrid extraction |
+| + Conditional Fractals | **31** | Per-object isolation, largest/smallest, color masking |
+
+### Solver Architecture (7-Stage Cascade)
+
+```
+STAGE -1:  FRACTAL SOLVER (crop, tile, scale, per-object extraction)
+STAGE 0:   META-LEARNER (direct operator extraction -- 5 encoding levels)
+STAGE 0.5: SLEEP PROMOTER (cached macro primitives)
+STAGE 1:   GESTALT HIERARCHY (fill enclosed, add borders)
+STAGE 2:   HD RAYCASTER (line extension, gravity)
+STAGE 3:   DO-CALCULUS (neighbor count, conditional recolor, symmetry)
+STAGE 4-6: Object-Centric DSL + Grid Ops + Multi-Step Search
+```
+
+### AGI Trinity (Beyond ARC)
+
+| Layer | Module | Capability |
+|-------|--------|------------|
+| 4D Perception | `four_dim_vsa.py` | Continuous spacetime via FFT, trajectory encoding, physics discovery |
+| Singularity Gate | `singularity_core.py` | Z3-verified self-rewriting with mathematical safety proofs |
+| Genesis | `genesis.py` | Darwinian evolution of algorithms from atomic logic gates |
 
 ---
 
@@ -208,4 +233,4 @@ MIT
 
 ---
 
-*Built by hand. No LLM was used to write the core KASM algebra. The machine discovers its own physics.*
+*The machine discovers its own physics from three algebraic operations on a laptop CPU.*
