@@ -48,6 +48,18 @@ try:
     from .fractal_solver import FractalSolver
 except ImportError:
     FractalSolver = None
+try:
+    from .symmetry_engine import SymmetryEngine
+except ImportError:
+    SymmetryEngine = None
+try:
+    from .line_engine import LineEngine
+except ImportError:
+    LineEngine = None
+try:
+    from .flood_engine import FloodEngine
+except ImportError:
+    FloodEngine = None
 
 SPATIAL_STEP = 17
 
@@ -64,6 +76,9 @@ class ObjectVSA:
         self.do_calculus = DoCalculus() if DoCalculus else None
         self.sleep_promoter = SleepPromoter(vsa) if SleepPromoter else None
         self.fractal_solver = FractalSolver() if FractalSolver else None
+        self.symmetry_engine = SymmetryEngine() if SymmetryEngine else None
+        self.line_engine = LineEngine() if LineEngine else None
+        self.flood_engine = FloodEngine() if FloodEngine else None
 
         # Role vectors for binding attributes to objects
         self._ensure_role("ROLE_SHAPE")
@@ -383,7 +398,7 @@ class ObjectVSA:
         # ══════════════════════════════════════════════════════════
         # STAGE 2: HD RAYCASTER — Line extension / Gravity
         # ══════════════════════════════════════════════════════════
-        if self.hd_raycaster:
+        if self.hd_raycaster and (time.perf_counter() - t0) < timeout - 1:
             try:
                 train_pairs = [(np.array(ex["input"]), np.array(ex["output"])) for ex in examples]
 
@@ -436,7 +451,7 @@ class ObjectVSA:
         # ══════════════════════════════════════════════════════════
         # STAGE 3: DO-CALCULUS — Neighbor counting / Conditional / Symmetry
         # ══════════════════════════════════════════════════════════
-        if self.do_calculus:
+        if self.do_calculus and (time.perf_counter() - t0) < timeout - 1:
             try:
                 train_pairs = [(np.array(ex["input"]), np.array(ex["output"])) for ex in examples]
 
@@ -533,6 +548,76 @@ class ObjectVSA:
                         return rule
             except Exception:
                 pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 3.5: SYMMETRY ENGINE — Mirror completion / folding
+        # ══════════════════════════════════════════════════════════
+        if self.symmetry_engine and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"])) for ex in examples]
+                sym_rule = self.symmetry_engine.detect_symmetry_completion(train_pairs)
+                if sym_rule is not None:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = self.symmetry_engine.apply_symmetry_completion(inp, sym_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        sym_rule["type"] = "symmetry"
+                        print(f"[SYMMETRY] RULE VERIFIED in {elapsed:.1f}ms: {sym_rule['description']}")
+                        return sym_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 3.6: LINE ENGINE — Connect dots / extend to edges
+        # ══════════════════════════════════════════════════════════
+        if self.line_engine and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"])) for ex in examples]
+                line_rule = self.line_engine.detect_line_draw_rule(train_pairs)
+                if line_rule is not None:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = self.line_engine.apply_line_draw(inp, line_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[LINE] RULE VERIFIED in {elapsed:.1f}ms: {line_rule['description']}")
+                        return line_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 3.7: FLOOD ENGINE — Void fill / seed fill / region color
+        # ══════════════════════════════════════════════════════════
+        if self.flood_engine and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"])) for ex in examples]
+                flood_rule = self.flood_engine.detect_flood_fill_rule(train_pairs)
+                if flood_rule is not None:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = self.flood_engine.apply_flood_fill(inp, flood_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[FLOOD] RULE VERIFIED in {elapsed:.1f}ms: {flood_rule['description']}")
+                        return flood_rule
+            except Exception:
+                pass
+
+        # Bail if already out of time before expensive object extraction
+        if (time.perf_counter() - t0) >= timeout - 0.5:
+            elapsed = (time.perf_counter() - t0) * 1000
+            print(f"[OBJECT-VSA] Timeout before object extraction. {elapsed:.1f}ms")
+            return None
 
         all_deltas = []
 
@@ -810,7 +895,7 @@ class ObjectVSA:
                 train_pairs = [{"input": ex["input"].tolist() if hasattr(ex["input"], "tolist") else ex["input"],
                                 "output": ex["output"].tolist() if hasattr(ex["output"], "tolist") else ex["output"]}
                                for ex in examples]
-                hyp = searcher.search(train_pairs, max_depth=2, timeout=min(remaining, 5.0))
+                hyp = searcher.search(train_pairs, max_depth=2, timeout=min(remaining, 2.0))
                 if hyp:
                     desc_parts = []
                     for step in hyp:
@@ -942,6 +1027,18 @@ class ObjectVSA:
         # Fractal rules (size-changing operations)
         if rule["type"].startswith("fractal_") and self.fractal_solver:
             return self.fractal_solver.apply_rule(grid, rule)
+
+        # Symmetry rules
+        if rule["type"] == "symmetry" and self.symmetry_engine:
+            return self.symmetry_engine.apply_symmetry_completion(grid, rule)
+
+        # Line drawing rules
+        if rule["type"].startswith("line_") and self.line_engine:
+            return self.line_engine.apply_line_draw(grid, rule)
+
+        # Flood fill rules
+        if rule["type"].startswith("flood_") and self.flood_engine:
+            return self.flood_engine.apply_flood_fill(grid, rule)
 
         # Meta-operator: pure hyperdimensional algebra
         if rule["type"] == "meta_operator":

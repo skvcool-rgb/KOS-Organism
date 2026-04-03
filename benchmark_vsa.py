@@ -15,6 +15,7 @@ just the VSA pipeline discovering rules from examples.
 """
 
 import json
+import gc
 import numpy as np
 import sys
 import os
@@ -96,7 +97,7 @@ def run_benchmark():
             # Suppress per-example verbose output
             import io, contextlib
             with contextlib.redirect_stdout(io.StringIO()):
-                rule = obj_vsa.solve_object_level(examples, timeout=5.0)
+                rule = obj_vsa.solve_object_level(examples, timeout=3.0)
 
             if rule:
                 # Verify on ALL test pairs
@@ -131,6 +132,9 @@ def run_benchmark():
             errors += 1
             if errors <= 5:
                 print(f"  ERROR {task_id}: {e}")
+
+        # Free memory after each task
+        gc.collect()
 
         # Progress bar
         if (i + 1) % 50 == 0:
