@@ -60,6 +60,10 @@ try:
     from .flood_engine import FloodEngine
 except ImportError:
     FloodEngine = None
+try:
+    from .swarm_synthesizer import EvolutionarySwarm
+except ImportError:
+    EvolutionarySwarm = None
 
 SPATIAL_STEP = 17
 
@@ -79,6 +83,7 @@ class ObjectVSA:
         self.symmetry_engine = SymmetryEngine() if SymmetryEngine else None
         self.line_engine = LineEngine() if LineEngine else None
         self.flood_engine = FloodEngine() if FloodEngine else None
+        self.swarm = EvolutionarySwarm(vsa) if EvolutionarySwarm else None
 
         # Role vectors for binding attributes to objects
         self._ensure_role("ROLE_SHAPE")
@@ -926,6 +931,44 @@ class ObjectVSA:
             except Exception:
                 pass
 
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11: EVOLUTIONARY SWARM — Darwinian VSA Synthesis
+        # All deterministic heuristics exhausted. Let evolution find it.
+        # ══════════════════════════════════════════════════════════
+        remaining = timeout - (time.perf_counter() - t0)
+        if self.swarm and remaining > 0.5:
+            try:
+                print("[CASCADE] All deterministic heuristics exhausted. "
+                      "Initiating Evolutionary Swarm.")
+
+                # Ensure color vectors exist in VSA space
+                all_colors = set()
+                for ex in examples:
+                    all_colors.update(int(v) for v in np.unique(ex["input"]))
+                    all_colors.update(int(v) for v in np.unique(ex["output"]))
+                self.swarm._ensure_color_vectors(all_colors)
+
+                # Let the swarm evolve on grid pairs
+                swarm_time = min(remaining - 0.2, 0.5)
+                evolved_rule = self.swarm.breed_from_grids(
+                    examples, self.meta_learner.codec,
+                    pop_size=300, max_time_sec=swarm_time,
+                    verbose=True
+                )
+
+                if evolved_rule:
+                    elapsed_ms = (time.perf_counter() - t0) * 1000
+                    print(f"[SWARM] RULE VERIFIED on ALL pairs in "
+                          f"{elapsed_ms:.1f}ms: {evolved_rule['description']}")
+
+                    # WAKE-SLEEP PROTOCOL: Register macro for future tasks
+                    task_name = f"evolved_t{int(time.perf_counter()*1000)}"
+                    self.swarm.register_macro(task_name, evolved_rule["genome"])
+
+                    return evolved_rule
+            except Exception:
+                pass
+
         elapsed = (time.perf_counter() - t0) * 1000
         print(f"[OBJECT-VSA] No consistent rule found. {elapsed:.1f}ms")
         return None
@@ -1068,6 +1111,12 @@ class ObjectVSA:
                 return self.do_calculus.apply_pattern_completion(grid, dc_rule)
             elif sub == "border_contact":
                 return self.do_calculus.apply_conditional_recolor(grid, dc_rule)
+
+        # Evolved programs (Swarm Synthesizer)
+        if rule["type"] == "evolved" and self.swarm:
+            enc = self.meta_learner.codec.encode(grid)
+            evolved = self.swarm._execute_genome(enc, rule["genome"])
+            return self.meta_learner.codec.decode(evolved, h, w)
 
         # Multi-step DSL composition
         if rule["type"] == "multi_step":
