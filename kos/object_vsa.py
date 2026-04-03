@@ -64,6 +64,10 @@ try:
     from .swarm_synthesizer import EvolutionarySwarm
 except ImportError:
     EvolutionarySwarm = None
+try:
+    from .grid_swarm import EvolutionaryGridSwarm
+except ImportError:
+    EvolutionaryGridSwarm = None
 
 SPATIAL_STEP = 17
 
@@ -84,6 +88,7 @@ class ObjectVSA:
         self.line_engine = LineEngine() if LineEngine else None
         self.flood_engine = FloodEngine() if FloodEngine else None
         self.swarm = EvolutionarySwarm(vsa) if EvolutionarySwarm else None
+        self.grid_swarm = None  # Initialized lazily per task with correct palette
 
         # Role vectors for binding attributes to objects
         self._ensure_role("ROLE_SHAPE")
@@ -969,6 +974,61 @@ class ObjectVSA:
             except Exception:
                 pass
 
+        # ══════════════════════════════════════════════════════════
+        # STAGE 12: GRID SWARM — Darwinian Evolution on Raw Pixels
+        # The final desperate attempt. No VSA. No algebra.
+        # Just raw grid ops bred by natural selection.
+        # ══════════════════════════════════════════════════════════
+        remaining = timeout - (time.perf_counter() - t0)
+        if EvolutionaryGridSwarm and remaining > 0.3:
+            try:
+                # Extract color palette from training data
+                palette = set()
+                for ex in examples:
+                    palette.update(int(v) for v in np.unique(ex["input"]))
+                    palette.update(int(v) for v in np.unique(ex["output"]))
+
+                grid_swarm = EvolutionaryGridSwarm(
+                    palette=palette, allow_resize=has_size_mismatch)
+
+                # Build training pairs
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+
+                swarm_time = min(remaining - 0.1, 1.5)
+                winning_dna = grid_swarm.breed_solution(
+                    train_pairs, pop_size=300, max_time_sec=swarm_time,
+                    verbose=True
+                )
+
+                if winning_dna:
+                    # Verify on ALL training pairs (breed_solution already does this,
+                    # but double-check for safety)
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = grid_swarm._execute_dna(inp, winning_dna)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+
+                    if verified:
+                        elapsed_ms = (time.perf_counter() - t0) * 1000
+                        dna_str = grid_swarm._dna_to_str(winning_dna)
+                        rule = {
+                            "type": "grid_evolved",
+                            "dna": winning_dna,
+                            "target_color": None,
+                            "displacement": (0, 0),
+                            "color_swap": None,
+                            "description": f"GRID-EVOLVED: {dna_str}",
+                            "worst_error": 0.0,
+                        }
+                        print(f"[GRID-SWARM] RULE VERIFIED in {elapsed_ms:.1f}ms: "
+                              f"{dna_str}")
+                        return rule
+            except Exception:
+                pass
+
         elapsed = (time.perf_counter() - t0) * 1000
         print(f"[OBJECT-VSA] No consistent rule found. {elapsed:.1f}ms")
         return None
@@ -1111,6 +1171,12 @@ class ObjectVSA:
                 return self.do_calculus.apply_pattern_completion(grid, dc_rule)
             elif sub == "border_contact":
                 return self.do_calculus.apply_conditional_recolor(grid, dc_rule)
+
+        # Grid-evolved programs (Grid Swarm)
+        if rule["type"] == "grid_evolved":
+            gs = EvolutionaryGridSwarm() if EvolutionaryGridSwarm else None
+            if gs:
+                return gs._execute_dna(grid, rule["dna"])
 
         # Evolved programs (Swarm Synthesizer)
         if rule["type"] == "evolved" and self.swarm:
