@@ -23,6 +23,7 @@ import numpy as np
 from typing import Optional, List, Dict, Tuple
 
 from .fractal_vsa import FractalVSA
+from .gestalt_extractor import GestaltExtractor
 
 
 class FractalSolver:
@@ -32,6 +33,7 @@ class FractalSolver:
 
     def __init__(self):
         self.vsa = FractalVSA(dim=10000)
+        self.extractor = GestaltExtractor()
 
     def solve(self, examples: List[dict]) -> Optional[dict]:
         """
@@ -86,6 +88,31 @@ class FractalSolver:
         if rule:
             return rule
 
+        # ── CONDITIONAL FRACTALS: per-object isolation + scaling ──
+        rule = self._try_object_crop(pairs)
+        if rule:
+            return rule
+
+        rule = self._try_object_scale(pairs)
+        if rule:
+            return rule
+
+        rule = self._try_color_mask_crop(pairs)
+        if rule:
+            return rule
+
+        rule = self._try_largest_object_crop(pairs)
+        if rule:
+            return rule
+
+        rule = self._try_smallest_object_crop(pairs)
+        if rule:
+            return rule
+
+        rule = self._try_unique_object_crop(pairs)
+        if rule:
+            return rule
+
         return None
 
     def apply_rule(self, grid: np.ndarray, rule: dict) -> np.ndarray:
@@ -127,6 +154,24 @@ class FractalSolver:
         elif rule_type == "fractal_single_object":
             bg = rule.get("bg_color", 0)
             return self.vsa.extract_bounding_box(grid, bg_color=bg)
+
+        elif rule_type == "fractal_object_crop":
+            return self._apply_object_crop(grid, rule)
+
+        elif rule_type == "fractal_object_scale":
+            return self._apply_object_scale(grid, rule)
+
+        elif rule_type == "fractal_color_mask":
+            return self._apply_color_mask_crop(grid, rule)
+
+        elif rule_type == "fractal_largest_object":
+            return self._apply_largest_object_crop(grid, rule)
+
+        elif rule_type == "fractal_smallest_object":
+            return self._apply_smallest_object_crop(grid, rule)
+
+        elif rule_type == "fractal_unique_object":
+            return self._apply_unique_object_crop(grid, rule)
 
         return grid.copy()
 
@@ -415,3 +460,331 @@ class FractalSolver:
                     best = sub.copy()
 
         return best
+
+    # ================================================================
+    # CONDITIONAL FRACTALS: Per-Object Isolation + Scaling
+    # ================================================================
+
+    def _object_to_grid(self, obj, grid_shape: Tuple[int, int],
+                        source_grid: np.ndarray) -> np.ndarray:
+        """Convert a GestaltObject to its bounding-box grid with original colors."""
+        h = obj.max_row - obj.min_row + 1
+        w = obj.max_col - obj.min_col + 1
+        result = np.zeros((h, w), dtype=source_grid.dtype)
+        for r, c in obj.pixels:
+            result[r - obj.min_row, c - obj.min_col] = source_grid[r, c]
+        return result
+
+    def _try_object_crop(self, pairs: List[Tuple]) -> Optional[dict]:
+        """
+        Hypothesis: output = bounding box of a SPECIFIC object (by color).
+        Tests each color group independently.
+        """
+        # Collect all colors across inputs
+        all_colors = set()
+        for inp, out in pairs:
+            all_colors.update(int(v) for v in np.unique(inp) if v != 0)
+
+        for target_color in sorted(all_colors):
+            success = True
+            for inp, out in pairs:
+                # Extract all objects of this color
+                objs = self.extractor.extract(inp)
+                color_objs = [o for o in objs if o.color == target_color]
+                if not color_objs:
+                    success = False
+                    break
+
+                # Try each object of this color
+                matched = False
+                for obj in color_objs:
+                    obj_grid = self._object_to_grid(obj, inp.shape, inp)
+                    if np.array_equal(obj_grid, out):
+                        matched = True
+                        break
+                if not matched:
+                    success = False
+                    break
+
+            if success:
+                return {
+                    "type": "fractal_object_crop",
+                    "target_color": target_color,
+                    "selector": "color",
+                    "target_color": target_color,
+                    "displacement": (0, 0),
+                    "color_swap": None,
+                    "description": f"EXTRACT object color={target_color}",
+                    "worst_error": 0.0,
+                }
+
+        return None
+
+    def _apply_object_crop(self, grid: np.ndarray, rule: dict) -> np.ndarray:
+        """Apply object crop: extract the object with the target color."""
+        target_color = rule["target_color"]
+        objs = self.extractor.extract(grid)
+        color_objs = [o for o in objs if o.color == target_color]
+        if not color_objs:
+            return grid.copy()
+        # Return the largest object of that color
+        best = max(color_objs, key=lambda o: o.size)
+        return self._object_to_grid(best, grid.shape, grid)
+
+    def _try_object_scale(self, pairs: List[Tuple]) -> Optional[dict]:
+        """
+        Hypothesis: output = a SCALED version of a specific object.
+        Extract each object, upscale it, and compare to output.
+        """
+        for target_color in range(10):
+            scale_factors = set()
+            success = True
+
+            for inp, out in pairs:
+                objs = self.extractor.extract(inp)
+                color_objs = [o for o in objs if o.color == target_color]
+                if not color_objs:
+                    success = False
+                    break
+
+                matched = False
+                for obj in color_objs:
+                    obj_grid = self._object_to_grid(obj, inp.shape, inp)
+                    scale = self.vsa.detect_scale(obj_grid, out)
+                    if scale is not None:
+                        scale_factors.add(scale)
+                        matched = True
+                        break
+                if not matched:
+                    success = False
+                    break
+
+            if success and len(scale_factors) == 1:
+                scale = scale_factors.pop()
+                # Final verification
+                verified = True
+                for inp, out in pairs:
+                    pred = self._apply_object_scale(inp, {
+                        "target_color": target_color, "scale": scale
+                    })
+                    if not np.array_equal(pred, out):
+                        verified = False
+                        break
+                if verified:
+                    return {
+                        "type": "fractal_object_scale",
+                        "target_color": target_color,
+                        "scale": scale,
+                        "displacement": (0, 0),
+                        "color_swap": None,
+                        "description": f"EXTRACT color={target_color} + UPSCALE {scale}x",
+                        "worst_error": 0.0,
+                    }
+
+        return None
+
+    def _apply_object_scale(self, grid: np.ndarray, rule: dict) -> np.ndarray:
+        """Extract object by color and upscale it."""
+        target_color = rule["target_color"]
+        scale = rule["scale"]
+        objs = self.extractor.extract(grid)
+        color_objs = [o for o in objs if o.color == target_color]
+        if not color_objs:
+            return grid.copy()
+        best = max(color_objs, key=lambda o: o.size)
+        obj_grid = self._object_to_grid(best, grid.shape, grid)
+        return self.vsa.upscale_grid(obj_grid, scale)
+
+    def _try_color_mask_crop(self, pairs: List[Tuple]) -> Optional[dict]:
+        """
+        Hypothesis: output = bounding box of ALL pixels of a specific color,
+        with other colors zeroed out.
+        """
+        all_colors = set()
+        for inp, out in pairs:
+            all_colors.update(int(v) for v in np.unique(inp) if v != 0)
+
+        for mask_color in sorted(all_colors):
+            success = True
+            for inp, out in pairs:
+                # Create mask: keep only mask_color pixels
+                masked = np.where(inp == mask_color, inp, 0)
+                cropped = self.vsa.extract_bounding_box(masked, bg_color=0)
+                if not np.array_equal(cropped, out):
+                    success = False
+                    break
+            if success:
+                return {
+                    "type": "fractal_color_mask",
+                    "mask_color": mask_color,
+                    "target_color": None,
+                    "displacement": (0, 0),
+                    "color_swap": None,
+                    "description": f"MASK color={mask_color} + CROP",
+                    "worst_error": 0.0,
+                }
+
+        # Also try: keep everything EXCEPT one color
+        for exclude_color in sorted(all_colors):
+            success = True
+            for inp, out in pairs:
+                masked = np.where(inp != exclude_color, inp, 0)
+                cropped = self.vsa.extract_bounding_box(masked, bg_color=0)
+                if not np.array_equal(cropped, out):
+                    success = False
+                    break
+            if success:
+                return {
+                    "type": "fractal_color_mask",
+                    "exclude_color": exclude_color,
+                    "mask_color": -1,  # sentinel for exclude mode
+                    "target_color": None,
+                    "displacement": (0, 0),
+                    "color_swap": None,
+                    "description": f"EXCLUDE color={exclude_color} + CROP",
+                    "worst_error": 0.0,
+                }
+
+        return None
+
+    def _apply_color_mask_crop(self, grid: np.ndarray, rule: dict) -> np.ndarray:
+        """Apply color mask + crop."""
+        if rule.get("mask_color", 0) == -1:
+            # Exclude mode
+            exclude = rule["exclude_color"]
+            masked = np.where(grid != exclude, grid, 0)
+        else:
+            mask_color = rule["mask_color"]
+            masked = np.where(grid == mask_color, grid, 0)
+        return self.vsa.extract_bounding_box(masked, bg_color=0)
+
+    def _try_largest_object_crop(self, pairs: List[Tuple]) -> Optional[dict]:
+        """Hypothesis: output = bounding box of the LARGEST object in input."""
+        success = True
+        for inp, out in pairs:
+            objs = self.extractor.extract(inp)
+            if not objs:
+                success = False
+                break
+            largest = max(objs, key=lambda o: o.size)
+            obj_grid = self._object_to_grid(largest, inp.shape, inp)
+            if not np.array_equal(obj_grid, out):
+                success = False
+                break
+
+        if success:
+            return {
+                "type": "fractal_largest_object",
+                "target_color": None,
+                "displacement": (0, 0),
+                "color_swap": None,
+                "description": "EXTRACT LARGEST OBJECT",
+                "worst_error": 0.0,
+            }
+        return None
+
+    def _apply_largest_object_crop(self, grid: np.ndarray,
+                                    rule: dict) -> np.ndarray:
+        """Extract the largest object's bounding box."""
+        objs = self.extractor.extract(grid)
+        if not objs:
+            return grid.copy()
+        largest = max(objs, key=lambda o: o.size)
+        return self._object_to_grid(largest, grid.shape, grid)
+
+    def _try_smallest_object_crop(self, pairs: List[Tuple]) -> Optional[dict]:
+        """Hypothesis: output = bounding box of the SMALLEST object in input."""
+        success = True
+        for inp, out in pairs:
+            objs = self.extractor.extract(inp)
+            if not objs:
+                success = False
+                break
+            smallest = min(objs, key=lambda o: o.size)
+            obj_grid = self._object_to_grid(smallest, inp.shape, inp)
+            if not np.array_equal(obj_grid, out):
+                success = False
+                break
+
+        if success:
+            return {
+                "type": "fractal_smallest_object",
+                "target_color": None,
+                "displacement": (0, 0),
+                "color_swap": None,
+                "description": "EXTRACT SMALLEST OBJECT",
+                "worst_error": 0.0,
+            }
+        return None
+
+    def _apply_smallest_object_crop(self, grid: np.ndarray,
+                                     rule: dict) -> np.ndarray:
+        """Extract the smallest object's bounding box."""
+        objs = self.extractor.extract(grid)
+        if not objs:
+            return grid.copy()
+        smallest = min(objs, key=lambda o: o.size)
+        return self._object_to_grid(smallest, grid.shape, grid)
+
+    def _try_unique_object_crop(self, pairs: List[Tuple]) -> Optional[dict]:
+        """
+        Hypothesis: output = the object with a UNIQUE color
+        (color that appears in only one connected component).
+        """
+        success = True
+        for inp, out in pairs:
+            objs = self.extractor.extract(inp)
+            if not objs:
+                success = False
+                break
+
+            # Find colors with exactly one object
+            color_counts = {}
+            for o in objs:
+                color_counts[o.color] = color_counts.get(o.color, 0) + 1
+
+            unique_objs = [o for o in objs if color_counts[o.color] == 1]
+            if not unique_objs:
+                success = False
+                break
+
+            # Check if any unique object matches output
+            matched = False
+            for obj in unique_objs:
+                obj_grid = self._object_to_grid(obj, inp.shape, inp)
+                if np.array_equal(obj_grid, out):
+                    matched = True
+                    break
+            if not matched:
+                success = False
+                break
+
+        if success:
+            return {
+                "type": "fractal_unique_object",
+                "target_color": None,
+                "displacement": (0, 0),
+                "color_swap": None,
+                "description": "EXTRACT UNIQUE-COLOR OBJECT",
+                "worst_error": 0.0,
+            }
+        return None
+
+    def _apply_unique_object_crop(self, grid: np.ndarray,
+                                   rule: dict) -> np.ndarray:
+        """Extract the object with a unique color."""
+        objs = self.extractor.extract(grid)
+        if not objs:
+            return grid.copy()
+
+        color_counts = {}
+        for o in objs:
+            color_counts[o.color] = color_counts.get(o.color, 0) + 1
+
+        unique_objs = [o for o in objs if color_counts[o.color] == 1]
+        if not unique_objs:
+            return grid.copy()
+
+        # Return the largest unique object
+        best = max(unique_objs, key=lambda o: o.size)
+        return self._object_to_grid(best, grid.shape, grid)
