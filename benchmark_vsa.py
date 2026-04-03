@@ -47,6 +47,7 @@ def run_benchmark():
     failed = 0
     skipped = 0
     errors = 0
+    diff_size_count = 0
 
     solved_tasks = []
     failed_tasks = []
@@ -74,7 +75,7 @@ def run_benchmark():
             skipped += 1
             continue
 
-        # Check: same-size input/output (VSA handles this currently)
+        # Check: same-size input/output (for stats tracking)
         try:
             same_size = all(
                 np.array(p["input"]).shape == np.array(p["output"]).shape
@@ -85,8 +86,7 @@ def run_benchmark():
             continue
 
         if not same_size:
-            skipped += 1
-            continue
+            diff_size_count += 1
 
         # Stage 1: Object-Centric VSA — discover rule from training
         try:
@@ -160,7 +160,7 @@ def run_benchmark():
     print(f"  BENCHMARK RESULTS")
     print("=" * 70)
     print(f"  Total tasks:    {total_tasks}")
-    print(f"  Same-size only: {tested} (skipped {skipped} different-size tasks)")
+    print(f"  Tested: {tested} ({diff_size_count} different-size tasks included)")
     print(f"  Solved:         {solved} ({accuracy:.1f}%)")
     print(f"  Failed:         {failed}")
     print(f"  Errors:         {errors}")

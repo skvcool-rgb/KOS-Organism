@@ -44,6 +44,10 @@ try:
     from .sleep_promoter import SleepPromoter
 except ImportError:
     SleepPromoter = None
+try:
+    from .fractal_solver import FractalSolver
+except ImportError:
+    FractalSolver = None
 
 SPATIAL_STEP = 17
 
@@ -59,6 +63,7 @@ class ObjectVSA:
         self.hd_raycaster = HDRaycaster() if HDRaycaster else None
         self.do_calculus = DoCalculus() if DoCalculus else None
         self.sleep_promoter = SleepPromoter(vsa) if SleepPromoter else None
+        self.fractal_solver = FractalSolver() if FractalSolver else None
 
         # Role vectors for binding attributes to objects
         self._ensure_role("ROLE_SHAPE")
@@ -276,6 +281,43 @@ class ObjectVSA:
         t0 = time.perf_counter()
         n = len(examples)
         print(f"[OBJECT-VSA] Analyzing {n} examples at object level...")
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE -1: FRACTAL SOLVER — Dimensional Metamorphosis
+        # Handles size-mismatched grids (crop, tile, scale, extract)
+        # Must run FIRST since all other stages require same-size I/O
+        # ══════════════════════════════════════════════════════════
+        if self.fractal_solver:
+            try:
+                fractal_rule = self.fractal_solver.solve(examples)
+                if fractal_rule is not None:
+                    # Verify pixel-perfect
+                    verified = True
+                    for ex in examples:
+                        inp = np.array(ex["input"])
+                        out = np.array(ex["output"])
+                        pred = self.fractal_solver.apply_rule(inp, fractal_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[FRACTAL] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{fractal_rule['description']}")
+                        return fractal_rule
+            except Exception:
+                pass
+
+        # If grids have different sizes and fractal solver didn't handle it,
+        # no other solver can handle mismatched dimensions
+        has_size_mismatch = any(
+            np.array(ex["input"]).shape != np.array(ex["output"]).shape
+            for ex in examples
+        )
+        if has_size_mismatch:
+            elapsed = (time.perf_counter() - t0) * 1000
+            print(f"[OBJECT-VSA] Size mismatch, no fractal rule found. {elapsed:.1f}ms")
+            return None
 
         # ══════════════════════════════════════════════════════════
         # STAGE 0: META-LEARNER — Direct Operator Extraction
@@ -896,6 +938,10 @@ class ObjectVSA:
         examples and apply it to the unseen test input.
         """
         h, w = grid.shape
+
+        # Fractal rules (size-changing operations)
+        if rule["type"].startswith("fractal_") and self.fractal_solver:
+            return self.fractal_solver.apply_rule(grid, rule)
 
         # Meta-operator: pure hyperdimensional algebra
         if rule["type"] == "meta_operator":
