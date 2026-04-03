@@ -191,18 +191,22 @@ The [Abstraction and Reasoning Corpus](https://arcprize.org/) is the gold standa
 | + Object-Centric DSL | 16 | Move, recolor, gravity, multi-step composition |
 | + Gestalt + Raycaster | 20 | Fill enclosed, borders, line extension |
 | + Fractal Engine | 27 | Crop, tile, upscale, subgrid extraction |
-| + Conditional Fractals | **31** | Per-object isolation, largest/smallest, color masking |
+| + Conditional Fractals | 31 | Per-object isolation, largest/smallest, color masking |
+| + Geometry Engines | **33** | Symmetry completion, line drawing, flood fill |
 
-### Solver Architecture (7-Stage Cascade)
+### Solver Architecture (10-Stage Cascade)
 
 ```
-STAGE -1:  FRACTAL SOLVER (crop, tile, scale, per-object extraction)
-STAGE 0:   META-LEARNER (direct operator extraction -- 5 encoding levels)
-STAGE 0.5: SLEEP PROMOTER (cached macro primitives)
-STAGE 1:   GESTALT HIERARCHY (fill enclosed, add borders)
-STAGE 2:   HD RAYCASTER (line extension, gravity)
-STAGE 3:   DO-CALCULUS (neighbor count, conditional recolor, symmetry)
-STAGE 4-6: Object-Centric DSL + Grid Ops + Multi-Step Search
+STAGE -1:   FRACTAL SOLVER (crop, tile, scale, per-object extraction)
+STAGE 0:    META-LEARNER (direct operator extraction -- 5 encoding levels)
+STAGE 0.5:  SLEEP PROMOTER (cached macro primitives)
+STAGE 1:    GESTALT HIERARCHY (fill enclosed, add borders)
+STAGE 2:    HD RAYCASTER (line extension, gravity)
+STAGE 3:    DO-CALCULUS (neighbor count, conditional recolor, symmetry)
+STAGE 3.5:  SYMMETRY ENGINE (mirror completion, periodic patterns)
+STAGE 3.6:  LINE ENGINE (connect dots, extend to edge, Bresenham)
+STAGE 3.7:  FLOOD ENGINE (enclosed fill, seed fill, region coloring)
+STAGE 4-6:  Object-Centric DSL + Grid Ops + Multi-Step Search
 ```
 
 ### AGI Trinity (Beyond ARC)
