@@ -71,6 +71,21 @@ except ImportError:
     detect_pattern_tile_rule = None
     apply_pattern_tile = None
 try:
+    from .template_stamp_engine import detect_template_stamp_rule, apply_template_stamp
+except ImportError:
+    detect_template_stamp_rule = None
+    apply_template_stamp = None
+try:
+    from .ray_extension_engine import detect_ray_extension_rule, apply_ray_extension
+except ImportError:
+    detect_ray_extension_rule = None
+    apply_ray_extension = None
+try:
+    from .connect_pairs_engine import detect_connect_pairs_rule, apply_connect_pairs
+except ImportError:
+    detect_connect_pairs_rule = None
+    apply_connect_pairs = None
+try:
     from .swarm_synthesizer import EvolutionarySwarm
 except ImportError:
     EvolutionarySwarm = None
@@ -998,6 +1013,75 @@ class ObjectVSA:
                 pass
 
         # ══════════════════════════════════════════════════════════
+        # STAGE 11c: TEMPLATE STAMP — Copy pattern to marker locations
+        # ══════════════════════════════════════════════════════════
+        if detect_template_stamp_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                tstamp_rule = detect_template_stamp_rule(train_pairs)
+                if tstamp_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_template_stamp(inp, tstamp_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[TEMPLATE-STAMP] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{tstamp_rule['description']}")
+                        return tstamp_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11d: RAY EXTENSION — Shoot rays from isolated pixels
+        # ══════════════════════════════════════════════════════════
+        if detect_ray_extension_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                ray_rule = detect_ray_extension_rule(train_pairs)
+                if ray_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_ray_extension(inp, ray_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[RAY-EXTENSION] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{ray_rule['description']}")
+                        return ray_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11e: CONNECT PAIRS — Fill lines between matching colors
+        # ══════════════════════════════════════════════════════════
+        if detect_connect_pairs_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                cpair_rule = detect_connect_pairs_rule(train_pairs)
+                if cpair_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_connect_pairs(inp, cpair_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[CONNECT-PAIRS] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{cpair_rule['description']}")
+                        return cpair_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
         # STAGE 12: EVOLUTIONARY SWARM — Darwinian VSA Synthesis
         # All deterministic heuristics exhausted. Let evolution find it.
         # ══════════════════════════════════════════════════════════
@@ -1263,6 +1347,18 @@ class ObjectVSA:
         # Pattern tile rules
         if rule["type"].startswith("pattern_tile") and apply_pattern_tile:
             return apply_pattern_tile(grid, rule)
+
+        # Template stamp rules
+        if rule["type"] == "template_stamp" and apply_template_stamp:
+            return apply_template_stamp(grid, rule)
+
+        # Ray extension rules
+        if rule["type"] == "ray_extension" and apply_ray_extension:
+            return apply_ray_extension(grid, rule)
+
+        # Connect pairs rules
+        if rule["type"] == "connect_pairs" and apply_connect_pairs:
+            return apply_connect_pairs(grid, rule)
 
         # Meta-operator: pure hyperdimensional algebra
         if rule["type"] == "meta_operator":

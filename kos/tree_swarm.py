@@ -268,6 +268,164 @@ class ASTGridSwarm:
         return result
 
     # ================================================================
+    # 1b. DIFF ANALYZER -- seed swarm with analytical priors
+    # ================================================================
+    def _analyze_diff(self, train_pairs):
+        """
+        Analyze input-output diffs to generate strong priors -- likely
+        atomic operations that appear in the solution.
+        Returns a list of suggested atomic ops (strings or tuples).
+        Designed to run in < 10ms.
+        """
+        hints = []
+
+        for inp, out in train_pairs:
+            in_colors = set(np.unique(inp))
+            out_colors = set(np.unique(out))
+
+            # 1. Color changes: disappeared/appeared colors
+            disappeared = in_colors - out_colors - {0}
+            appeared = out_colors - in_colors - {0}
+            # Check for simple recoloring
+            if disappeared and appeared:
+                for old_c in disappeared:
+                    for new_c in appeared:
+                        hint = ("RECOLOR", int(old_c), int(new_c))
+                        if hint not in hints:
+                            hints.append(hint)
+            # Check for swaps: colors that exist in both but pixel counts changed
+            shared = (in_colors & out_colors) - {0}
+            if len(shared) >= 2 and inp.shape == out.shape:
+                shared_list = sorted(shared)
+                for i in range(len(shared_list)):
+                    for j in range(i + 1, len(shared_list)):
+                        c1, c2 = shared_list[i], shared_list[j]
+                        in_c1 = int(np.sum(inp == c1))
+                        in_c2 = int(np.sum(inp == c2))
+                        out_c1 = int(np.sum(out == c1))
+                        out_c2 = int(np.sum(out == c2))
+                        if in_c1 == out_c2 and in_c2 == out_c1 and in_c1 > 0:
+                            hint = ("SWAP", int(c1), int(c2))
+                            if hint not in hints:
+                                hints.append(hint)
+
+            # 2. Spatial transforms: check if output matches a transform of input
+            if inp.shape == out.shape or inp.shape == out.shape[::-1]:
+                transforms = [
+                    ("ROT90", np.rot90(inp, k=-1)),
+                    ("ROT180", np.rot90(inp, k=2)),
+                    ("ROT270", np.rot90(inp, k=1)),
+                    ("FLIP_H", np.fliplr(inp)),
+                    ("FLIP_V", np.flipud(inp)),
+                    ("TRANSPOSE", inp.T),
+                ]
+                for name, transformed in transforms:
+                    if transformed.shape == out.shape and np.array_equal(transformed, out):
+                        if name not in hints:
+                            hints.append(name)
+
+            # 3. Size changes
+            in_h, in_w = inp.shape
+            out_h, out_w = out.shape
+            if out_h < in_h or out_w < in_w:
+                if "CROP_NONZERO" not in hints:
+                    hints.append("CROP_NONZERO")
+                if "DELETE_ROWS_ZERO" not in hints:
+                    hints.append("DELETE_ROWS_ZERO")
+                if "DELETE_COLS_ZERO" not in hints:
+                    hints.append("DELETE_COLS_ZERO")
+            if out_h > in_h or out_w > in_w:
+                # Check for exact 2x or 3x scaling
+                if out_h == in_h * 2 and out_w == in_w * 2:
+                    if "UPSCALE_2X" not in hints:
+                        hints.append("UPSCALE_2X")
+                elif out_h == in_h * 3 and out_w == in_w * 3:
+                    if "UPSCALE_3X" not in hints:
+                        hints.append("UPSCALE_3X")
+
+            # 4. Gravity signals: non-zero pixels compacted to one side
+            if inp.shape == out.shape and not np.array_equal(inp, out):
+                nz_in = np.argwhere(inp != 0)
+                nz_out = np.argwhere(out != 0)
+                if len(nz_in) > 0 and len(nz_out) > 0:
+                    # Check if non-zero content moved toward an edge
+                    in_mean_r = nz_in[:, 0].mean()
+                    out_mean_r = nz_out[:, 0].mean()
+                    in_mean_c = nz_in[:, 1].mean()
+                    out_mean_c = nz_out[:, 1].mean()
+                    row_shift = out_mean_r - in_mean_r
+                    col_shift = out_mean_c - in_mean_c
+                    threshold = 0.5
+                    if row_shift > threshold and "GRAVITY_DOWN" not in hints:
+                        hints.append("GRAVITY_DOWN")
+                    elif row_shift < -threshold and "GRAVITY_UP" not in hints:
+                        hints.append("GRAVITY_UP")
+                    if col_shift > threshold and "GRAVITY_RIGHT" not in hints:
+                        hints.append("GRAVITY_RIGHT")
+                    elif col_shift < -threshold and "GRAVITY_LEFT" not in hints:
+                        hints.append("GRAVITY_LEFT")
+
+            # 5. Object isolation: output has fewer non-zero pixels
+            if inp.shape == out.shape:
+                in_nz = int(np.count_nonzero(inp))
+                out_nz = int(np.count_nonzero(out))
+                if out_nz < in_nz and out_nz > 0:
+                    # Suggest MASK for retained colors
+                    retained = out_colors - {0}
+                    for c in retained:
+                        hint = ("MASK", int(c))
+                        if hint not in hints:
+                            hints.append(hint)
+
+            # 6. Background fill: 0s in input become a specific color in output
+            if inp.shape == out.shape:
+                bg_mask = (inp == 0)
+                if np.any(bg_mask):
+                    filled_vals = out[bg_mask]
+                    filled_nonzero = filled_vals[filled_vals != 0]
+                    if len(filled_nonzero) > 0:
+                        fill_color = int(np.bincount(filled_nonzero.astype(int)).argmax())
+                        # Check if most bg pixels got this color
+                        fill_ratio = np.sum(filled_nonzero == fill_color) / max(len(filled_nonzero), 1)
+                        if fill_ratio > 0.5:
+                            hint = ("FILL_BG", fill_color)
+                            if hint not in hints:
+                                hints.append(hint)
+
+        return hints
+
+    def _guided_ast(self, hints, depth=2):
+        """
+        Generate an AST biased toward using operations from the hints list.
+        60% chance of picking from hints, 40% random.
+        """
+        # Leaf node
+        if depth <= 0 or random.random() < 0.55:
+            if hints and random.random() < 0.60:
+                return random.choice(hints)
+            return random.choice(self.atomic_ops)
+
+        control = random.choice(self.control_ops)
+        if control == "IF_COLOR":
+            c = random.choice(self.colors) if self.colors else random.randint(0, 9)
+            return ("IF_COLOR", c,
+                    self._guided_ast(hints, depth - 1),
+                    self._guided_ast(hints, depth - 1))
+        elif control == "OVERLAY":
+            return ("OVERLAY",
+                    self._guided_ast(hints, depth - 1),
+                    self._guided_ast(hints, depth - 1))
+        elif control == "FOR_EACH_OBJECT":
+            return ("FOR_EACH_OBJECT", self._guided_ast(hints, depth - 1))
+        elif control == "SEQ":
+            n_steps = random.randint(2, 3)
+            return ("SEQ",) + tuple(self._guided_ast(hints, depth - 1) for _ in range(n_steps))
+
+        if hints and random.random() < 0.60:
+            return random.choice(hints)
+        return random.choice(self.atomic_ops)
+
+    # ================================================================
     # 2. TREE GENERATION & MUTATION
     # ================================================================
     def _random_ast(self, depth: int = 2):
@@ -425,9 +583,28 @@ class ASTGridSwarm:
                     print(f"[AST-SWARM] MACRO RECALL: {macro_name}")
                 return macro_ast
 
-        # Generation 0: random population
-        population = [TreeOrganism(self._random_ast(depth=self.MAX_AST_DEPTH))
-                      for _ in range(pop_size)]
+        # Diff analysis: seed population with analytical priors
+        diff_hints = self._analyze_diff(train_pairs)
+        if diff_hints and verbose:
+            hint_strs = []
+            for h in diff_hints:
+                if isinstance(h, tuple):
+                    hint_strs.append("{}({})".format(h[0], ",".join(str(x) for x in h[1:])))
+                else:
+                    hint_strs.append(str(h))
+            print("[AST-SWARM] Diff priors: [{}]".format(", ".join(hint_strs)))
+
+        # Generation 0: 50% guided (if hints available), 50% random
+        population = []
+        if diff_hints:
+            guided_count = pop_size // 2
+            for _ in range(guided_count):
+                population.append(TreeOrganism(self._guided_ast(diff_hints, depth=self.MAX_AST_DEPTH)))
+            for _ in range(pop_size - guided_count):
+                population.append(TreeOrganism(self._random_ast(depth=self.MAX_AST_DEPTH)))
+        else:
+            population = [TreeOrganism(self._random_ast(depth=self.MAX_AST_DEPTH))
+                          for _ in range(pop_size)]
 
         t0 = time.perf_counter()
         generation = 0
