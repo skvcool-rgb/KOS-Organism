@@ -22,6 +22,8 @@ solved = 0
 errors = 0
 rule_types = {}
 solved_tasks = []
+solved_ids = set()
+unsolved_ids = []
 slow_tasks = []
 t0 = time.time()
 
@@ -58,10 +60,15 @@ for i, tf in enumerate(tasks):
                     break
             if all_ok:
                 solved += 1
+                solved_ids.add(tid)
                 solved_tasks.append((tid, rule['description']))
                 rt = rule['type']
                 rule_types[rt] = rule_types.get(rt, 0) + 1
                 print(f"  [{solved:3d}] SOLVED {tid}: {rule['description']} ({task_dt:.1f}s)")
+            else:
+                unsolved_ids.append(tid)
+        else:
+            unsolved_ids.append(tid)
     except Exception as e:
         errors += 1
         task_dt = time.time() - task_t0
@@ -95,3 +102,9 @@ for rt, c in sorted(rule_types.items(), key=lambda x: -x[1]):
 print(f"\nSolved tasks:")
 for tid, desc in solved_tasks:
     print(f"  {tid}: {desc}")
+
+# Save dream queue for Dream Mode
+dream_queue_path = os.path.join(os.path.dirname(__file__), "dream_queue.json")
+with open(dream_queue_path, "w") as f:
+    json.dump(unsolved_ids, f, indent=2)
+print(f"\nDream queue: {len(unsolved_ids)} unsolved tasks saved to dream_queue.json")

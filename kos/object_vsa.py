@@ -86,6 +86,26 @@ except ImportError:
     detect_connect_pairs_rule = None
     apply_connect_pairs = None
 try:
+    from .gravity_drop_engine import detect_gravity_drop_rule, apply_gravity_drop
+except ImportError:
+    detect_gravity_drop_rule = None
+    apply_gravity_drop = None
+try:
+    from .paint_boundary_engine import detect_paint_boundary_rule, apply_paint_boundary
+except ImportError:
+    detect_paint_boundary_rule = None
+    apply_paint_boundary = None
+try:
+    from .mirror_fold_engine import detect_mirror_fold_rule, apply_mirror_fold
+except ImportError:
+    detect_mirror_fold_rule = None
+    apply_mirror_fold = None
+try:
+    from .size_recolor_engine import detect_size_recolor_rule, apply_size_recolor
+except ImportError:
+    detect_size_recolor_rule = None
+    apply_size_recolor = None
+try:
     from .swarm_synthesizer import EvolutionarySwarm
 except ImportError:
     EvolutionarySwarm = None
@@ -1082,6 +1102,98 @@ class ObjectVSA:
                 pass
 
         # ══════════════════════════════════════════════════════════
+        # STAGE 11f: GRAVITY DROP — Tetris-style object falling
+        # ══════════════════════════════════════════════════════════
+        if detect_gravity_drop_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                gdrop_rule = detect_gravity_drop_rule(train_pairs)
+                if gdrop_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_gravity_drop(inp, gdrop_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[GRAVITY-DROP] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{gdrop_rule['description']}")
+                        return gdrop_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11g: PAINT BOUNDARY — Raycast from seeds to walls
+        # ══════════════════════════════════════════════════════════
+        if detect_paint_boundary_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                pb_rule = detect_paint_boundary_rule(train_pairs)
+                if pb_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_paint_boundary(inp, pb_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[PAINT-BOUNDARY] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{pb_rule['description']}")
+                        return pb_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11h: MIRROR FOLD — Global symmetry completion
+        # ══════════════════════════════════════════════════════════
+        if detect_mirror_fold_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                mfold_rule = detect_mirror_fold_rule(train_pairs)
+                if mfold_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_mirror_fold(inp, mfold_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[MIRROR-FOLD] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{mfold_rule['description']}")
+                        return mfold_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11i: SIZE RECOLOR — Recolor objects by size rank
+        # ══════════════════════════════════════════════════════════
+        if detect_size_recolor_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                sr_rule = detect_size_recolor_rule(train_pairs)
+                if sr_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_size_recolor(inp, sr_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[SIZE-RECOLOR] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{sr_rule['description']}")
+                        return sr_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
         # STAGE 12: EVOLUTIONARY SWARM — Darwinian VSA Synthesis
         # All deterministic heuristics exhausted. Let evolution find it.
         # ══════════════════════════════════════════════════════════
@@ -1359,6 +1471,22 @@ class ObjectVSA:
         # Connect pairs rules
         if rule["type"] == "connect_pairs" and apply_connect_pairs:
             return apply_connect_pairs(grid, rule)
+
+        # Gravity drop rules
+        if rule["type"] == "gravity_drop" and apply_gravity_drop:
+            return apply_gravity_drop(grid, rule)
+
+        # Paint boundary rules
+        if rule["type"] == "paint_boundary" and apply_paint_boundary:
+            return apply_paint_boundary(grid, rule)
+
+        # Mirror fold rules
+        if rule["type"] == "mirror_fold" and apply_mirror_fold:
+            return apply_mirror_fold(grid, rule)
+
+        # Size recolor rules
+        if rule["type"] == "size_recolor" and apply_size_recolor:
+            return apply_size_recolor(grid, rule)
 
         # Meta-operator: pure hyperdimensional algebra
         if rule["type"] == "meta_operator":
