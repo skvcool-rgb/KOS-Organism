@@ -169,17 +169,42 @@ def dream_on_task(task_id: str, task_dir: str,
     print(f"[DREAM] Palette: {sorted(palette)}")
     print(f"[DREAM] Time budget: {time_budget}s, Population: {pop_size}")
 
+    # Scale population by grid size (small grids don't need 1500 organisms)
+    max_area = max(inp.size for inp, _ in train_pairs)
+    if max_area <= 25:
+        effective_pop = min(pop_size, 500)
+    elif max_area <= 100:
+        effective_pop = min(pop_size, 800)
+    else:
+        effective_pop = pop_size
+
     # Create AST swarm
     swarm = ASTGridSwarm(palette=palette)
 
-    # Run evolution with full time budget
+    # Strategy: try without CV first (fast), then with CV (thorough)
     t0 = time.perf_counter()
+    winning_ast = None
+
+    # Phase 1: Quick attempt without cross-validation (20% of budget)
+    quick_budget = time_budget * 0.2
     winning_ast = swarm.breed_program(
         train_pairs,
-        pop_size=pop_size,
-        max_time_sec=time_budget,
+        pop_size=effective_pop,
+        max_time_sec=quick_budget,
         verbose=True,
+        cross_validate=False,
     )
+
+    # Phase 2: If quick attempt failed, try with cross-validation (remaining budget)
+    if winning_ast is None and (time.perf_counter() - t0) < time_budget * 0.9:
+        remaining = time_budget - (time.perf_counter() - t0)
+        winning_ast = swarm.breed_program(
+            train_pairs,
+            pop_size=effective_pop,
+            max_time_sec=remaining,
+            verbose=True,
+            cross_validate=True,
+        )
 
     elapsed = time.perf_counter() - t0
 
@@ -294,13 +319,15 @@ def _adaptive_budget(task_id: str, task_dir: str,
             max_area = max(max_area, len(inp) * (len(inp[0]) if inp else 0))
 
         if max_area <= 25:      # 5x5 or smaller
-            return min(base_time, 60.0)
+            return min(base_time, 30.0)
         elif max_area <= 100:   # 10x10 or smaller
-            return min(base_time, 120.0)
+            return min(base_time, 60.0)
         elif max_area <= 225:   # 15x15 or smaller
-            return min(base_time, 180.0)
+            return min(base_time, 90.0)
+        elif max_area <= 400:   # 20x20 or smaller
+            return min(base_time, 120.0)
         else:
-            return base_time
+            return min(base_time, 180.0)
     except Exception:
         return base_time
 

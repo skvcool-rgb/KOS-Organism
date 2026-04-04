@@ -1099,6 +1099,10 @@ class ASTGridSwarm:
             else:
                 stagnation += 1
 
+            # Early extinction: if no improvement in 15 generations, bail
+            if stagnation >= 15 and best_ever < -20:
+                break
+
             # --- APEX PREDATOR DETECTED ---
             if best.fitness == 0.0:
                 elapsed_ms = (time.perf_counter() - t0) * 1000
