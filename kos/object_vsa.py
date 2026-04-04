@@ -61,6 +61,16 @@ try:
 except ImportError:
     FloodEngine = None
 try:
+    from .interior_fill_engine import detect_interior_fill_rule, apply_interior_fill
+except ImportError:
+    detect_interior_fill_rule = None
+    apply_interior_fill = None
+try:
+    from .pattern_tile_engine import detect_pattern_tile_rule, apply_pattern_tile
+except ImportError:
+    detect_pattern_tile_rule = None
+    apply_pattern_tile = None
+try:
     from .swarm_synthesizer import EvolutionarySwarm
 except ImportError:
     EvolutionarySwarm = None
@@ -68,6 +78,10 @@ try:
     from .grid_swarm import EvolutionaryGridSwarm
 except ImportError:
     EvolutionaryGridSwarm = None
+try:
+    from .tree_swarm import ASTGridSwarm
+except ImportError:
+    ASTGridSwarm = None
 
 SPATIAL_STEP = 17
 
@@ -937,7 +951,54 @@ class ObjectVSA:
                 pass
 
         # ══════════════════════════════════════════════════════════
-        # STAGE 11: EVOLUTIONARY SWARM — Darwinian VSA Synthesis
+        # STAGE 11a: INTERIOR FILL — Detect rectangles, fill interiors
+        # ══════════════════════════════════════════════════════════
+        if detect_interior_fill_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                ifill_rule = detect_interior_fill_rule(train_pairs)
+                if ifill_rule:
+                    # Verify on all pairs
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_interior_fill(inp, ifill_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[INTERIOR-FILL] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{ifill_rule['description']}")
+                        return ifill_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11b: PATTERN TILE — Detect and extend repeating patterns
+        # ══════════════════════════════════════════════════════════
+        if detect_pattern_tile_rule and (time.perf_counter() - t0) < timeout - 1:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                ptile_rule = detect_pattern_tile_rule(train_pairs)
+                if ptile_rule:
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = apply_pattern_tile(inp, ptile_rule)
+                        if not np.array_equal(pred, out):
+                            verified = False
+                            break
+                    if verified:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[PATTERN-TILE] RULE VERIFIED in {elapsed:.1f}ms: "
+                              f"{ptile_rule['description']}")
+                        return ptile_rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 12: EVOLUTIONARY SWARM — Darwinian VSA Synthesis
         # All deterministic heuristics exhausted. Let evolution find it.
         # ══════════════════════════════════════════════════════════
         remaining = timeout - (time.perf_counter() - t0)
@@ -1025,6 +1086,58 @@ class ObjectVSA:
                         }
                         print(f"[GRID-SWARM] RULE VERIFIED in {elapsed_ms:.1f}ms: "
                               f"{dna_str}")
+                        return rule
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 13: AST SWARM — Turing-Complete Genetic Programming
+        # Evolves tree-structured programs with IF_COLOR, FOR_EACH_OBJECT,
+        # OVERLAY, and SEQ. The machine writes its own control flow.
+        # ══════════════════════════════════════════════════════════
+        remaining = timeout - (time.perf_counter() - t0)
+        if ASTGridSwarm and remaining > 0.5:
+            try:
+                palette = set()
+                for ex in examples:
+                    palette.update(int(v) for v in np.unique(ex["input"]))
+                    palette.update(int(v) for v in np.unique(ex["output"]))
+
+                ast_swarm = ASTGridSwarm(palette=palette)
+
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+
+                ast_time = min(remaining - 0.1, 3.0)
+                winning_ast = ast_swarm.breed_program(
+                    train_pairs, pop_size=200, max_time_sec=ast_time,
+                    verbose=True
+                )
+
+                if winning_ast is not None:
+                    # Double-verify on all training pairs
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = ast_swarm._execute_ast(inp, winning_ast)
+                        if pred.shape != out.shape or not np.array_equal(pred, out):
+                            verified = False
+                            break
+
+                    if verified:
+                        elapsed_ms = (time.perf_counter() - t0) * 1000
+                        ast_str = ast_swarm._ast_to_str(winning_ast)
+                        rule = {
+                            "type": "ast_evolved",
+                            "ast": winning_ast,
+                            "palette": list(palette),
+                            "target_color": None,
+                            "displacement": (0, 0),
+                            "color_swap": None,
+                            "description": f"AST-EVOLVED: {ast_str}",
+                            "worst_error": 0.0,
+                        }
+                        print(f"[AST-SWARM] RULE VERIFIED in {elapsed_ms:.1f}ms: "
+                              f"{ast_str}")
                         return rule
             except Exception:
                 pass
@@ -1143,6 +1256,14 @@ class ObjectVSA:
         if rule["type"].startswith("flood_") and self.flood_engine:
             return self.flood_engine.apply_flood_fill(grid, rule)
 
+        # Interior fill rules
+        if rule["type"] == "interior_fill" and apply_interior_fill:
+            return apply_interior_fill(grid, rule)
+
+        # Pattern tile rules
+        if rule["type"].startswith("pattern_tile") and apply_pattern_tile:
+            return apply_pattern_tile(grid, rule)
+
         # Meta-operator: pure hyperdimensional algebra
         if rule["type"] == "meta_operator":
             return self.meta_learner.apply_rule(grid, rule)
@@ -1177,6 +1298,12 @@ class ObjectVSA:
             gs = EvolutionaryGridSwarm() if EvolutionaryGridSwarm else None
             if gs:
                 return gs._execute_dna(grid, rule["dna"])
+
+        # AST-evolved programs (Tree Swarm)
+        if rule["type"] == "ast_evolved" and ASTGridSwarm:
+            palette = set(rule.get("palette", range(10)))
+            ast_swarm = ASTGridSwarm(palette=palette)
+            return ast_swarm._execute_ast(grid, rule["ast"])
 
         # Evolved programs (Swarm Synthesizer)
         if rule["type"] == "evolved" and self.swarm:
