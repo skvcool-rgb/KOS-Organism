@@ -1,0 +1,157 @@
+[
+  {
+    "name": "SEQ_RECOLOR85_IF4_RECOLOR15_RECOLOR35",
+    "ast": [
+      "SEQ",
+      [
+        "RECOLOR",
+        8,
+        5
+      ],
+      [
+        "IF_COLOR",
+        4,
+        [
+          "RECOLOR",
+          1,
+          5
+        ],
+        [
+          "IF_COLOR",
+          3,
+          [
+            "RECOLOR",
+            2,
+            5
+          ],
+          [
+            "SWAP",
+            1,
+            3
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        3,
+        5
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "RECOLOR(8,5) -> IF(4, RECOLOR(1,5), IF(3, RECOLOR(2,5), SWAP(1,3))) -> RECOLOR(3,5)",
+    "depth": 4
+  },
+  {
+    "name": "IF4_RECOLOR15",
+    "ast": [
+      "IF_COLOR",
+      4,
+      [
+        "RECOLOR",
+        1,
+        5
+      ],
+      [
+        "IF_COLOR",
+        3,
+        [
+          "RECOLOR",
+          2,
+          5
+        ],
+        [
+          "SWAP",
+          1,
+          3
+        ]
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "IF(4, RECOLOR(1,5), IF(3, RECOLOR(2,5), SWAP(1,3)))",
+    "depth": 3
+  },
+  {
+    "name": "IF3_RECOLOR25",
+    "ast": [
+      "IF_COLOR",
+      3,
+      [
+        "RECOLOR",
+        2,
+        5
+      ],
+      [
+        "SWAP",
+        1,
+        3
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "IF(3, RECOLOR(2,5), SWAP(1,3))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_SWAP80_ROT90_SHIFT_LEFT_FOR_EACH_SWAP08_OVERLAY_ROT90_ROT270",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SWAP",
+          8,
+          0
+        ],
+        "ROT90",
+        "SHIFT_LEFT",
+        "SHIFT_DOWN"
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "SWAP",
+          0,
+          8
+        ]
+      ],
+      [
+        "OVERLAY",
+        "ROT90",
+        "ROT270"
+      ]
+    ],
+    "source_task": "6f8cd79b",
+    "description": "SWAP(8,0) -> ROT90 -> SHIFT_LEFT -> SHIFT_DOWN -> FOR_EACH(SWAP(0,8)) -> OVERLAY(ROT90, ROT270)",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_SWAP80_ROT90_SHIFT_LEFT",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        8,
+        0
+      ],
+      "ROT90",
+      "SHIFT_LEFT",
+      "SHIFT_DOWN"
+    ],
+    "source_task": "6f8cd79b",
+    "description": "SWAP(8,0) -> ROT90 -> SHIFT_LEFT -> SHIFT_DOWN",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_SWAP08",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "SWAP",
+        0,
+        8
+      ]
+    ],
+    "source_task": "6f8cd79b",
+    "description": "FOR_EACH(SWAP(0,8))",
+    "depth": 2
+  }
+]

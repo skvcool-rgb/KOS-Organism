@@ -106,6 +106,10 @@ except ImportError:
     detect_size_recolor_rule = None
     apply_size_recolor = None
 try:
+    from .learned_engines import get_learned_engines
+except ImportError:
+    get_learned_engines = None
+try:
     from .swarm_synthesizer import EvolutionarySwarm
 except ImportError:
     EvolutionarySwarm = None
@@ -986,6 +990,35 @@ class ObjectVSA:
                 pass
 
         # ══════════════════════════════════════════════════════════
+        # STAGE 10b: LEARNED ENGINES — Myelinated Dream Mode solvers
+        # These are auto-generated from overnight evolution.
+        # ══════════════════════════════════════════════════════════
+        if get_learned_engines and (time.perf_counter() - t0) < timeout - 0.5:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                for eng in get_learned_engines():
+                    try:
+                        learned_rule = eng["detect"](train_pairs)
+                        if learned_rule:
+                            # Verify on all pairs
+                            verified = True
+                            for inp, out in train_pairs:
+                                pred = eng["apply"](inp, learned_rule)
+                                if pred.shape != out.shape or not np.array_equal(pred, out):
+                                    verified = False
+                                    break
+                            if verified:
+                                elapsed = (time.perf_counter() - t0) * 1000
+                                desc = learned_rule.get("description", eng["description"])
+                                print(f"[LEARNED] RULE VERIFIED in {elapsed:.1f}ms: {desc}")
+                                return learned_rule
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
+        # ══════════════════════════════════════════════════════════
         # STAGE 11a: INTERIOR FILL — Detect rectangles, fill interiors
         # ══════════════════════════════════════════════════════════
         if detect_interior_fill_rule and (time.perf_counter() - t0) < timeout - 1:
@@ -1522,6 +1555,23 @@ class ObjectVSA:
             gs = EvolutionaryGridSwarm() if EvolutionaryGridSwarm else None
             if gs:
                 return gs._execute_dna(grid, rule["dna"])
+
+        # Learned engines (Dream Mode myelinated)
+        if rule["type"].startswith("learned_") and get_learned_engines:
+            # Match by task_id in rule type (e.g. "learned_9565186b" -> task "9565186b")
+            target_task = rule["type"].replace("learned_", "", 1)
+            for eng in get_learned_engines():
+                try:
+                    if eng.get("task_id") == target_task or eng.get("task_ids") and target_task in eng.get("task_ids", []):
+                        return eng["apply"](grid, rule)
+                except Exception:
+                    pass
+            # Fallback: try all engines
+            for eng in get_learned_engines():
+                try:
+                    return eng["apply"](grid, rule)
+                except Exception:
+                    pass
 
         # AST-evolved programs (Tree Swarm)
         if rule["type"] == "ast_evolved" and ASTGridSwarm:

@@ -14,6 +14,8 @@ nested structure that can express:
 This is the leap from "sequence of transforms" to "evolved programs."
 """
 
+import os
+import json
 import numpy as np
 import random
 import time
@@ -76,6 +78,43 @@ class ASTGridSwarm:
 
         # Macro library for cross-task recall
         self.macro_library = {}
+
+        # Load genetic vocabulary (REM Sleep macros)
+        self.learned_macros = []
+        self._load_genetic_vocabulary()
+
+    def _load_genetic_vocabulary(self):
+        """Load compound macros from REM Sleep into the atomic op set."""
+        try:
+            vocab_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "genetic_vocabulary.json"
+            )
+            if os.path.exists(vocab_path):
+                import json
+                with open(vocab_path) as f:
+                    vocab = json.load(f)
+                for entry in vocab:
+                    ast_data = entry.get("ast")
+                    if ast_data:
+                        macro = self._json_to_tuple(ast_data)
+                        self.learned_macros.append(macro)
+                if self.learned_macros:
+                    print(f"[AST-SWARM] Loaded {len(self.learned_macros)} "
+                          f"genetic macros from REM Sleep")
+        except Exception:
+            pass
+
+    @staticmethod
+    def _json_to_tuple(data):
+        """Convert JSON list-based AST to tuple-based AST."""
+        if isinstance(data, str):
+            return data
+        if isinstance(data, (int, float)):
+            return data
+        if isinstance(data, list):
+            return tuple(ASTGridSwarm._json_to_tuple(x) for x in data)
+        return data
 
     # ================================================================
     # 1. THE RECURSIVE PHYSICS EXECUTOR
@@ -432,6 +471,9 @@ class ASTGridSwarm:
         """Generate a random AST node."""
         # Leaf node: higher probability at lower depths or randomly
         if depth <= 0 or random.random() < 0.55:
+            # 15% chance to use a learned macro instead of a primitive
+            if self.learned_macros and random.random() < 0.15:
+                return random.choice(self.learned_macros)
             return random.choice(self.atomic_ops)
 
         control = random.choice(self.control_ops)

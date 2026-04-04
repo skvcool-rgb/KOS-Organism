@@ -33,20 +33,17 @@ def detect_rule(train_pairs):
 
 
 def apply_rule(grid, rule=None):
-    """Apply the learned transformation."""
-    state = grid.copy()
-    state[state == 8] = 5
-    if 4 in state:
-        state[state == 1] = 5
-    else:
-        if 3 in state:
-            state[state == 2] = 5
-        else:
-            m1, m2 = state == 1, state == 3
-            state[m1] = 3
-            state[m2] = 1
-    state[state == 3] = 5
+    """Apply the learned transformation.
 
+    True rule: keep the most frequent color, replace all others with 5.
+    (Original evolved AST overfit to training-specific color checks.)
+    """
+    state = grid.copy()
+    # Find the most frequent color
+    colors, counts = np.unique(state, return_counts=True)
+    keep_color = colors[np.argmax(counts)]
+    # Replace everything else with 5
+    state[state != keep_color] = 5
     return state
 
 
