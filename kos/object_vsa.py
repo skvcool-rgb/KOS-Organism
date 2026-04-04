@@ -1346,9 +1346,11 @@ class ObjectVSA:
                                for ex in examples]
 
                 ast_time = min(remaining - 0.1, 3.0)
+                # Disable cross-validation in benchmark (3s too short for CV folds)
+                # CV is for Dream Mode's 600s budget where generalization matters
                 winning_ast = ast_swarm.breed_program(
                     train_pairs, pop_size=200, max_time_sec=ast_time,
-                    verbose=True
+                    verbose=True, cross_validate=False
                 )
 
                 if winning_ast is not None:
