@@ -73,6 +73,37 @@ class ASTGridSwarm:
                 self.atomic_ops.append(("MASK", c1))
                 self.atomic_ops.append(("FILL_BG", c1))
 
+        # Relational color tokens -- resolved dynamically at runtime
+        # These let the swarm evolve "RECOLOR(COLOR_MIN, COLOR_MAX)" instead
+        # of hardcoding "RECOLOR(4, 7)" which overfits to training colors.
+        self.relational_tokens = [
+            "COLOR_MAX",        # Most frequent non-zero color
+            "COLOR_MIN",        # Least frequent non-zero color
+            "COLOR_BG",         # Background (most frequent overall, usually 0)
+            "COLOR_SECOND",     # Second most frequent non-zero color
+            "COLOR_UNIQUE",     # Color that appears exactly once
+        ]
+
+        # Add relational ops to the atomic op pool
+        # RECOLOR(REL, REL), SWAP(REL, REL), MASK(REL), FILL_BG(REL)
+        for rt in self.relational_tokens:
+            self.atomic_ops.append(("MASK", rt))
+            self.atomic_ops.append(("FILL_BG", rt))
+            for rt2 in self.relational_tokens:
+                if rt != rt2:
+                    self.atomic_ops.append(("RECOLOR", rt, rt2))
+                    self.atomic_ops.append(("SWAP", rt, rt2))
+            # Mixed: relational + absolute
+            for c in colors:
+                self.atomic_ops.append(("RECOLOR", rt, c))
+                self.atomic_ops.append(("RECOLOR", c, rt))
+                self.atomic_ops.append(("SWAP", rt, c))
+
+        # High-value relational compound ops
+        self.atomic_ops.append("RECOLOR_ALL_TO_MAX")    # All non-bg → most frequent
+        self.atomic_ops.append("RECOLOR_NONMAX_TO_BG")  # Keep only most frequent color
+        self.atomic_ops.append("KEEP_MOST_FREQUENT")    # Keep most frequent, rest → 5
+
         # Control flow operations (non-leaf)
         self.control_ops = ["IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ"]
 
@@ -116,6 +147,54 @@ class ASTGridSwarm:
             return tuple(ASTGridSwarm._json_to_tuple(x) for x in data)
         return data
 
+    @staticmethod
+    def _resolve_relational_color(token, grid):
+        """Resolve a relational color token to an actual integer color.
+
+        Relational tokens let the AST express 'most frequent color'
+        instead of hardcoding 'color 4'. This is the key to generalization.
+        """
+        if isinstance(token, (int, float, np.integer)):
+            return int(token)
+        if not isinstance(token, str) or not token.startswith("COLOR_"):
+            return token  # Not a relational token
+
+        vals = grid.flatten()
+        if len(vals) == 0:
+            return 0
+
+        colors, counts = np.unique(vals, return_counts=True)
+
+        # Separate background (0) from foreground
+        nonzero_mask = colors != 0
+        nz_colors = colors[nonzero_mask]
+        nz_counts = counts[nonzero_mask]
+
+        if token == "COLOR_BG":
+            # Most frequent overall (usually 0)
+            return int(colors[np.argmax(counts)])
+
+        if len(nz_colors) == 0:
+            return 0  # All zeros
+
+        if token == "COLOR_MAX":
+            return int(nz_colors[np.argmax(nz_counts)])
+        elif token == "COLOR_MIN":
+            return int(nz_colors[np.argmin(nz_counts)])
+        elif token == "COLOR_SECOND":
+            if len(nz_colors) >= 2:
+                order = np.argsort(-nz_counts)
+                return int(nz_colors[order[1]])
+            return int(nz_colors[0])
+        elif token == "COLOR_UNIQUE":
+            # Color that appears exactly once
+            uniques = nz_colors[nz_counts == 1]
+            if len(uniques) > 0:
+                return int(uniques[0])
+            return int(nz_colors[np.argmin(nz_counts)])
+
+        return 0
+
     # ================================================================
     # 1. THE RECURSIVE PHYSICS EXECUTOR
     # ================================================================
@@ -139,7 +218,10 @@ class ASTGridSwarm:
             op = ast[0]
 
             if op == "SWAP" and len(ast) == 3:
-                c1, c2 = ast[1], ast[2]
+                c1 = self._resolve_relational_color(ast[1], grid)
+                c2 = self._resolve_relational_color(ast[2], grid)
+                if c1 == c2:
+                    return grid
                 state = grid.copy()
                 m1, m2 = state == c1, state == c2
                 state[m1] = c2
@@ -147,22 +229,27 @@ class ASTGridSwarm:
                 return state
 
             elif op == "RECOLOR" and len(ast) == 3:
-                c1, c2 = ast[1], ast[2]
+                c1 = self._resolve_relational_color(ast[1], grid)
+                c2 = self._resolve_relational_color(ast[2], grid)
+                if c1 == c2:
+                    return grid
                 state = grid.copy()
                 state[state == c1] = c2
                 return state
 
             elif op == "MASK" and len(ast) == 2:
-                return np.where(grid == ast[1], ast[1], 0)
+                c = self._resolve_relational_color(ast[1], grid)
+                return np.where(grid == c, c, 0)
 
             elif op == "FILL_BG" and len(ast) == 2:
+                c = self._resolve_relational_color(ast[1], grid)
                 state = grid.copy()
-                state[state == 0] = ast[1]
+                state[state == 0] = c
                 return state
 
             # --- Control flow nodes ---
             elif op == "IF_COLOR" and len(ast) == 4:
-                target_color = ast[1]
+                target_color = self._resolve_relational_color(ast[1], grid)
                 if target_color in grid:
                     return self._execute_ast(grid, ast[2], depth + 1, step_counter)
                 else:
@@ -239,6 +326,26 @@ class ASTGridSwarm:
             return grid[:, mask] if np.any(mask) else grid
         elif op == "IDENTITY":
             return grid
+
+        # --- Relational compound operations ---
+        elif op == "RECOLOR_ALL_TO_MAX":
+            # All non-background pixels → most frequent non-zero color
+            max_c = self._resolve_relational_color("COLOR_MAX", grid)
+            state = grid.copy()
+            state[(state != 0) & (state != max_c)] = max_c
+            return state
+        elif op == "RECOLOR_NONMAX_TO_BG":
+            # Keep only the most frequent color, everything else → 0
+            max_c = self._resolve_relational_color("COLOR_MAX", grid)
+            return np.where(grid == max_c, max_c, 0)
+        elif op == "KEEP_MOST_FREQUENT":
+            # Keep most frequent non-zero color, replace rest with 5
+            # (This is the exact rule the swarm couldn't express before)
+            max_c = self._resolve_relational_color("COLOR_MAX", grid)
+            state = grid.copy()
+            state[state != max_c] = 5
+            return state
+
         return grid
 
     def _exec_for_each(self, grid: np.ndarray, sub_ast,
@@ -446,7 +553,11 @@ class ASTGridSwarm:
 
         control = random.choice(self.control_ops)
         if control == "IF_COLOR":
-            c = random.choice(self.colors) if self.colors else random.randint(0, 9)
+            # 30% chance to use relational token for IF_COLOR condition
+            if random.random() < 0.3:
+                c = random.choice(self.relational_tokens)
+            else:
+                c = random.choice(self.colors) if self.colors else random.randint(0, 9)
             return ("IF_COLOR", c,
                     self._guided_ast(hints, depth - 1),
                     self._guided_ast(hints, depth - 1))
@@ -478,7 +589,11 @@ class ASTGridSwarm:
 
         control = random.choice(self.control_ops)
         if control == "IF_COLOR":
-            c = random.choice(self.colors) if self.colors else random.randint(0, 9)
+            # 30% chance relational token for condition
+            if random.random() < 0.3:
+                c = random.choice(self.relational_tokens)
+            else:
+                c = random.choice(self.colors) if self.colors else random.randint(0, 9)
             return ("IF_COLOR", c,
                     self._random_ast(depth - 1),
                     self._random_ast(depth - 1))
@@ -539,6 +654,121 @@ class ASTGridSwarm:
 
         # Tuple atomic op (SWAP, RECOLOR, etc.) -- return as-is
         return ast
+
+    # ------------------------------------------------------------------
+    # Fristonian Active Inference: error-gradient-guided mutation
+    # ------------------------------------------------------------------
+
+    def _error_gradient(self, ast, train_pairs):
+        """Analyze prediction errors to guide mutation toward fixing them.
+
+        Returns a dict with:
+        - 'wrong_colors': set of (predicted_color, target_color) pairs at error pixels
+        - 'error_positions': list of (row, col) positions that are wrong
+        - 'missing_colors': colors in target but not in prediction
+        - 'extra_colors': colors in prediction but not in target
+        - 'error_count': total pixel errors
+        - 'shape_mismatch': bool
+        - 'suggested_ops': list of operations likely to fix the errors
+        """
+        info = {
+            'wrong_colors': set(),
+            'error_positions': [],
+            'missing_colors': set(),
+            'extra_colors': set(),
+            'error_count': 0,
+            'shape_mismatch': False,
+            'suggested_ops': [],
+        }
+
+        step_counter = [0]
+        for inp, out in train_pairs:
+            step_counter[0] = 0
+            try:
+                pred = self._execute_ast(inp, ast, depth=0,
+                                         step_counter=step_counter)
+            except Exception:
+                info['error_count'] += max(out.size, inp.size)
+                info['shape_mismatch'] = True
+                continue
+
+            if pred.shape != out.shape:
+                info['shape_mismatch'] = True
+                info['error_count'] += max(out.size, inp.size)
+                continue
+
+            diff_mask = pred != out
+            info['error_count'] += int(np.sum(diff_mask))
+
+            # Analyze color errors
+            if np.any(diff_mask):
+                pred_colors_at_error = set(int(v) for v in pred[diff_mask])
+                target_colors_at_error = set(int(v) for v in out[diff_mask])
+
+                for pc in pred_colors_at_error:
+                    for tc in target_colors_at_error:
+                        info['wrong_colors'].add((pc, tc))
+
+                # Track error positions (limit to avoid memory bloat)
+                rows, cols = np.where(diff_mask)
+                for i in range(min(len(rows), 50)):
+                    info['error_positions'].append(
+                        (int(rows[i]), int(cols[i])))
+
+            pred_all = set(int(v) for v in np.unique(pred))
+            target_all = set(int(v) for v in np.unique(out))
+            info['missing_colors'].update(target_all - pred_all)
+            info['extra_colors'].update(pred_all - target_all)
+
+        # Generate suggested fix operations
+        ops = []
+        for pred_c, target_c in info['wrong_colors']:
+            if pred_c != target_c:
+                ops.append(("RECOLOR", pred_c, target_c))
+        for mc in info['missing_colors']:
+            if mc != 0:
+                ops.append(("FILL_BG", mc))
+        for ec in info['extra_colors']:
+            if ec != 0:
+                ops.append(("MASK", ec))
+        if info['shape_mismatch']:
+            ops.extend([
+                "CROP_NONZERO",
+                "DELETE_ROWS_ZERO",
+                "DELETE_COLS_ZERO",
+            ])
+
+        info['suggested_ops'] = ops
+        return info
+
+    def _gradient_mutate(self, ast, error_info, mutation_chance=0.25):
+        """Error-guided mutation (Fristonian Active Inference).
+
+        Instead of blind random replacement, uses error gradient info:
+        - 50% chance: SMART FIX -- append a correction op to the program
+        - 50% chance: normal mutation biased toward suggested ops
+        """
+        suggested = error_info.get('suggested_ops', [])
+
+        if suggested and random.random() < 0.5:
+            # SMART FIX: append a correction operation to the existing program
+            fix_op = random.choice(suggested)
+
+            if (isinstance(ast, tuple) and len(ast) >= 2
+                    and ast[0] == "SEQ"):
+                # Append fix to existing SEQ
+                return ast + (fix_op,)
+            else:
+                # Wrap in SEQ with the fix
+                return ("SEQ", ast, fix_op)
+        else:
+            # Normal mutation but biased toward suggested ops
+            if suggested and random.random() < 0.4:
+                # Replace a random subtree with a suggested op
+                return self._replace_random_node(
+                    ast, random.choice(suggested))
+            else:
+                return self._mutate_tree(ast, mutation_chance)
 
     def _crossover(self, parent1_ast, parent2_ast):
         """Graft a subtree from parent2 onto parent1."""
@@ -605,15 +835,117 @@ class ASTGridSwarm:
     # ================================================================
     def breed_program(self, train_pairs: List[Tuple[np.ndarray, np.ndarray]],
                       pop_size: int = 500, max_time_sec: float = 2.0,
-                      verbose: bool = True) -> Optional[tuple]:
+                      verbose: bool = True, cross_validate: bool = True) -> Optional[tuple]:
         """
         Evolve an AST program that perfectly solves ALL training pairs.
+
+        When cross_validate=True and there are 3+ training pairs, uses
+        leave-one-out cross-validation: evolves on N-1 pairs and validates
+        on the held-out pair. This prevents overfitting to training-specific
+        color patterns (e.g. IF_COLOR(4)) that don't generalize.
+
+        Time budget split: 60% for cross-val folds, 40% for fallback.
 
         Returns: Winning AST, or None on extinction.
         """
         if not train_pairs:
             return None
 
+        n_pairs = len(train_pairs)
+
+        # Cross-validation: hold out 1 pair per fold if we have enough
+        if cross_validate and n_pairs >= 3:
+            cv_budget = max_time_sec * 0.6
+            n_folds = min(n_pairs, 4)  # Cap at 4 folds to keep time reasonable
+            time_per_fold = cv_budget / n_folds
+
+            if verbose:
+                print(f"\n[AST-SWARM] K-Fold Cross-Validation: {n_folds} folds, "
+                      f"{time_per_fold:.2f}s/fold, {max_time_sec * 0.4:.2f}s fallback")
+
+            for fold_idx in range(n_folds):
+                train_fold = [p for i, p in enumerate(train_pairs) if i != fold_idx]
+                val_pair = train_pairs[fold_idx]
+
+                if verbose:
+                    print(f"\n[AST-SWARM] === Fold {fold_idx + 1}/{n_folds}: "
+                          f"train on {len(train_fold)} pairs, holdout pair {fold_idx} ===")
+
+                # Evolve on training fold only
+                winning_ast = self._breed_inner(
+                    train_fold, pop_size, time_per_fold, verbose)
+
+                if winning_ast is not None:
+                    # Validate on held-out pair
+                    val_inp, val_out = val_pair
+                    step_counter = [0]
+                    try:
+                        pred = self._execute_ast(
+                            val_inp, winning_ast, depth=0,
+                            step_counter=step_counter)
+                        holdout_pass = (pred.shape == val_out.shape
+                                        and np.array_equal(pred, val_out))
+                    except Exception:
+                        holdout_pass = False
+
+                    if holdout_pass:
+                        if verbose:
+                            print(f"[AST-SWARM] Cross-validation PASSED "
+                                  f"on holdout pair {fold_idx}")
+                        # Final sanity check: verify on ALL pairs
+                        all_ok = True
+                        for inp, out in train_pairs:
+                            step_counter[0] = 0
+                            try:
+                                p = self._execute_ast(
+                                    inp, winning_ast, depth=0,
+                                    step_counter=step_counter)
+                                if p.shape != out.shape or not np.array_equal(p, out):
+                                    all_ok = False
+                                    break
+                            except Exception:
+                                all_ok = False
+                                break
+                        if all_ok:
+                            if verbose:
+                                ast_str = self._ast_to_str(winning_ast)
+                                print(f"[AST-SWARM] ** CROSS-VALIDATED SOLUTION ** "
+                                      f"Generalizes across all {n_pairs} pairs")
+                                print(f"[AST-SWARM] Program: {ast_str}")
+                            return winning_ast
+                        else:
+                            if verbose:
+                                print(f"[AST-SWARM] Holdout passed but failed "
+                                      f"on full set (partial generalization)")
+                    else:
+                        if verbose:
+                            print(f"[AST-SWARM] Cross-validation FAILED "
+                                  f"on holdout pair {fold_idx} (overfit detected)")
+
+            # All folds exhausted without a cross-validated solution
+            fallback_budget = max_time_sec * 0.4
+            if verbose:
+                print(f"\n[AST-SWARM] All {n_folds} cross-val folds failed. "
+                      f"Fallback: evolve on full set ({fallback_budget:.2f}s)")
+            return self._breed_inner(
+                train_pairs, pop_size, fallback_budget, verbose)
+
+        # Not enough pairs for cross-validation, or disabled -- use full budget
+        if verbose and n_pairs < 3 and cross_validate:
+            print(f"\n[AST-SWARM] Only {n_pairs} training pair(s), "
+                  f"skipping cross-validation")
+        return self._breed_inner(train_pairs, pop_size, max_time_sec, verbose)
+
+    def _breed_inner(self, train_pairs: List[Tuple[np.ndarray, np.ndarray]],
+                     pop_size: int, max_time_sec: float,
+                     verbose: bool) -> Optional[tuple]:
+        """
+        Core evolutionary loop. Evolves an AST that scores fitness=0 on
+        all provided train_pairs. Extracted from breed_program so it can
+        be called per cross-validation fold.
+
+        Returns: Winning AST, or None on extinction.
+        """
         if verbose:
             print(f"\n[AST-SWARM] Spawning {pop_size} Turing-Complete organisms. "
                   f"Budget: {max_time_sec:.1f}s")
@@ -692,11 +1024,27 @@ class ASTGridSwarm:
             # Adaptive mutation: boost on stagnation
             mut_chance = min(0.5, 0.20 + stagnation * 0.02)
 
+            # Compute error gradients for top organisms (Fristonian Active Inference)
+            top_gradients = {}
+            gradient_organisms = [
+                s for s in survivors[:5]
+                if s.fitness > -50 and s.fitness < 0
+            ]
+            for org in gradient_organisms:
+                top_gradients[id(org)] = self._error_gradient(
+                    org.ast, train_pairs)
+
             next_gen = [TreeOrganism(s.ast) for s in survivors]
             while len(next_gen) < pop_size:
                 r = random.random()
-                if r < 0.6:
-                    # Mutation
+                if r < 0.3 and gradient_organisms:
+                    # GRADIENT-GUIDED mutation (Fristonian Active Inference)
+                    parent = random.choice(gradient_organisms)
+                    grad = top_gradients[id(parent)]
+                    child_ast = self._gradient_mutate(
+                        parent.ast, grad, mut_chance)
+                elif r < 0.6:
+                    # Normal mutation
                     parent = random.choice(survivors)
                     child_ast = self._mutate_tree(parent.ast, mut_chance)
                 elif r < 0.85:
