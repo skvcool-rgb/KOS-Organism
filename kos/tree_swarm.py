@@ -84,20 +84,23 @@ class ASTGridSwarm:
             "COLOR_UNIQUE",     # Color that appears exactly once
         ]
 
-        # Add relational ops to the atomic op pool
-        # RECOLOR(REL, REL), SWAP(REL, REL), MASK(REL), FILL_BG(REL)
+        # Add CURATED relational ops (not exhaustive -- keep search space tight)
+        # Only the highest-value relational combinations
         for rt in self.relational_tokens:
             self.atomic_ops.append(("MASK", rt))
             self.atomic_ops.append(("FILL_BG", rt))
-            for rt2 in self.relational_tokens:
-                if rt != rt2:
-                    self.atomic_ops.append(("RECOLOR", rt, rt2))
-                    self.atomic_ops.append(("SWAP", rt, rt2))
-            # Mixed: relational + absolute
-            for c in colors:
-                self.atomic_ops.append(("RECOLOR", rt, c))
-                self.atomic_ops.append(("RECOLOR", c, rt))
-                self.atomic_ops.append(("SWAP", rt, c))
+        # Key relational pairs (not all permutations)
+        self.atomic_ops.extend([
+            ("RECOLOR", "COLOR_MIN", "COLOR_MAX"),
+            ("RECOLOR", "COLOR_MAX", "COLOR_MIN"),
+            ("RECOLOR", "COLOR_UNIQUE", "COLOR_MAX"),
+            ("RECOLOR", "COLOR_UNIQUE", "COLOR_BG"),
+            ("SWAP", "COLOR_MAX", "COLOR_MIN"),
+            ("SWAP", "COLOR_MAX", "COLOR_UNIQUE"),
+            ("SWAP", "COLOR_MIN", "COLOR_UNIQUE"),
+            ("RECOLOR", "COLOR_SECOND", "COLOR_MAX"),
+            ("RECOLOR", "COLOR_MAX", "COLOR_BG"),
+        ])
 
         # High-value relational compound ops
         self.atomic_ops.append("RECOLOR_ALL_TO_MAX")    # All non-bg → most frequent
