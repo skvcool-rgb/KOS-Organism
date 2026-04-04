@@ -121,6 +121,14 @@ try:
     from .tree_swarm import ASTGridSwarm
 except ImportError:
     ASTGridSwarm = None
+try:
+    from .graph_swarm import ObjectGraphSwarm
+except ImportError:
+    ObjectGraphSwarm = None
+try:
+    from .bayesian_router import get_router as get_bayesian_router
+except ImportError:
+    get_bayesian_router = None
 
 SPATIAL_STEP = 17
 
@@ -1371,6 +1379,56 @@ class ObjectVSA:
             except Exception:
                 pass
 
+        # ══════════════════════════════════════════════════════════
+        # STAGE 14: OBJECT-GRAPH SWARM — Evolution in Topological Space
+        # When scattered objects exist, evolve graph-manipulation programs
+        # instead of pixel transforms. O(1) moves instead of O(n²).
+        # ══════════════════════════════════════════════════════════
+        remaining = timeout - (time.perf_counter() - t0)
+        if ObjectGraphSwarm and remaining > 0.5:
+            try:
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                               for ex in examples]
+                palette = set()
+                for inp, out in train_pairs:
+                    palette.update(int(v) for v in np.unique(inp))
+                    palette.update(int(v) for v in np.unique(out))
+
+                graph_swarm = ObjectGraphSwarm(palette=palette)
+                graph_time = min(remaining - 0.1, 2.0)
+                winning_ops = graph_swarm.breed_solution(
+                    train_pairs, pop_size=300, max_time_sec=graph_time,
+                    verbose=True
+                )
+
+                if winning_ops is not None:
+                    # Verify on all training pairs
+                    verified = True
+                    for inp, out in train_pairs:
+                        pred = graph_swarm.apply_solution(inp, winning_ops)
+                        if pred.shape != out.shape or not np.array_equal(pred, out):
+                            verified = False
+                            break
+
+                    if verified:
+                        elapsed_ms = (time.perf_counter() - t0) * 1000
+                        ops_str = ' -> '.join(str(op) for op in winning_ops)
+                        rule = {
+                            "type": "graph_evolved",
+                            "ops": winning_ops,
+                            "palette": list(palette),
+                            "target_color": None,
+                            "displacement": (0, 0),
+                            "color_swap": None,
+                            "description": f"GRAPH-EVOLVED: {ops_str}",
+                            "worst_error": 0.0,
+                        }
+                        print(f"[GRAPH-SWARM] RULE VERIFIED in {elapsed_ms:.1f}ms: "
+                              f"{ops_str}")
+                        return rule
+            except Exception:
+                pass
+
         elapsed = (time.perf_counter() - t0) * 1000
         print(f"[OBJECT-VSA] No consistent rule found. {elapsed:.1f}ms")
         return None
@@ -1578,6 +1636,12 @@ class ObjectVSA:
             palette = set(rule.get("palette", range(10)))
             ast_swarm = ASTGridSwarm(palette=palette)
             return ast_swarm._execute_ast(grid, rule["ast"])
+
+        # Graph-evolved programs (Object-Graph Swarm)
+        if rule["type"] == "graph_evolved" and ObjectGraphSwarm:
+            palette = set(rule.get("palette", range(10)))
+            gs = ObjectGraphSwarm(palette=palette)
+            return gs.apply_solution(grid, rule["ops"])
 
         # Evolved programs (Swarm Synthesizer)
         if rule["type"] == "evolved" and self.swarm:

@@ -104,6 +104,26 @@ class ASTGridSwarm:
         self.atomic_ops.append("RECOLOR_NONMAX_TO_BG")  # Keep only most frequent color
         self.atomic_ops.append("KEEP_MOST_FREQUENT")    # Keep most frequent, rest → 5
 
+        # Metamorphosis primitives -- shape-shifting operations
+        self.atomic_ops.extend([
+            "CROP_TO_NONBG",       # Alias for CROP_NONZERO (clearer name)
+            "TESSELLATE_2X2",      # Tile the grid into a 2x2 arrangement
+            "TESSELLATE_1X3",      # Tile horizontally 3 times
+            "TESSELLATE_3X1",      # Tile vertically 3 times
+            "UPSCALE_2X",          # Each pixel becomes 2x2 block
+            "UPSCALE_3X",          # Each pixel becomes 3x3 block
+            "DOWNSCALE_2X",        # Majority-vote 2x2 blocks into 1 pixel
+            "EXTRACT_QUADRANT_TL", # Top-left quarter of grid
+            "EXTRACT_QUADRANT_TR", # Top-right quarter
+            "EXTRACT_QUADRANT_BL", # Bottom-left quarter
+            "EXTRACT_QUADRANT_BR", # Bottom-right quarter
+            "PAD_ZERO_1",          # Add 1-pixel border of zeros
+        ])
+        # CROP_TO_COLOR: crop to bounding box of a specific color
+        for c in colors:
+            if c != 0:
+                self.atomic_ops.append(("CROP_TO_COLOR", c))
+
         # Control flow operations (non-leaf)
         self.control_ops = ["IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ"]
 
@@ -247,6 +267,15 @@ class ASTGridSwarm:
                 state[state == 0] = c
                 return state
 
+            elif op == "CROP_TO_COLOR" and len(ast) == 2:
+                c = self._resolve_relational_color(ast[1], grid)
+                nz = np.argwhere(grid == c)
+                if len(nz) > 0:
+                    r0, c0 = nz.min(axis=0)
+                    r1, c1 = nz.max(axis=0)
+                    return grid[r0:r1 + 1, c0:c1 + 1].copy()
+                return grid
+
             # --- Control flow nodes ---
             elif op == "IF_COLOR" and len(ast) == 4:
                 target_color = self._resolve_relational_color(ast[1], grid)
@@ -345,6 +374,54 @@ class ASTGridSwarm:
             state = grid.copy()
             state[state != max_c] = 5
             return state
+
+        # --- Metamorphosis primitives ---
+        elif op == "CROP_TO_NONBG":
+            # Alias for CROP_NONZERO
+            nz = np.argwhere(grid != 0)
+            if len(nz) > 0:
+                r0, c0 = nz.min(axis=0)
+                r1, c1 = nz.max(axis=0)
+                return grid[r0:r1 + 1, c0:c1 + 1].copy()
+            return grid
+        elif op == "TESSELLATE_2X2":
+            return np.tile(grid, (2, 2))
+        elif op == "TESSELLATE_1X3":
+            return np.tile(grid, (1, 3))
+        elif op == "TESSELLATE_3X1":
+            return np.tile(grid, (3, 1))
+        elif op == "UPSCALE_2X":
+            return np.repeat(np.repeat(grid, 2, axis=0), 2, axis=1)
+        elif op == "UPSCALE_3X":
+            return np.repeat(np.repeat(grid, 3, axis=0), 3, axis=1)
+        elif op == "DOWNSCALE_2X":
+            h, w = grid.shape
+            nh, nw = h // 2, w // 2
+            if nh == 0 or nw == 0:
+                return grid
+            out = np.zeros((nh, nw), dtype=grid.dtype)
+            for r in range(nh):
+                for c in range(nw):
+                    block = grid[r*2:r*2+2, c*2:c*2+2].flatten()
+                    nonzero = block[block != 0]
+                    if len(nonzero) > 0:
+                        vals, counts = np.unique(nonzero, return_counts=True)
+                        out[r, c] = vals[np.argmax(counts)]
+            return out
+        elif op == "EXTRACT_QUADRANT_TL":
+            h, w = grid.shape
+            return grid[:h//2, :w//2].copy()
+        elif op == "EXTRACT_QUADRANT_TR":
+            h, w = grid.shape
+            return grid[:h//2, w//2:].copy()
+        elif op == "EXTRACT_QUADRANT_BL":
+            h, w = grid.shape
+            return grid[h//2:, :w//2].copy()
+        elif op == "EXTRACT_QUADRANT_BR":
+            h, w = grid.shape
+            return grid[h//2:, w//2:].copy()
+        elif op == "PAD_ZERO_1":
+            return np.pad(grid, 1, mode='constant', constant_values=0)
 
         return grid
 
@@ -480,14 +557,31 @@ class ASTGridSwarm:
                     hints.append("DELETE_ROWS_ZERO")
                 if "DELETE_COLS_ZERO" not in hints:
                     hints.append("DELETE_COLS_ZERO")
+            if out_h < in_h and out_w < in_w:
+                # Check for downscale or quadrant extraction
+                if out_h == in_h // 2 and out_w == in_w // 2:
+                    if "DOWNSCALE_2X" not in hints:
+                        hints.append("DOWNSCALE_2X")
+                    for qd in ["EXTRACT_QUADRANT_TL", "EXTRACT_QUADRANT_TR",
+                                "EXTRACT_QUADRANT_BL", "EXTRACT_QUADRANT_BR"]:
+                        if qd not in hints:
+                            hints.append(qd)
             if out_h > in_h or out_w > in_w:
                 # Check for exact 2x or 3x scaling
                 if out_h == in_h * 2 and out_w == in_w * 2:
                     if "UPSCALE_2X" not in hints:
                         hints.append("UPSCALE_2X")
+                    if "TESSELLATE_2X2" not in hints:
+                        hints.append("TESSELLATE_2X2")
                 elif out_h == in_h * 3 and out_w == in_w * 3:
                     if "UPSCALE_3X" not in hints:
                         hints.append("UPSCALE_3X")
+                elif out_h == in_h and out_w == in_w * 3:
+                    if "TESSELLATE_1X3" not in hints:
+                        hints.append("TESSELLATE_1X3")
+                elif out_h == in_h * 3 and out_w == in_w:
+                    if "TESSELLATE_3X1" not in hints:
+                        hints.append("TESSELLATE_3X1")
 
             # 4. Gravity signals: non-zero pixels compacted to one side
             if inp.shape == out.shape and not np.array_equal(inp, out):
