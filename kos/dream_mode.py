@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from kos.tree_swarm import ASTGridSwarm
 from kos.myelinate import myelinate
+from kos.rem_sleep import run_rem_sleep
 
 
 DREAM_QUEUE_PATH = os.path.join(
@@ -210,6 +211,12 @@ def dream_on_task(task_id: str, task_dir: str,
         print(f"[DREAM] MYELINATED {task_id} -> {module_name}")
         print(f"[DREAM] Program: {ast_str}")
         print(f"[DREAM] Evolution time: {elapsed:.1f}s")
+
+        # REM Sleep: extract macros from new engine into genetic vocabulary
+        try:
+            run_rem_sleep()
+        except Exception as e:
+            print(f"[DREAM] REM Sleep failed: {e}")
     else:
         print(f"[DREAM] Myelination failed for {task_id}")
 
