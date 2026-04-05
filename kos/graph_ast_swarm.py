@@ -137,6 +137,90 @@ class GraphASTSwarm:
         ]
 
     # ================================================================
+    # TOPOLOGICAL PRUNING — Collapse search space via semantic diff
+    # ================================================================
+
+    def prune_vocabulary(self, manifest: dict):
+        """
+        Dynamically nuke the 88+ operations down to just the physics
+        required by the semantic diff between input and output graphs.
+
+        If a puzzle never changes colors, ZERO color ops survive.
+        If objects don't move, ZERO kinematics ops survive.
+        The search space collapses from combinatorial to structured.
+        """
+        pruned_node_ops = []
+        pruned_graph_ops = []
+
+        # Always keep basic control flow
+        self.control_ops = ["FOR_EACH_NODE", "IF_PROPERTY", "SEQ"]
+
+        # 1. KINEMATICS (Movement, Collision, Alignment)
+        if manifest.get("allow_kinematics"):
+            # Fixed-distance movement
+            pruned_node_ops.extend([
+                "MOVE_UP_1", "MOVE_DOWN_1", "MOVE_LEFT_1", "MOVE_RIGHT_1",
+                "MOVE_UP_2", "MOVE_DOWN_2", "MOVE_LEFT_2", "MOVE_RIGHT_2",
+                "MOVE_UP_3", "MOVE_DOWN_3", "MOVE_LEFT_3", "MOVE_RIGHT_3",
+            ])
+            # Physics
+            pruned_node_ops.extend([
+                "GRAVITY_UP", "GRAVITY_DOWN", "GRAVITY_LEFT", "GRAVITY_RIGHT",
+                "SNAP_TO_TOP", "SNAP_TO_BOTTOM", "SNAP_TO_LEFT", "SNAP_TO_RIGHT",
+            ])
+            # Geometry
+            pruned_node_ops.extend([
+                "MIRROR_H", "MIRROR_V", "ROTATE_90", "ROTATE_180",
+            ])
+            # Parameterized kinematics
+            for direction in ["UP", "DOWN", "LEFT", "RIGHT"]:
+                for sel in ["LARGEST_AREA", "SMALLEST_AREA", "IS_SOLID"]:
+                    pruned_node_ops.append(("MOVE_UNTIL_TOUCH", direction, sel))
+                pruned_node_ops.append(("MOVE_UNTIL_EDGE", direction))
+            # Alignment
+            for sel in self.node_selectors[:6]:
+                pruned_node_ops.append(("ALIGN_H", sel))
+                pruned_node_ops.append(("ALIGN_V", sel))
+            # Graph-level kinematics
+            pruned_graph_ops.extend([
+                "COMPACT_H", "COMPACT_V",
+                "MIRROR_GRAPH_H", "MIRROR_GRAPH_V",
+            ])
+
+        # 2. COLOR TRANSFORMATIONS (Pure Relational)
+        if manifest.get("allow_recolor"):
+            for ct in self.color_tokens:
+                pruned_node_ops.append(("RECOLOR_NODE", ct))
+            pruned_graph_ops.append("MERGE_SAME_COLOR")
+
+        # 3. SCALING / METAMORPHOSIS
+        if manifest.get("allow_scaling"):
+            pruned_node_ops.extend([
+                "DUPLICATE_MIRROR_H", "DUPLICATE_MIRROR_V",
+            ])
+            pruned_graph_ops.append("DUPLICATE_ALL")
+
+        # 4. CRUD (Create/Delete nodes)
+        if manifest.get("allow_crud"):
+            pruned_node_ops.append("DELETE_NODE")
+            pruned_graph_ops.extend([
+                "DELETE_SMALLEST", "DELETE_LARGEST",
+            ])
+            # Conditional deletion/filtering
+            for sel in self.node_selectors[:6]:
+                pruned_node_ops.append(("DELETE_WHERE", sel))
+                pruned_node_ops.append(("KEEP_WHERE", sel))
+
+        # Apply the pruned vocabulary
+        self.node_ops = pruned_node_ops
+        self.graph_ops = pruned_graph_ops if pruned_graph_ops else ["IDENTITY"]
+
+        total = len(self.node_ops) + len(self.graph_ops) + len(self.control_ops)
+        print(f"[GRAPH-SWARM] Topology pruned: {len(self.node_ops)} node + "
+              f"{len(self.graph_ops)} graph + {len(self.control_ops)} control = "
+              f"{total} ops (was 88)")
+
+    # ================================================================
     # RELATIONAL RESOLVERS
     # ================================================================
 
@@ -916,8 +1000,23 @@ class GraphASTSwarm:
         """
         t0 = time.perf_counter()
 
+        # ---- TOPOLOGICAL PRUNING: Collapse search space ----
+        # Parse first training pair to generate semantic diff manifest
+        try:
+            inp0, out0 = train_pairs[0]
+            g_in = self.transducer.parse(inp0)
+            g_out = self.transducer.parse(out0)
+            manifest = self.transducer.generate_diff_manifest(g_in, g_out)
+            self.prune_vocabulary(manifest)
+            if verbose:
+                flags = [k.replace("allow_", "") for k, v in manifest.items() if v]
+                print(f"[GRAPH-SWARM] Diff manifest: {', '.join(flags)}")
+        except Exception as e:
+            if verbose:
+                print(f"[GRAPH-SWARM] Pruning failed ({e}), using full vocabulary")
+
         if verbose:
-            print(f"\n[GRAPH-SWARM] Spawning {pop_size} topological organisms. "
+            print(f"[GRAPH-SWARM] Spawning {pop_size} topological organisms. "
                   f"Budget: {max_time_sec:.1f}s")
 
         # Initialize population

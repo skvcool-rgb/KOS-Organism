@@ -312,6 +312,58 @@ class ARCGridTransducer:
                 if np.array_equal(b1, b2):
                     graph.edges.append(UniversalEdge(n1.id, n2.id, "SAME_SHAPE"))
 
+    def generate_diff_manifest(self, graph_in: UniversalGraph,
+                               graph_out: UniversalGraph) -> dict:
+        """
+        The Semantic Diff: Analyzes the transformation between input and
+        output graphs to heavily prune the AST Swarm's mutation search space.
+
+        Returns a boolean mask of what physics actually occurred:
+          allow_kinematics: objects moved
+          allow_recolor: colors changed
+          allow_scaling: objects grew/shrank/morphed
+          allow_crud: objects created or destroyed
+        """
+        manifest = {
+            "allow_kinematics": False,
+            "allow_recolor": False,
+            "allow_scaling": False,
+            "allow_crud": False,
+        }
+
+        nodes_in = graph_in.nodes
+        nodes_out = graph_out.nodes
+
+        # 1. Node Count Check (Creation / Deletion)
+        if len(nodes_in) != len(nodes_out):
+            manifest["allow_crud"] = True
+
+        # 2. Color Drift Check
+        colors_in = {n.get("color") for n in nodes_in.values()}
+        colors_out = {n.get("color") for n in nodes_out.values()}
+        if colors_in != colors_out:
+            manifest["allow_recolor"] = True
+
+        # 3. Geometric / Metamorphosis Check
+        bb_in = {n.get("bounding_box") for n in nodes_in.values()}
+        bb_out = {n.get("bounding_box") for n in nodes_out.values()}
+
+        if bb_in != bb_out:
+            manifest["allow_kinematics"] = True
+
+            # Did they just move, or did they morph/scale?
+            area_in = sorted([n.get("area", 0) for n in nodes_in.values()])
+            area_out = sorted([n.get("area", 0) for n in nodes_out.values()])
+            if area_in != area_out:
+                manifest["allow_scaling"] = True
+
+        # Fallback: If no structural changes detected, allow base physics
+        if not any(manifest.values()):
+            manifest["allow_kinematics"] = True
+            manifest["allow_recolor"] = True
+
+        return manifest
+
     def render(self, graph: UniversalGraph,
                shape: Tuple[int, int] = None,
                bg_color: int = 0) -> np.ndarray:
