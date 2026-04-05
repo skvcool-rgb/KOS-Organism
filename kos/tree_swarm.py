@@ -194,17 +194,18 @@ class ASTGridSwarm:
                 if c != 0:
                     self.atomic_ops.append(("CROP_TO_COLOR", c))
 
-        # Boolean mask algebra & counting ops
+        # Counting ops (leaf — no sub-trees needed)
         self.atomic_ops.extend([
-            "MASK_AND",          # Keep pixels present in BOTH grid variants
-            "MASK_XOR",          # Keep pixels in one OR other but NOT both
-            "MASK_DIFF",         # Erase second pattern from first
             "COUNT_COLORS_H",    # Output height = number of non-bg colors
             "COUNT_OBJECTS_H",   # Output height = number of connected objects
         ])
 
-        # Control flow operations (non-leaf)
-        self.control_ops = ["IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ"]
+        # Control flow operations (non-leaf — these BRANCH into sub-ASTs)
+        # MASK_AND/XOR/DIFF are binary branching ops like OVERLAY
+        self.control_ops = [
+            "IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ",
+            "MASK_AND", "MASK_XOR", "MASK_DIFF",
+        ]
 
         # Macro library for cross-task recall
         self.macro_library = {}
@@ -885,8 +886,8 @@ class ASTGridSwarm:
             return ("IF_COLOR", c,
                     self._random_ast(depth - 1),
                     self._random_ast(depth - 1))
-        elif control == "OVERLAY":
-            return ("OVERLAY",
+        elif control in ("OVERLAY", "MASK_AND", "MASK_XOR", "MASK_DIFF"):
+            return (control,
                     self._random_ast(depth - 1),
                     self._random_ast(depth - 1))
         elif control == "FOR_EACH_OBJECT":
@@ -925,8 +926,8 @@ class ASTGridSwarm:
             return ("IF_COLOR", c,
                     self._mutate_tree(ast[2], mutation_chance),
                     self._mutate_tree(ast[3], mutation_chance))
-        elif op == "OVERLAY" and len(ast) == 3:
-            return ("OVERLAY",
+        elif op in ("OVERLAY", "MASK_AND", "MASK_XOR", "MASK_DIFF") and len(ast) == 3:
+            return (op,
                     self._mutate_tree(ast[1], mutation_chance),
                     self._mutate_tree(ast[2], mutation_chance))
         elif op == "FOR_EACH_OBJECT" and len(ast) == 2:
