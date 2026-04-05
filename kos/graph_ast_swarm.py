@@ -23,6 +23,13 @@ from kos.graph_transducer import (
     ARCGridTransducer, UniversalGraph, UniversalNode, UniversalEdge
 )
 
+try:
+    from kos.autonomous_ouroboros import AutonomousOuroboros
+    from kos.dynamic_grammar import DynamicGrammarRegistry
+    HAS_OUROBOROS = True
+except ImportError:
+    HAS_OUROBOROS = False
+
 
 class GraphOrganism:
     """A digital organism whose genome operates on graph topology."""
@@ -1065,10 +1072,10 @@ class GraphASTSwarm:
                           f"({elapsed:.1f}s): {self._ast_to_str(best_ever)}")
                 return best_ever
 
-            # Early extinction (boredom kill switch)
+            # Early extinction (boredom kill switch) -- clean kill, no Ouroboros
             if stagnation >= 150:
                 if verbose:
-                    print("[GRAPH-SWARM] Boredom threshold hit (150 gen stagnation). Aborting.")
+                    print(f"[GRAPH-SWARM] Boredom kill (150 gens stagnant, fitness {best_fitness:.1f}). Aborting.")
                 break
 
             # Selection: top 20%

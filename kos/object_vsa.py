@@ -400,10 +400,33 @@ class ObjectVSA:
             np.array(ex["input"]).shape != np.array(ex["output"]).shape
             for ex in examples
         )
+        predicted_size = None
         if has_size_mismatch:
-            elapsed = (time.perf_counter() - t0) * 1000
-            print(f"[OBJECT-VSA] Size mismatch, no fractal rule found. {elapsed:.1f}ms")
-            return None
+            # Try Size Predictor before giving up
+            try:
+                from kos.size_predictor import OutputSizePredictor
+                train_pairs_sp = [(np.array(ex["input"]), np.array(ex["output"]))
+                                  for ex in examples]
+                # Validate predictor on training data
+                sp_valid = True
+                for inp, out in train_pairs_sp:
+                    pred_sz = OutputSizePredictor.predict(train_pairs_sp, inp)
+                    if pred_sz is None or pred_sz != out.shape:
+                        sp_valid = False
+                        break
+                if sp_valid:
+                    predicted_size = pred_sz
+                    elapsed = (time.perf_counter() - t0) * 1000
+                    print(f"[SIZE-PREDICTOR] Predicted output: {predicted_size} ({elapsed:.1f}ms)")
+                    # Don't bail -- let this flow through to the swarm stages
+                else:
+                    elapsed = (time.perf_counter() - t0) * 1000
+                    print(f"[OBJECT-VSA] Size mismatch, predictor failed. {elapsed:.1f}ms")
+                    return None
+            except Exception:
+                elapsed = (time.perf_counter() - t0) * 1000
+                print(f"[OBJECT-VSA] Size mismatch, no fractal rule found. {elapsed:.1f}ms")
+                return None
 
         # ══════════════════════════════════════════════════════════
         # STAGE 0: META-LEARNER — Direct Operator Extraction
@@ -1252,7 +1275,7 @@ class ObjectVSA:
                 self.swarm._ensure_color_vectors(all_colors)
 
                 # Let the swarm evolve on grid pairs
-                swarm_time = min(remaining - 0.2, 0.5)
+                swarm_time = min(remaining - 0.2, 2.0)
                 evolved_rule = self.swarm.breed_from_grids(
                     examples, self.meta_learner.codec,
                     pop_size=300, max_time_sec=swarm_time,
@@ -1293,7 +1316,7 @@ class ObjectVSA:
                 train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
                                for ex in examples]
 
-                swarm_time = min(remaining - 0.1, 1.5)
+                swarm_time = min(remaining - 0.1, 3.0)
                 winning_dna = grid_swarm.breed_solution(
                     train_pairs, pop_size=300, max_time_sec=swarm_time,
                     verbose=True
@@ -1345,7 +1368,7 @@ class ObjectVSA:
                 train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
                                for ex in examples]
 
-                ast_time = min(remaining - 0.1, 3.0)
+                ast_time = min(remaining - 0.1, 8.0)
                 # Disable cross-validation in benchmark (3s too short for CV folds)
                 # CV is for Dream Mode's 600s budget where generalization matters
                 winning_ast = ast_swarm.breed_program(
@@ -1397,7 +1420,7 @@ class ObjectVSA:
                     palette.update(int(v) for v in np.unique(out))
 
                 graph_swarm = ObjectGraphSwarm(palette=palette)
-                graph_time = min(remaining - 0.1, 2.0)
+                graph_time = min(remaining - 0.1, 5.0)
                 winning_ops = graph_swarm.breed_solution(
                     train_pairs, pop_size=300, max_time_sec=graph_time,
                     verbose=True

@@ -56,8 +56,18 @@ def myelinate(ast, task_id: str, train_pairs: List[Tuple[np.ndarray, np.ndarray]
         os.remove(filepath)
         return None
 
-    # Update manifest
+    # Deduplication: skip if this task already has a verified engine
     manifest = _load_manifest()
+    for entry in manifest:
+        if isinstance(entry, dict):
+            existing_tid = entry.get("task_id", "")
+            if existing_tid == task_id:
+                # Task already myelinated -- don't bloat the manifest
+                os.remove(filepath)
+                print(f"[MYELINATE] Duplicate for {task_id} -- skipping (engine already exists)")
+                return entry.get("module")
+
+    # Update manifest with new entry
     manifest.append({
         "module": module_name,
         "task_id": task_id,

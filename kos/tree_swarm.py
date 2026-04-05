@@ -26,6 +26,13 @@ try:
 except ImportError:
     scipy_label = None
 
+try:
+    from kos.autonomous_ouroboros import AutonomousOuroboros
+    from kos.dynamic_grammar import DynamicGrammarRegistry
+    HAS_OUROBOROS = True
+except ImportError:
+    HAS_OUROBOROS = False
+
 
 class TreeOrganism:
     """A digital organism whose genome is an AST (nested tuples)."""
@@ -186,6 +193,15 @@ class ASTGridSwarm:
             for c in colors:
                 if c != 0:
                     self.atomic_ops.append(("CROP_TO_COLOR", c))
+
+        # Boolean mask algebra & counting ops
+        self.atomic_ops.extend([
+            "MASK_AND",          # Keep pixels present in BOTH grid variants
+            "MASK_XOR",          # Keep pixels in one OR other but NOT both
+            "MASK_DIFF",         # Erase second pattern from first
+            "COUNT_COLORS_H",    # Output height = number of non-bg colors
+            "COUNT_OBJECTS_H",   # Output height = number of connected objects
+        ])
 
         # Control flow operations (non-leaf)
         self.control_ops = ["IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ"]
@@ -429,6 +445,28 @@ class ASTGridSwarm:
                     state = self._execute_ast(state, sub_ast, depth + 1, step_counter, orig_grid)
                 return state
 
+            # --- BOOLEAN MASK ALGEBRA ---
+            elif op == "MASK_AND" and len(ast) == 3:
+                g1 = self._execute_ast(grid, ast[1], depth + 1, step_counter, orig_grid)
+                g2 = self._execute_ast(grid, ast[2], depth + 1, step_counter, orig_grid)
+                if g1.shape == g2.shape:
+                    return np.where((g1 > 0) & (g2 > 0), g1, 0).astype(grid.dtype)
+                return grid
+
+            elif op == "MASK_XOR" and len(ast) == 3:
+                g1 = self._execute_ast(grid, ast[1], depth + 1, step_counter, orig_grid)
+                g2 = self._execute_ast(grid, ast[2], depth + 1, step_counter, orig_grid)
+                if g1.shape == g2.shape:
+                    return np.where((g1 > 0) ^ (g2 > 0), np.maximum(g1, g2), 0).astype(grid.dtype)
+                return grid
+
+            elif op == "MASK_DIFF" and len(ast) == 3:
+                g1 = self._execute_ast(grid, ast[1], depth + 1, step_counter, orig_grid)
+                g2 = self._execute_ast(grid, ast[2], depth + 1, step_counter, orig_grid)
+                if g1.shape == g2.shape:
+                    return np.where((g1 > 0) & (g2 == 0), g1, 0).astype(grid.dtype)
+                return grid
+
         return grid
 
     def _exec_leaf(self, grid: np.ndarray, op: str) -> np.ndarray:
@@ -547,6 +585,35 @@ class ASTGridSwarm:
             return grid[h//2:, w//2:].copy()
         elif op == "PAD_ZERO_1":
             return np.pad(grid, 1, mode='constant', constant_values=0)
+
+        # --- COUNTING / ARITHMETIC OPS ---
+        elif op == "COUNT_COLORS_H":
+            # Reshape grid to height = number of non-bg colors
+            bg = int(np.bincount(grid.ravel()).argmax())
+            n_colors = len(set(int(v) for v in np.unique(grid)) - {bg})
+            if 0 < n_colors <= 30 and n_colors != grid.shape[0]:
+                # Crop or pad to n_colors rows, keep width
+                if n_colors < grid.shape[0]:
+                    return grid[:n_colors, :].copy()
+                else:
+                    pad_h = n_colors - grid.shape[0]
+                    return np.pad(grid, ((0, pad_h), (0, 0)),
+                                  mode='constant', constant_values=0)
+            return grid
+
+        elif op == "COUNT_OBJECTS_H":
+            # Reshape grid to height = number of connected objects
+            from scipy.ndimage import label as _label
+            bg = int(np.bincount(grid.ravel()).argmax())
+            _, n_obj = _label(grid != bg)
+            if 0 < n_obj <= 30 and n_obj != grid.shape[0]:
+                if n_obj < grid.shape[0]:
+                    return grid[:n_obj, :].copy()
+                else:
+                    pad_h = n_obj - grid.shape[0]
+                    return np.pad(grid, ((0, pad_h), (0, 0)),
+                                  mode='constant', constant_values=0)
+            return grid
 
         return grid
 
@@ -1265,10 +1332,10 @@ class ASTGridSwarm:
             if stagnation >= 15 and best_ever < -20:
                 break
 
-            # Boredom kill switch: absolute stagnation cap
+            # Boredom kill switch -- clean kill, no Ouroboros (0% success rate, burns 10s)
             if stagnation >= 150:
                 if verbose:
-                    print("[AST-SWARM] Boredom threshold (150 gen stagnation). Aborting to save compute.")
+                    print(f"[AST-SWARM] Boredom kill (150 gens stagnant, fitness {best_ever:.1f}). Aborting.")
                 break
 
             # --- APEX PREDATOR DETECTED ---

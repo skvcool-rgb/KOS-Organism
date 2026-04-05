@@ -45,7 +45,7 @@ for i, tf in enumerate(tasks):
         # Fresh VSA + ObjectVSA per task to prevent memory leaks
         vsa = HDCSpace(dimensions=10000)
         obj = ObjectVSA(vsa)
-        rule = obj.solve_object_level(examples, timeout=3.0)
+        rule = obj.solve_object_level(examples, timeout=15.0)
         task_dt = time.time() - task_t0
 
         if task_dt > 2.5:
