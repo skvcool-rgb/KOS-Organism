@@ -223,6 +223,10 @@ def _transpile_node(ast, indent: int = 1) -> str:
     if isinstance(ast, str):
         return _transpile_leaf(ast, indent)
 
+    # Single-element tuple: treat as leaf
+    if isinstance(ast, tuple) and len(ast) == 1 and isinstance(ast[0], str):
+        return _transpile_leaf(ast[0], indent)
+
     # Tuple node
     if isinstance(ast, tuple) and len(ast) >= 2 and isinstance(ast[0], str):
         op = ast[0]
@@ -359,6 +363,40 @@ def _transpile_leaf(op: str, indent: int) -> str:
         "EXTRACT_QUADRANT_BR": (
             "h, w = state.shape\n"
             f"{prefix}state = state[h//2:, w//2:].copy()"
+        ),
+        "UPSCALE_3X": "state = np.repeat(np.repeat(state, 3, axis=0), 3, axis=1)",
+        "TESSELLATE_2X2": "state = np.tile(state, (2, 2))",
+        "TESSELLATE_1X3": "state = np.tile(state, (1, 3))",
+        "TESSELLATE_3X1": "state = np.tile(state, (3, 1))",
+        "PAD_ZERO_1": "state = np.pad(state, 1, mode='constant', constant_values=0)",
+        "CROP_TO_NONBG": (
+            "_bg = _resolve_color('COLOR_BG', _orig_grid)\n"
+            f"{prefix}nz = np.argwhere(state != _bg)\n"
+            f"{prefix}if len(nz) > 0:\n"
+            f"{prefix}    r0, c0 = nz.min(axis=0)\n"
+            f"{prefix}    r1, c1 = nz.max(axis=0)\n"
+            f"{prefix}    state = state[r0:r1+1, c0:c1+1].copy()"
+        ),
+        "KEEP_MOST_FREQUENT": (
+            "_freq = {}\n"
+            f"{prefix}for v in state.flat:\n"
+            f"{prefix}    if int(v) != 0: _freq[int(v)] = _freq.get(int(v), 0) + 1\n"
+            f"{prefix}if _freq:\n"
+            f"{prefix}    _keep = max(_freq, key=_freq.get)\n"
+            f"{prefix}    state = np.where((state == _keep) | (state == 0), state, 0)"
+        ),
+        "RECOLOR_NONMAX_TO_BG": (
+            "_cmax = _resolve_color('COLOR_MAX', _orig_grid)\n"
+            f"{prefix}state = np.where((state == _cmax) | (state == 0), state, 0)"
+        ),
+        "MASK": (
+            "pass  # MASK as leaf is a no-op (needs color arg)"
+        ),
+        "FILL_BG": (
+            "pass  # FILL_BG as leaf is a no-op (needs color arg)"
+        ),
+        "CROP_TO_COLOR": (
+            "pass  # CROP_TO_COLOR as leaf is a no-op (needs color arg)"
         ),
     }
 
