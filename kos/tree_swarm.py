@@ -80,15 +80,21 @@ class ASTGridSwarm:
             "COLOR_FG_1",       # First foreground color (sorted by value)
             "COLOR_FG_2",       # Second foreground color (sorted by value)
         ]
-        self.temporal_tokens = [
-            "ORIG_COLOR_MAX",   # Most frequent non-zero in ORIGINAL input
-            "ORIG_COLOR_MIN",   # Least frequent non-zero in ORIGINAL input
-            "ORIG_COLOR_BG",    # Background in ORIGINAL input
-            "ORIG_COLOR_SECOND",# Second most frequent in ORIGINAL input
-            "ORIG_COLOR_UNIQUE",# Unique color in ORIGINAL input
-            "ORIG_COLOR_FG_1",  # First foreground in ORIGINAL input
-            "ORIG_COLOR_FG_2",  # Second foreground in ORIGINAL input
-        ]
+        # Temporal tokens ONLY in pure relational mode.
+        # In backward-compat mode, absolute colors are already temporal-invariant
+        # (RECOLOR(4,5) always means "4→5" regardless of mutation state).
+        if pure_relational:
+            self.temporal_tokens = [
+                "ORIG_COLOR_MAX",   # Most frequent non-zero in ORIGINAL input
+                "ORIG_COLOR_MIN",   # Least frequent non-zero in ORIGINAL input
+                "ORIG_COLOR_BG",    # Background in ORIGINAL input
+                "ORIG_COLOR_SECOND",# Second most frequent in ORIGINAL input
+                "ORIG_COLOR_UNIQUE",# Unique color in ORIGINAL input
+                "ORIG_COLOR_FG_1",  # First foreground in ORIGINAL input
+                "ORIG_COLOR_FG_2",  # Second foreground in ORIGINAL input
+            ]
+        else:
+            self.temporal_tokens = []
         self.relational_tokens = self.dynamic_tokens + self.temporal_tokens
 
         # Geometric / structural leaf operations (color-blind)
@@ -103,26 +109,42 @@ class ASTGridSwarm:
             "DELETE_ROWS_ZERO", "DELETE_COLS_ZERO",
         ]
 
-        # Relational color ops -- the ONLY way the organism touches color
-        # MASK and FILL_BG with both dynamic and temporal tokens
-        for rt in self.relational_tokens:
-            self.atomic_ops.append(("MASK", rt))
-            self.atomic_ops.append(("FILL_BG", rt))
+        if pure_relational:
+            # PURE RELATIONAL: all color ops use relational tokens
+            # MASK and FILL_BG with both dynamic and temporal tokens
+            for rt in self.relational_tokens:
+                self.atomic_ops.append(("MASK", rt))
+                self.atomic_ops.append(("FILL_BG", rt))
 
-        # Pairwise SWAP and RECOLOR within dynamic tokens
-        for i, rt1 in enumerate(self.dynamic_tokens):
-            for j, rt2 in enumerate(self.dynamic_tokens):
-                if i != j:
-                    self.atomic_ops.append(("SWAP", rt1, rt2))
-                    self.atomic_ops.append(("RECOLOR", rt1, rt2))
+            # All pairwise SWAP and RECOLOR within dynamic tokens
+            for i, rt1 in enumerate(self.dynamic_tokens):
+                for j, rt2 in enumerate(self.dynamic_tokens):
+                    if i != j:
+                        self.atomic_ops.append(("SWAP", rt1, rt2))
+                        self.atomic_ops.append(("RECOLOR", rt1, rt2))
 
-        # CROSS-TEMPORAL pairings: the key to multi-step SEQ chains
-        # Only RECOLOR(ORIG→dynamic) and RECOLOR(dynamic→ORIG) combos
-        # This lets the organism say: "recolor what WAS the max to what IS NOW the min"
-        for dt in self.dynamic_tokens:
-            for tt in self.temporal_tokens:
-                self.atomic_ops.append(("RECOLOR", tt, dt))  # Past → Present
-                self.atomic_ops.append(("RECOLOR", dt, tt))  # Present → Past
+            # CROSS-TEMPORAL pairings: multi-step SEQ chains need temporal memory
+            for dt in self.dynamic_tokens:
+                for tt in self.temporal_tokens:
+                    self.atomic_ops.append(("RECOLOR", tt, dt))  # Past -> Present
+                    self.atomic_ops.append(("RECOLOR", dt, tt))  # Present -> Past
+        else:
+            # BACKWARD COMPAT: curated relational ops (keep search space tight for 3s)
+            for rt in self.dynamic_tokens[:5]:  # MAX, MIN, BG, SECOND, UNIQUE
+                self.atomic_ops.append(("MASK", rt))
+                self.atomic_ops.append(("FILL_BG", rt))
+            # Only high-value relational pairs
+            self.atomic_ops.extend([
+                ("RECOLOR", "COLOR_MIN", "COLOR_MAX"),
+                ("RECOLOR", "COLOR_MAX", "COLOR_MIN"),
+                ("RECOLOR", "COLOR_UNIQUE", "COLOR_MAX"),
+                ("RECOLOR", "COLOR_UNIQUE", "COLOR_BG"),
+                ("SWAP", "COLOR_MAX", "COLOR_MIN"),
+                ("SWAP", "COLOR_MAX", "COLOR_UNIQUE"),
+                ("SWAP", "COLOR_MIN", "COLOR_UNIQUE"),
+                ("RECOLOR", "COLOR_SECOND", "COLOR_MAX"),
+                ("RECOLOR", "COLOR_MAX", "COLOR_BG"),
+            ])
 
         # High-value relational compound ops
         self.atomic_ops.append("RECOLOR_ALL_TO_MAX")    # All non-bg -> most frequent
