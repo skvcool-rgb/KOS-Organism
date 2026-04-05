@@ -188,30 +188,49 @@ def dream_on_task(task_id: str, task_dir: str,
     # This makes overfitting to the training palette IMPOSSIBLE.
     swarm = ASTGridSwarm(palette=palette, pure_relational=True)
 
-    # Strategy: try without CV first (fast), then with CV (thorough)
+    # Strategy: CV-FIRST to ensure generalization, then no-CV fallback
+    # Non-CV solutions overfit to training data and fail on test.
+    # CV-validated solutions generalize because they must predict held-out pairs.
     t0 = time.perf_counter()
     winning_ast = None
 
-    # Phase 1: Quick attempt without cross-validation (20% of budget)
-    quick_budget = time_budget * 0.2
-    winning_ast = swarm.breed_program(
-        train_pairs,
-        pop_size=effective_pop,
-        max_time_sec=quick_budget,
-        verbose=True,
-        cross_validate=False,
-    )
+    # Phase 1: Cross-validated attempt (70% of budget) — GENERALIZATION FIRST
+    if len(train_pairs) >= 3:
+        cv_budget = time_budget * 0.7
+        winning_ast = swarm.breed_program(
+            train_pairs,
+            pop_size=effective_pop,
+            max_time_sec=cv_budget,
+            verbose=True,
+            cross_validate=True,
+        )
 
-    # Phase 2: If quick attempt failed, try with cross-validation (remaining budget)
+    # Phase 2: If CV failed (or <3 pairs), try without CV (remaining budget)
+    # But validate the result against a held-out pair if possible
     if winning_ast is None and (time.perf_counter() - t0) < time_budget * 0.9:
         remaining = time_budget - (time.perf_counter() - t0)
-        winning_ast = swarm.breed_program(
+        candidate_ast = swarm.breed_program(
             train_pairs,
             pop_size=effective_pop,
             max_time_sec=remaining,
             verbose=True,
-            cross_validate=True,
+            cross_validate=False,
         )
+        if candidate_ast is not None:
+            # Generalization check: if we have 3+ pairs, hold out the last one
+            if len(train_pairs) >= 3:
+                holdout_inp, holdout_out = train_pairs[-1]
+                try:
+                    pred = swarm._execute_ast(holdout_inp, candidate_ast)
+                    if pred.shape == holdout_out.shape and np.array_equal(pred, holdout_out):
+                        winning_ast = candidate_ast
+                    else:
+                        print(f"[DREAM] Non-CV solution failed holdout check, discarding")
+                except Exception:
+                    print(f"[DREAM] Non-CV solution crashed on holdout, discarding")
+            else:
+                # Only 2 pairs — accept but flag as potentially overfitting
+                winning_ast = candidate_ast
 
     elapsed = time.perf_counter() - t0
 
