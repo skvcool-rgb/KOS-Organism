@@ -67,7 +67,11 @@ class ASTGridSwarm:
         # ================================================================
 
         # Relational color tokens -- resolved dynamically at runtime
-        self.relational_tokens = [
+        # DYNAMIC tokens resolve against the CURRENT (mutated) grid state.
+        # ORIG_ tokens resolve against the ORIGINAL (pristine) input grid.
+        # This gives the organism TEMPORAL MEMORY: it can reference the
+        # Past while mutating the Present, enabling multi-step SEQ chains.
+        self.dynamic_tokens = [
             "COLOR_MAX",        # Most frequent non-zero color
             "COLOR_MIN",        # Least frequent non-zero color
             "COLOR_BG",         # Background (most frequent overall, usually 0)
@@ -76,6 +80,16 @@ class ASTGridSwarm:
             "COLOR_FG_1",       # First foreground color (sorted by value)
             "COLOR_FG_2",       # Second foreground color (sorted by value)
         ]
+        self.temporal_tokens = [
+            "ORIG_COLOR_MAX",   # Most frequent non-zero in ORIGINAL input
+            "ORIG_COLOR_MIN",   # Least frequent non-zero in ORIGINAL input
+            "ORIG_COLOR_BG",    # Background in ORIGINAL input
+            "ORIG_COLOR_SECOND",# Second most frequent in ORIGINAL input
+            "ORIG_COLOR_UNIQUE",# Unique color in ORIGINAL input
+            "ORIG_COLOR_FG_1",  # First foreground in ORIGINAL input
+            "ORIG_COLOR_FG_2",  # Second foreground in ORIGINAL input
+        ]
+        self.relational_tokens = self.dynamic_tokens + self.temporal_tokens
 
         # Geometric / structural leaf operations (color-blind)
         self.atomic_ops = [
@@ -90,16 +104,25 @@ class ASTGridSwarm:
         ]
 
         # Relational color ops -- the ONLY way the organism touches color
+        # MASK and FILL_BG with both dynamic and temporal tokens
         for rt in self.relational_tokens:
             self.atomic_ops.append(("MASK", rt))
             self.atomic_ops.append(("FILL_BG", rt))
 
-        # All pairwise relational SWAP and RECOLOR
-        for i, rt1 in enumerate(self.relational_tokens):
-            for j, rt2 in enumerate(self.relational_tokens):
+        # Pairwise SWAP and RECOLOR within dynamic tokens
+        for i, rt1 in enumerate(self.dynamic_tokens):
+            for j, rt2 in enumerate(self.dynamic_tokens):
                 if i != j:
                     self.atomic_ops.append(("SWAP", rt1, rt2))
                     self.atomic_ops.append(("RECOLOR", rt1, rt2))
+
+        # CROSS-TEMPORAL pairings: the key to multi-step SEQ chains
+        # Only RECOLOR(ORIG→dynamic) and RECOLOR(dynamic→ORIG) combos
+        # This lets the organism say: "recolor what WAS the max to what IS NOW the min"
+        for dt in self.dynamic_tokens:
+            for tt in self.temporal_tokens:
+                self.atomic_ops.append(("RECOLOR", tt, dt))  # Past → Present
+                self.atomic_ops.append(("RECOLOR", dt, tt))  # Present → Past
 
         # High-value relational compound ops
         self.atomic_ops.append("RECOLOR_ALL_TO_MAX")    # All non-bg -> most frequent
@@ -213,15 +236,27 @@ class ASTGridSwarm:
         return data
 
     @staticmethod
-    def _resolve_relational_color(token, grid):
+    def _resolve_relational_color(token, grid, orig_grid=None):
         """Resolve a relational color token to an actual integer color.
 
         Relational tokens let the AST express 'most frequent color'
         instead of hardcoding 'color 4'. This is the key to generalization.
+
+        ORIG_ tokens resolve against the original (pristine) input grid,
+        giving the organism Temporal Memory for multi-step SEQ chains.
         """
         if isinstance(token, (int, float, np.integer)):
             return int(token)
-        if not isinstance(token, str) or not token.startswith("COLOR_"):
+        if not isinstance(token, str):
+            return token
+
+        # Route ORIG_ tokens to the pristine input grid
+        if token.startswith("ORIG_") and orig_grid is not None:
+            # Strip "ORIG_" prefix and resolve against original grid
+            base_token = token[5:]  # "ORIG_COLOR_MAX" -> "COLOR_MAX"
+            return ASTGridSwarm._resolve_relational_color(base_token, orig_grid, None)
+
+        if not token.startswith("COLOR_"):
             return token  # Not a relational token
 
         vals = grid.flatten()
@@ -272,15 +307,29 @@ class ASTGridSwarm:
     # 1. THE RECURSIVE PHYSICS EXECUTOR
     # ================================================================
     def _execute_ast(self, grid: np.ndarray, ast, depth: int = 0,
-                     step_counter: list = None) -> np.ndarray:
-        """Recursively parse and execute the DNA tree on the grid."""
+                     step_counter: list = None,
+                     orig_grid: np.ndarray = None) -> np.ndarray:
+        """Recursively parse and execute the DNA tree on the grid.
+
+        orig_grid: The pristine input grid, cached at the top-level call.
+                   ORIG_ tokens resolve against this, giving the organism
+                   Temporal Memory across SEQ steps.
+        """
         if step_counter is None:
             step_counter = [0]
+
+        # Cache the original grid on the very first call
+        if orig_grid is None:
+            orig_grid = grid.copy()
 
         # Safety: prevent infinite recursion / runaway
         step_counter[0] += 1
         if depth > self.MAX_EXEC_DEPTH or step_counter[0] > self.MAX_EXEC_STEPS:
             return grid
+
+        # Helper: resolve with temporal memory
+        def resolve(token):
+            return self._resolve_relational_color(token, grid, orig_grid)
 
         # --- Leaf node: string atomic op ---
         if isinstance(ast, str):
@@ -291,8 +340,8 @@ class ASTGridSwarm:
             op = ast[0]
 
             if op == "SWAP" and len(ast) == 3:
-                c1 = self._resolve_relational_color(ast[1], grid)
-                c2 = self._resolve_relational_color(ast[2], grid)
+                c1 = resolve(ast[1])
+                c2 = resolve(ast[2])
                 if c1 == c2:
                     return grid
                 state = grid.copy()
@@ -302,8 +351,8 @@ class ASTGridSwarm:
                 return state
 
             elif op == "RECOLOR" and len(ast) == 3:
-                c1 = self._resolve_relational_color(ast[1], grid)
-                c2 = self._resolve_relational_color(ast[2], grid)
+                c1 = resolve(ast[1])
+                c2 = resolve(ast[2])
                 if c1 == c2:
                     return grid
                 state = grid.copy()
@@ -311,17 +360,17 @@ class ASTGridSwarm:
                 return state
 
             elif op == "MASK" and len(ast) == 2:
-                c = self._resolve_relational_color(ast[1], grid)
+                c = resolve(ast[1])
                 return np.where(grid == c, c, 0)
 
             elif op == "FILL_BG" and len(ast) == 2:
-                c = self._resolve_relational_color(ast[1], grid)
+                c = resolve(ast[1])
                 state = grid.copy()
                 state[state == 0] = c
                 return state
 
             elif op == "CROP_TO_COLOR" and len(ast) == 2:
-                c = self._resolve_relational_color(ast[1], grid)
+                c = resolve(ast[1])
                 nz = np.argwhere(grid == c)
                 if len(nz) > 0:
                     r0, c0 = nz.min(axis=0)
@@ -331,15 +380,15 @@ class ASTGridSwarm:
 
             # --- Control flow nodes ---
             elif op == "IF_COLOR" and len(ast) == 4:
-                target_color = self._resolve_relational_color(ast[1], grid)
+                target_color = resolve(ast[1])
                 if target_color in grid:
-                    return self._execute_ast(grid, ast[2], depth + 1, step_counter)
+                    return self._execute_ast(grid, ast[2], depth + 1, step_counter, orig_grid)
                 else:
-                    return self._execute_ast(grid, ast[3], depth + 1, step_counter)
+                    return self._execute_ast(grid, ast[3], depth + 1, step_counter, orig_grid)
 
             elif op == "OVERLAY" and len(ast) == 3:
-                grid_a = self._execute_ast(grid, ast[1], depth + 1, step_counter)
-                grid_b = self._execute_ast(grid, ast[2], depth + 1, step_counter)
+                grid_a = self._execute_ast(grid, ast[1], depth + 1, step_counter, orig_grid)
+                grid_b = self._execute_ast(grid, ast[2], depth + 1, step_counter, orig_grid)
                 if grid_a.shape != grid_b.shape:
                     return grid_a
                 state = grid_a.copy()
@@ -348,13 +397,14 @@ class ASTGridSwarm:
                 return state
 
             elif op == "FOR_EACH_OBJECT" and len(ast) == 2:
-                return self._exec_for_each(grid, ast[1], depth, step_counter)
+                return self._exec_for_each(grid, ast[1], depth, step_counter, orig_grid)
 
             elif op == "SEQ" and len(ast) >= 2:
                 # Sequential composition: ('SEQ', op1, op2, ...)
+                # Each step mutates the Present; ORIG_ tokens still see the Past
                 state = grid
                 for sub_ast in ast[1:]:
-                    state = self._execute_ast(state, sub_ast, depth + 1, step_counter)
+                    state = self._execute_ast(state, sub_ast, depth + 1, step_counter, orig_grid)
                 return state
 
         return grid
@@ -479,7 +529,8 @@ class ASTGridSwarm:
         return grid
 
     def _exec_for_each(self, grid: np.ndarray, sub_ast,
-                       depth: int, step_counter: list) -> np.ndarray:
+                       depth: int, step_counter: list,
+                       orig_grid: np.ndarray = None) -> np.ndarray:
         """Extract connected components, apply sub_ast to each, paste back."""
         mask = grid > 0
         if not np.any(mask):
@@ -508,7 +559,7 @@ class ASTGridSwarm:
             obj_mask = (labeled == i)
             isolated = np.where(obj_mask, grid, 0)
 
-            processed = self._execute_ast(isolated, sub_ast, depth + 1, step_counter)
+            processed = self._execute_ast(isolated, sub_ast, depth + 1, step_counter, orig_grid)
 
             if processed.shape == out_state.shape:
                 pm = processed != 0
