@@ -81,15 +81,34 @@ class GraphASTSwarm:
             # Movement (O(1) bounding box shift)
             "MOVE_UP_1", "MOVE_DOWN_1", "MOVE_LEFT_1", "MOVE_RIGHT_1",
             "MOVE_UP_2", "MOVE_DOWN_2", "MOVE_LEFT_2", "MOVE_RIGHT_2",
+            "MOVE_UP_3", "MOVE_DOWN_3", "MOVE_LEFT_3", "MOVE_RIGHT_3",
+            # Physics / Kinematics (O(N) but N = node count, not pixels)
+            "GRAVITY_UP", "GRAVITY_DOWN", "GRAVITY_LEFT", "GRAVITY_RIGHT",
+            "SNAP_TO_TOP", "SNAP_TO_BOTTOM", "SNAP_TO_LEFT", "SNAP_TO_RIGHT",
             # Geometry
             "MIRROR_H", "MIRROR_V", "ROTATE_90", "ROTATE_180",
             # Deletion
             "DELETE_NODE",
-            # Color operations (parameterized by color token)
+            # Duplication
+            "DUPLICATE_MIRROR_H", "DUPLICATE_MIRROR_V",
         ]
         # Add RECOLOR_NODE(token) for each color token
         for ct in self.color_tokens:
             self.node_ops.append(("RECOLOR_NODE", ct))
+
+        # Parameterized kinematics: MOVE_UNTIL_TOUCH(direction, target_selector)
+        # "Slide this node in direction until it touches a node matching selector"
+        for direction in ["UP", "DOWN", "LEFT", "RIGHT"]:
+            for selector in ["LARGEST_AREA", "SMALLEST_AREA", "MOST_FREQUENT_COLOR",
+                             "LEAST_FREQUENT_COLOR", "IS_SOLID"]:
+                self.node_ops.append(("MOVE_UNTIL_TOUCH", direction, selector))
+            # Also: slide until hitting grid boundary (no target)
+            self.node_ops.append(("MOVE_UNTIL_EDGE", direction))
+
+        # Alignment operations: snap to another node's axis
+        for selector in self.node_selectors[:8]:  # Position-based selectors
+            self.node_ops.append(("ALIGN_H", selector))  # Align horizontal center
+            self.node_ops.append(("ALIGN_V", selector))  # Align vertical center
 
         # ================================================================
         # GRAPH-LEVEL OPERATIONS (operate on the whole topology)
@@ -371,6 +390,56 @@ class GraphASTSwarm:
                         new_node.set("centroid", (c[0] + dy, c[1] + dx))
                 return new_node
 
+            elif op == "MOVE_UNTIL_TOUCH" and len(ast) == 3:
+                # ("MOVE_UNTIL_TOUCH", direction, target_selector)
+                direction, target_sel = ast[1], ast[2]
+                new_node = _copy_node(node)
+                # Find closest matching target node in direction
+                bb = new_node.get("bounding_box")
+                if bb:
+                    targets = [n for nid, n in graph.nodes.items()
+                               if nid != node.id
+                               and self._matches_selector(n, target_sel, graph)
+                               and not n.get("_deleted", False)]
+                    new_node = self._move_until_touch_impl(
+                        new_node, direction, targets, graph)
+                return new_node
+
+            elif op == "MOVE_UNTIL_EDGE" and len(ast) == 2:
+                # ("MOVE_UNTIL_EDGE", direction)
+                new_node = _copy_node(node)
+                return self._snap_to_edge(new_node, ast[1], graph)
+
+            elif op == "ALIGN_H" and len(ast) == 2:
+                # ("ALIGN_H", target_selector) -- align horizontal center
+                new_node = _copy_node(node)
+                targets = [n for nid, n in graph.nodes.items()
+                           if nid != node.id
+                           and self._matches_selector(n, ast[1], graph)]
+                if targets:
+                    target_c = targets[0].get("centroid")
+                    my_c = new_node.get("centroid")
+                    if target_c and my_c:
+                        dy = 0
+                        dx = int(target_c[1] - my_c[1])
+                        new_node = self._shift_node(new_node, dy, dx)
+                return new_node
+
+            elif op == "ALIGN_V" and len(ast) == 2:
+                # ("ALIGN_V", target_selector) -- align vertical center
+                new_node = _copy_node(node)
+                targets = [n for nid, n in graph.nodes.items()
+                           if nid != node.id
+                           and self._matches_selector(n, ast[1], graph)]
+                if targets:
+                    target_c = targets[0].get("centroid")
+                    my_c = new_node.get("centroid")
+                    if target_c and my_c:
+                        dy = int(target_c[0] - my_c[0])
+                        dx = 0
+                        new_node = self._shift_node(new_node, dy, dx)
+                return new_node
+
             elif op == "SEQ" and len(ast) >= 2:
                 result = node
                 for sub in ast[1:]:
@@ -386,6 +455,7 @@ class GraphASTSwarm:
         """Execute a string operation on a single node."""
         new_node = _copy_node(node)
 
+        # --- Fixed-distance movement ---
         if op == "MOVE_UP_1":
             return self._shift_node(new_node, -1, 0)
         elif op == "MOVE_DOWN_1":
@@ -402,6 +472,31 @@ class GraphASTSwarm:
             return self._shift_node(new_node, 0, -2)
         elif op == "MOVE_RIGHT_2":
             return self._shift_node(new_node, 0, 2)
+        elif op == "MOVE_UP_3":
+            return self._shift_node(new_node, -3, 0)
+        elif op == "MOVE_DOWN_3":
+            return self._shift_node(new_node, 3, 0)
+        elif op == "MOVE_LEFT_3":
+            return self._shift_node(new_node, 0, -3)
+        elif op == "MOVE_RIGHT_3":
+            return self._shift_node(new_node, 0, 3)
+
+        # --- GRAVITY: slide node until it hits another node or grid edge ---
+        elif op.startswith("GRAVITY_"):
+            direction = op.split("_", 1)[1]
+            return self._gravity(new_node, direction, graph)
+
+        # --- SNAP: teleport node to grid boundary ---
+        elif op == "SNAP_TO_TOP":
+            return self._snap_to_edge(new_node, "UP", graph)
+        elif op == "SNAP_TO_BOTTOM":
+            return self._snap_to_edge(new_node, "DOWN", graph)
+        elif op == "SNAP_TO_LEFT":
+            return self._snap_to_edge(new_node, "LEFT", graph)
+        elif op == "SNAP_TO_RIGHT":
+            return self._snap_to_edge(new_node, "RIGHT", graph)
+
+        # --- Geometry ---
         elif op == "MIRROR_H":
             matrix = new_node.get("matrix")
             if matrix is not None:
@@ -422,13 +517,160 @@ class GraphASTSwarm:
             if matrix is not None:
                 new_node.set("matrix", np.rot90(matrix, k=2))
             return new_node
+
+        # --- Deletion ---
         elif op == "DELETE_NODE":
             new_node.set("_deleted", True)
             return new_node
+
+        # --- Duplication with mirror ---
+        elif op == "DUPLICATE_MIRROR_H":
+            # Create a mirrored copy — handled at graph level
+            # At node level, just mirror this node's matrix
+            matrix = new_node.get("matrix")
+            if matrix is not None:
+                new_node.set("matrix", np.fliplr(matrix))
+            return new_node
+        elif op == "DUPLICATE_MIRROR_V":
+            matrix = new_node.get("matrix")
+            if matrix is not None:
+                new_node.set("matrix", np.flipud(matrix))
+            return new_node
+
         elif op == "IDENTITY":
             return new_node
 
         return new_node
+
+    def _gravity(self, node: UniversalNode, direction: str,
+                 graph: UniversalGraph) -> UniversalNode:
+        """
+        Simulate gravity: slide node in direction until it collides with
+        another node or hits the grid boundary. O(N) where N = node count.
+
+        This is the key physics operation that makes ARC gravity/raycasting
+        tasks solvable in object space instead of pixel space.
+        """
+        bb = node.get("bounding_box")
+        if not bb:
+            return node
+
+        r_start, r_end, c_start, c_end = bb
+        grid_shape = graph.metadata.get('grid_shape', (30, 30))
+        grid_h, grid_w = grid_shape
+
+        # Collect obstacles: all other nodes' bounding boxes
+        obstacles = []
+        for nid, other in graph.nodes.items():
+            if nid == node.id or other.get("_deleted", False):
+                continue
+            obb = other.get("bounding_box")
+            if obb:
+                obstacles.append(obb)
+
+        # Compute max travel distance before collision
+        if direction == "DOWN":
+            # Find closest obstacle below
+            max_dist = grid_h - r_end  # Grid boundary
+            for ob in obstacles:
+                if ob[2] < c_end and ob[3] > c_start:  # Horizontal overlap
+                    if ob[0] >= r_end:  # Below current
+                        max_dist = min(max_dist, ob[0] - r_end)
+            return self._shift_node(node, max_dist, 0)
+
+        elif direction == "UP":
+            max_dist = r_start  # Grid boundary
+            for ob in obstacles:
+                if ob[2] < c_end and ob[3] > c_start:
+                    if ob[1] <= r_start:
+                        max_dist = min(max_dist, r_start - ob[1])
+            return self._shift_node(node, -max_dist, 0)
+
+        elif direction == "RIGHT":
+            max_dist = grid_w - c_end
+            for ob in obstacles:
+                if ob[0] < r_end and ob[1] > r_start:  # Vertical overlap
+                    if ob[2] >= c_end:
+                        max_dist = min(max_dist, ob[2] - c_end)
+            return self._shift_node(node, 0, max_dist)
+
+        elif direction == "LEFT":
+            max_dist = c_start
+            for ob in obstacles:
+                if ob[0] < r_end and ob[1] > r_start:
+                    if ob[3] <= c_start:
+                        max_dist = min(max_dist, c_start - ob[3])
+            return self._shift_node(node, 0, -max_dist)
+
+        return node
+
+    def _snap_to_edge(self, node: UniversalNode, direction: str,
+                      graph: UniversalGraph) -> UniversalNode:
+        """Teleport node to grid boundary in given direction."""
+        bb = node.get("bounding_box")
+        if not bb:
+            return node
+
+        r_start, r_end, c_start, c_end = bb
+        grid_shape = graph.metadata.get('grid_shape', (30, 30))
+        h, w = grid_shape
+        node_h = r_end - r_start
+        node_w = c_end - c_start
+
+        if direction == "UP":
+            return self._shift_node(node, -r_start, 0)
+        elif direction == "DOWN":
+            return self._shift_node(node, h - r_end, 0)
+        elif direction == "LEFT":
+            return self._shift_node(node, 0, -c_start)
+        elif direction == "RIGHT":
+            return self._shift_node(node, 0, w - c_end)
+        return node
+
+    def _move_until_touch_impl(self, node: UniversalNode, direction: str,
+                               targets: list,
+                               graph: UniversalGraph) -> UniversalNode:
+        """Move node in direction until it touches one of the target nodes."""
+        bb = node.get("bounding_box")
+        if not bb or not targets:
+            # No targets: fall back to gravity (slide to edge)
+            return self._gravity(node, direction, graph)
+
+        r_start, r_end, c_start, c_end = bb
+        grid_shape = graph.metadata.get('grid_shape', (30, 30))
+        best_dist = 999
+
+        for t in targets:
+            tbb = t.get("bounding_box")
+            if not tbb:
+                continue
+            tr_start, tr_end, tc_start, tc_end = tbb
+
+            if direction == "DOWN":
+                if tc_start < c_end and tc_end > c_start and tr_start >= r_end:
+                    best_dist = min(best_dist, tr_start - r_end)
+            elif direction == "UP":
+                if tc_start < c_end and tc_end > c_start and tr_end <= r_start:
+                    best_dist = min(best_dist, r_start - tr_end)
+            elif direction == "RIGHT":
+                if tr_start < r_end and tr_end > r_start and tc_start >= c_end:
+                    best_dist = min(best_dist, tc_start - c_end)
+            elif direction == "LEFT":
+                if tr_start < r_end and tr_end > r_start and tc_end <= c_start:
+                    best_dist = min(best_dist, c_start - tc_end)
+
+        if best_dist == 999:
+            return self._gravity(node, direction, graph)
+
+        if direction == "DOWN":
+            return self._shift_node(node, best_dist, 0)
+        elif direction == "UP":
+            return self._shift_node(node, -best_dist, 0)
+        elif direction == "RIGHT":
+            return self._shift_node(node, 0, best_dist)
+        elif direction == "LEFT":
+            return self._shift_node(node, 0, -best_dist)
+        return node
 
     def _shift_node(self, node: UniversalNode, dy: int, dx: int) -> UniversalNode:
         """Shift a node's position by (dy, dx). O(1) operation."""
