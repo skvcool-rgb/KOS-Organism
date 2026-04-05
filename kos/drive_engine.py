@@ -124,6 +124,9 @@ class EpistemicDrive:
         )
         self._load_state()
 
+    # Keys that are computed properties, not raw state
+    _COMPUTED_KEYS = frozenset({"free_energy", "solve_rate"})
+
     def _load_state(self):
         """Load persisted drive state."""
         try:
@@ -131,7 +134,9 @@ class EpistemicDrive:
                 with open(self._state_path) as f:
                     data = json.load(f)
                 for key, val in data.items():
-                    if hasattr(self.state, key):
+                    if key in self._COMPUTED_KEYS:
+                        continue  # Skip computed properties
+                    if hasattr(self.state, key) and not callable(getattr(self.state, key)):
                         setattr(self.state, key, val)
         except Exception:
             pass
