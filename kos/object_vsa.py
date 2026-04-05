@@ -365,6 +365,7 @@ class ObjectVSA:
             }
         """
         t0 = time.perf_counter()
+        self._last_examples = examples  # Cache for apply_rule partition solver
         n = len(examples)
         print(f"[OBJECT-VSA] Analyzing {n} examples at object level...")
 
@@ -427,6 +428,39 @@ class ObjectVSA:
                 elapsed = (time.perf_counter() - t0) * 1000
                 print(f"[OBJECT-VSA] Size mismatch, no fractal rule found. {elapsed:.1f}ms")
                 return None
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE -1: GRID PARTITION DETECTOR — Sub-Grid Reasoning
+        # Detects separator lines, splits into panels, tries
+        # selection / boolean / per-panel transforms.
+        # ══════════════════════════════════════════════════════════
+        try:
+            from kos.grid_partition import solve_with_partition
+            test_inp = np.array(examples[0]["input"])  # Just for partition detection
+            partition_result = solve_with_partition(examples, test_inp)
+            if partition_result is not None:
+                # Verify on ALL training pairs
+                verified = True
+                for ex in examples:
+                    pred = solve_with_partition(examples, np.array(ex["input"]))
+                    if pred is None or not np.array_equal(pred, np.array(ex["output"])):
+                        verified = False
+                        break
+                if verified:
+                    elapsed = (time.perf_counter() - t0) * 1000
+                    rule = {
+                        "type": "grid_partition",
+                        "target_color": None,
+                        "displacement": (0, 0),
+                        "color_swap": None,
+                        "description": "GRID-PARTITION solver",
+                        "worst_error": 0.0,
+                        "_partition_solver": True,
+                    }
+                    print(f"[PARTITION] RULE VERIFIED in {elapsed:.1f}ms")
+                    return rule
+        except Exception:
+            pass
 
         # ══════════════════════════════════════════════════════════
         # STAGE 0: META-LEARNER — Direct Operator Extraction
@@ -1551,6 +1585,17 @@ class ObjectVSA:
         examples and apply it to the unseen test input.
         """
         h, w = grid.shape
+
+        # Grid partition rules
+        if rule.get("_partition_solver"):
+            try:
+                from kos.grid_partition import solve_with_partition
+                result = solve_with_partition(self._last_examples, grid)
+                if result is not None:
+                    return result
+            except Exception:
+                pass
+            return grid
 
         # Fractal rules (size-changing operations)
         if rule["type"].startswith("fractal_") and self.fractal_solver:
