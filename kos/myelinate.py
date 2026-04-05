@@ -92,11 +92,44 @@ DO NOT EDIT -- this file is auto-generated.
 """
 
 import numpy as np
+from collections import Counter
 
 try:
     from scipy.ndimage import label as scipy_label
 except ImportError:
     scipy_label = None
+
+
+def _resolve_color(token, grid):
+    """Resolve a relational color token to an integer using the grid."""
+    if isinstance(token, (int, float, np.integer)):
+        return int(token)
+    if not isinstance(token, str) or not token.startswith("COLOR_"):
+        return token
+    flat = grid.flatten()
+    freq = Counter(int(v) for v in flat)
+    nonzero = {{c: n for c, n in freq.items() if c != 0}}
+    if not nonzero:
+        return 0
+    if token == "COLOR_MAX":
+        return max(nonzero, key=nonzero.get)
+    elif token == "COLOR_MIN":
+        return min(nonzero, key=nonzero.get)
+    elif token == "COLOR_BG":
+        return max(freq, key=freq.get) if freq else 0
+    elif token == "COLOR_SECOND":
+        mc = sorted(nonzero, key=nonzero.get, reverse=True)
+        return mc[1] if len(mc) >= 2 else mc[0] if mc else 0
+    elif token == "COLOR_UNIQUE":
+        uniques = [c for c, n in nonzero.items() if n == 1]
+        return uniques[0] if uniques else min(nonzero, key=nonzero.get)
+    elif token == "COLOR_FG_1":
+        mc = sorted(nonzero, key=nonzero.get, reverse=True)
+        return mc[0] if mc else 0
+    elif token == "COLOR_FG_2":
+        mc = sorted(nonzero, key=nonzero.get, reverse=True)
+        return mc[1] if len(mc) >= 2 else mc[0] if mc else 0
+    return 0
 
 
 def detect_rule(train_pairs):
@@ -117,6 +150,7 @@ def detect_rule(train_pairs):
 
 def apply_rule(grid, rule=None):
     """Apply the learned transformation."""
+    _orig_grid = grid.copy()
     state = grid.copy()
 {apply_body}
     return state
@@ -172,6 +206,15 @@ def _for_each_object(grid, transform_fn):
     return code
 
 
+def _emit_val(val):
+    """Emit a value for transpiled code — resolve relational tokens."""
+    if isinstance(val, str) and (val.startswith("COLOR_") or val.startswith("ORIG_COLOR_")):
+        if val.startswith("ORIG_"):
+            return f'_resolve_color("{val[5:]}", _orig_grid)'
+        return f'_resolve_color("{val}", _orig_grid)'
+    return repr(val)
+
+
 def _transpile_node(ast, indent: int = 1) -> str:
     """Recursively transpile an AST node into Python code lines."""
     prefix = "    " * indent
@@ -185,24 +228,33 @@ def _transpile_node(ast, indent: int = 1) -> str:
         op = ast[0]
 
         if op == "SWAP" and len(ast) == 3:
-            c1, c2 = ast[1], ast[2]
-            return (f"{prefix}m1, m2 = state == {c1}, state == {c2}\n"
-                    f"{prefix}state[m1] = {c2}\n"
-                    f"{prefix}state[m2] = {c1}\n")
+            c1, c2 = _emit_val(ast[1]), _emit_val(ast[2])
+            return (f"{prefix}_c1, _c2 = {c1}, {c2}\n"
+                    f"{prefix}m1, m2 = state == _c1, state == _c2\n"
+                    f"{prefix}state[m1] = _c2\n"
+                    f"{prefix}state[m2] = _c1\n")
 
         elif op == "RECOLOR" and len(ast) == 3:
-            return f"{prefix}state[state == {ast[1]}] = {ast[2]}\n"
+            src, dst = _emit_val(ast[1]), _emit_val(ast[2])
+            return f"{prefix}state[state == {src}] = {dst}\n"
 
         elif op == "MASK" and len(ast) == 2:
-            return f"{prefix}state = np.where(state == {ast[1]}, {ast[1]}, 0)\n"
+            v = _emit_val(ast[1])
+            return f"{prefix}state = np.where(state == {v}, {v}, 0)\n"
 
         elif op == "FILL_BG" and len(ast) == 2:
-            return f"{prefix}state[state == 0] = {ast[1]}\n"
+            v = _emit_val(ast[1])
+            return f"{prefix}state[state == 0] = {v}\n"
+
+        elif op == "RECOLOR_ALL_TO_MAX":
+            return (f"{prefix}_cmax = _resolve_color('COLOR_MAX', _orig_grid)\n"
+                    f"{prefix}state[state != 0] = _cmax\n")
 
         elif op == "IF_COLOR" and len(ast) == 4:
+            v = _emit_val(ast[1])
             true_body = _transpile_node(ast[2], indent + 1)
             false_body = _transpile_node(ast[3], indent + 1)
-            return (f"{prefix}if {ast[1]} in state:\n"
+            return (f"{prefix}if {v} in state:\n"
                     f"{true_body}"
                     f"{prefix}else:\n"
                     f"{false_body}")
@@ -219,9 +271,9 @@ def _transpile_node(ast, indent: int = 1) -> str:
                     f"{prefix}state[mask] = result_b[mask]\n")
 
         elif op == "FOR_EACH_OBJECT" and len(ast) == 2:
-            # Generate a lambda for the sub-transform
             sub_body = _transpile_node(ast[1], indent=2)
             return (f"{prefix}def _sub_transform(state):\n"
+                    f"{prefix}    _orig_grid = state.copy()\n"
                     f"{sub_body}"
                     f"{prefix}    return state\n"
                     f"{prefix}state = _for_each_object(state, _sub_transform)\n")
@@ -231,6 +283,19 @@ def _transpile_node(ast, indent: int = 1) -> str:
             for sub in ast[1:]:
                 lines += _transpile_node(sub, indent)
             return lines
+
+        elif op == "CROP_TO_COLOR" and len(ast) == 2:
+            v = _emit_val(ast[1])
+            return (f"{prefix}_cv = {v}\n"
+                    f"{prefix}nz = np.argwhere(state == _cv)\n"
+                    f"{prefix}if len(nz) > 0:\n"
+                    f"{prefix}    r0, c0 = nz.min(axis=0)\n"
+                    f"{prefix}    r1, c1 = nz.max(axis=0)\n"
+                    f"{prefix}    state = state[r0:r1+1, c0:c1+1].copy()\n")
+
+        elif op == "RECOLOR_ALL_TO_MAX":
+            return (f"{prefix}_cmax = _resolve_color('COLOR_MAX', _orig_grid)\n"
+                    f"{prefix}state[state != 0] = _cmax\n")
 
     # Fallback
     return f"{prefix}pass  # Unknown AST node: {repr(ast)}\n"
@@ -262,6 +327,39 @@ def _transpile_leaf(op: str, indent: int) -> str:
         "SHIFT_RIGHT": "state = np.roll(state, 1, axis=1); state[:, 0] = 0",
         "SORT_ROWS": "state = np.sort(state, axis=1)",
         "SORT_COLS": "state = np.sort(state, axis=0)",
+        "RECOLOR_ALL_TO_MAX": (
+            "_cmax = _resolve_color('COLOR_MAX', _orig_grid)\n"
+            f"{prefix}state[state != 0] = _cmax"
+        ),
+        "DELETE_ROWS_ZERO": (
+            "mask = np.any(state != 0, axis=1)\n"
+            f"{prefix}if mask.any(): state = state[mask]"
+        ),
+        "DELETE_COLS_ZERO": (
+            "mask = np.any(state != 0, axis=0)\n"
+            f"{prefix}if mask.any(): state = state[:, mask]"
+        ),
+        "UPSCALE_2X": "state = np.repeat(np.repeat(state, 2, axis=0), 2, axis=1)",
+        "DOWNSCALE_2X": (
+            "h, w = state.shape\n"
+            f"{prefix}if h >= 2 and w >= 2: state = state[::2, ::2].copy()"
+        ),
+        "EXTRACT_QUADRANT_TL": (
+            "h, w = state.shape\n"
+            f"{prefix}state = state[:h//2, :w//2].copy()"
+        ),
+        "EXTRACT_QUADRANT_TR": (
+            "h, w = state.shape\n"
+            f"{prefix}state = state[:h//2, w//2:].copy()"
+        ),
+        "EXTRACT_QUADRANT_BL": (
+            "h, w = state.shape\n"
+            f"{prefix}state = state[h//2:, :w//2].copy()"
+        ),
+        "EXTRACT_QUADRANT_BR": (
+            "h, w = state.shape\n"
+            f"{prefix}state = state[h//2:, w//2:].copy()"
+        ),
     }
 
     code = leaf_map.get(op, f"pass  # Unknown op: {op}")
