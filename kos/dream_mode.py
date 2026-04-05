@@ -26,6 +26,11 @@ from kos.tree_swarm import ASTGridSwarm
 from kos.myelinate import myelinate
 from kos.rem_sleep import run_rem_sleep
 
+try:
+    from kos.graph_ast_swarm import GraphASTSwarm
+except ImportError:
+    GraphASTSwarm = None
+
 
 DREAM_QUEUE_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -210,24 +215,72 @@ def dream_on_task(task_id: str, task_dir: str,
 
     elapsed = time.perf_counter() - t0
 
+    # Phase 3: If pixel swarm failed, try Graph AST Swarm (topology evolution)
+    # The graph swarm operates on Objects and Relations instead of pixels.
+    if winning_ast is None and GraphASTSwarm is not None:
+        remaining = time_budget - (time.perf_counter() - t0)
+        if remaining > 5.0:
+            print(f"[DREAM] Pixel swarm failed. Launching Graph Swarm ({remaining:.0f}s)...")
+            graph_swarm = GraphASTSwarm()
+            graph_ast = graph_swarm.breed_program(
+                train_pairs,
+                pop_size=min(effective_pop, 400),
+                max_time_sec=remaining,
+                verbose=True,
+            )
+            if graph_ast is not None:
+                # Verify the graph solution
+                from kos.graph_transducer import ARCGridTransducer
+                transducer = ARCGridTransducer()
+                graph_verified = True
+                for inp, out in train_pairs:
+                    try:
+                        g_in = transducer.parse(inp)
+                        from kos.graph_ast_swarm import _deep_copy_graph
+                        g_result = graph_swarm._execute_graph_ast(
+                            g_in, graph_ast, _deep_copy_graph(g_in))
+                        # Remove deleted nodes
+                        deleted = [nid for nid, n in g_result.nodes.items()
+                                   if n.get("_deleted", False)]
+                        for nid in deleted:
+                            del g_result.nodes[nid]
+                        pred = transducer.render(g_result, inp.shape)
+                        if pred.shape != out.shape or not np.array_equal(pred, out):
+                            graph_verified = False
+                            break
+                    except Exception:
+                        graph_verified = False
+                        break
+
+                if graph_verified:
+                    winning_ast = graph_ast
+                    # Mark as graph-evolved for the myelinator
+                    swarm = None  # Signal that this came from graph swarm
+
+            elapsed = time.perf_counter() - t0
+
     if winning_ast is None:
         print(f"[DREAM] Failed on {task_id} after {elapsed:.1f}s")
         return None
 
-    # Double-verify
-    verified = True
-    for inp, out in train_pairs:
-        pred = swarm._execute_ast(inp, winning_ast)
-        if pred.shape != out.shape or not np.array_equal(pred, out):
-            verified = False
-            break
+    # Double-verify (for pixel swarm solutions)
+    if swarm is not None:
+        verified = True
+        for inp, out in train_pairs:
+            pred = swarm._execute_ast(inp, winning_ast)
+            if pred.shape != out.shape or not np.array_equal(pred, out):
+                verified = False
+                break
 
-    if not verified:
-        print(f"[DREAM] AST verification failed for {task_id}")
-        return None
+        if not verified:
+            print(f"[DREAM] AST verification failed for {task_id}")
+            return None
 
     # Myelinate: compile AST into permanent Python engine
-    ast_str = swarm._ast_to_str(winning_ast)
+    if swarm is not None:
+        ast_str = swarm._ast_to_str(winning_ast)
+    else:
+        ast_str = str(winning_ast)
     description = f"Evolved for {task_id}: {ast_str}"
 
     module_name = myelinate(
