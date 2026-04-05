@@ -322,63 +322,215 @@ def dream_on_task(task_id: str, task_dir: str,
     return module_name
 
 
+def _dream_worker(args):
+    """
+    Isolated worker for parallel dreaming. Runs in a separate process.
+    Returns (task_id, winning_ast, train_pairs, description) or (task_id, None, None, None).
+
+    Myelination happens in the MAIN thread to prevent file-write collisions.
+    """
+    task_id, task_dir, time_budget, pop_size = args
+    try:
+        task_path = os.path.join(task_dir, f"{task_id}.json")
+        if not os.path.exists(task_path):
+            return (task_id, None, None, None)
+
+        with open(task_path) as f:
+            task = json.load(f)
+
+        if not isinstance(task, dict) or "train" not in task:
+            return (task_id, None, None, None)
+
+        train_pairs = []
+        for ex in task["train"]:
+            inp = np.array(ex["input"])
+            out = np.array(ex["output"])
+            train_pairs.append((inp, out))
+
+        if not train_pairs:
+            return (task_id, None, None, None)
+
+        palette = set()
+        for inp, out in train_pairs:
+            palette.update(int(v) for v in np.unique(inp))
+            palette.update(int(v) for v in np.unique(out))
+
+        # Scale population
+        max_area = max(inp.size for inp, _ in train_pairs)
+        if max_area <= 25:
+            effective_pop = min(pop_size, 500)
+        elif max_area <= 100:
+            effective_pop = min(pop_size, 800)
+        else:
+            effective_pop = pop_size
+
+        swarm = ASTGridSwarm(palette=palette, pure_relational=True)
+
+        t0 = time.perf_counter()
+        winning_ast = None
+
+        # Phase 1: CV-first (70% budget)
+        if len(train_pairs) >= 3:
+            cv_budget = time_budget * 0.7
+            winning_ast = swarm.breed_program(
+                train_pairs, pop_size=effective_pop,
+                max_time_sec=cv_budget, verbose=False,
+                cross_validate=True,
+            )
+
+        # Phase 2: No-CV fallback with holdout check
+        if winning_ast is None and (time.perf_counter() - t0) < time_budget * 0.9:
+            remaining = time_budget - (time.perf_counter() - t0)
+            candidate = swarm.breed_program(
+                train_pairs, pop_size=effective_pop,
+                max_time_sec=remaining, verbose=False,
+                cross_validate=False,
+            )
+            if candidate is not None:
+                if len(train_pairs) >= 3:
+                    holdout_inp, holdout_out = train_pairs[-1]
+                    try:
+                        pred = swarm._execute_ast(holdout_inp, candidate)
+                        if pred.shape == holdout_out.shape and np.array_equal(pred, holdout_out):
+                            winning_ast = candidate
+                    except Exception:
+                        pass
+                else:
+                    winning_ast = candidate
+
+        # Phase 3: Graph AST Swarm
+        if winning_ast is None:
+            try:
+                from kos.graph_ast_swarm import GraphASTSwarm as GAS
+                remaining = time_budget - (time.perf_counter() - t0)
+                if remaining > 5.0:
+                    gs = GAS()
+                    graph_ast = gs.breed_program(
+                        train_pairs, pop_size=min(effective_pop, 400),
+                        max_time_sec=remaining, verbose=False,
+                    )
+                    if graph_ast is not None:
+                        from kos.graph_transducer import ARCGridTransducer
+                        from kos.graph_ast_swarm import _deep_copy_graph
+                        t = ARCGridTransducer()
+                        ok = True
+                        for inp, out in train_pairs:
+                            try:
+                                g_in = t.parse(inp)
+                                g_r = gs._execute_graph_ast(g_in, graph_ast, _deep_copy_graph(g_in))
+                                deleted = [nid for nid, n in g_r.nodes.items() if n.get("_deleted", False)]
+                                for nid in deleted:
+                                    del g_r.nodes[nid]
+                                pred = t.render(g_r, inp.shape)
+                                if pred.shape != out.shape or not np.array_equal(pred, out):
+                                    ok = False
+                                    break
+                            except Exception:
+                                ok = False
+                                break
+                        if ok:
+                            winning_ast = graph_ast
+                            swarm = None
+            except ImportError:
+                pass
+
+        if winning_ast is None:
+            return (task_id, None, None, None)
+
+        # Verify pixel swarm solutions
+        if swarm is not None:
+            for inp, out in train_pairs:
+                pred = swarm._execute_ast(inp, winning_ast)
+                if pred.shape != out.shape or not np.array_equal(pred, out):
+                    return (task_id, None, None, None)
+
+        elapsed = time.perf_counter() - t0
+        if swarm is not None:
+            desc = f"Evolved for {task_id}: {swarm._ast_to_str(winning_ast)}"
+        else:
+            desc = f"Evolved for {task_id}: {str(winning_ast)}"
+
+        print(f"[CORE] Solved {task_id} in {elapsed:.1f}s: {desc[:80]}")
+        return (task_id, winning_ast, train_pairs, desc)
+
+    except Exception as e:
+        print(f"[CORE] {task_id} crashed: {e}")
+        return (task_id, None, None, None)
+
+
 def run_dream_cycle(task_dir: str, max_tasks: int = 50,
                     time_per_task: float = 300.0,
                     pop_size: int = 1000):
     """
     Run a full Dream Mode cycle on all unsolved tasks.
-
-    Args:
-        task_dir: Directory containing task JSON files
-        max_tasks: Maximum number of tasks to dream on
-        time_per_task: Seconds per task
-        pop_size: Swarm population size
+    Uses multi-core parallel processing for maximum throughput.
     """
     queue = load_dream_queue()
     if not queue:
         print("[DREAM] No tasks in dream queue. Run benchmark first.")
         return
 
-    # Curriculum Learning: sort easiest first
     queue = sort_dream_queue_by_curriculum(queue, task_dir)
 
-    print(f"[DREAM] Dream queue: {len(queue)} unsolved tasks (curriculum sorted)")
-    print(f"[DREAM] Processing up to {max_tasks} tasks")
+    n_tasks = min(len(queue), max_tasks)
+    n_cores = max(1, os.cpu_count() - 1) if os.cpu_count() else 1
+
+    print(f"[DREAM] Dream queue: {len(queue)} unsolved tasks")
+    print(f"[DREAM] Processing {n_tasks} tasks across {n_cores} cores")
     print(f"[DREAM] Time per task: {time_per_task}s")
     print(f"[DREAM] Population: {pop_size}")
     print()
 
+    # Build work items with adaptive budgets
+    work_items = []
+    for tid in queue[:n_tasks]:
+        budget = _adaptive_budget(tid, task_dir, time_per_task)
+        work_items.append((tid, task_dir, budget, pop_size))
+
     solved = []
     total_t0 = time.perf_counter()
 
-    for i, task_id in enumerate(queue[:max_tasks]):
-        print(f"\n[DREAM] --- Task {i+1}/{min(len(queue), max_tasks)} ---")
+    # Parallel dream processing
+    import concurrent.futures
+    with concurrent.futures.ProcessPoolExecutor(max_workers=n_cores) as executor:
+        futures = {executor.submit(_dream_worker, item): item[0]
+                   for item in work_items}
 
-        # Adaptive time budget: scale by grid complexity
-        adaptive_time = _adaptive_budget(task_id, task_dir, time_per_task)
-
-        module_name = dream_on_task(
-            task_id, task_dir, adaptive_time, pop_size
-        )
-
-        if module_name:
-            solved.append(task_id)
-
-        # Clean up memory
-        gc.collect()
+        for future in concurrent.futures.as_completed(futures):
+            tid = futures[future]
+            try:
+                task_id, winning_ast, train_pairs, desc = future.result()
+                if winning_ast is not None and train_pairs is not None:
+                    # Myelinate in main thread (safe file writes)
+                    module_name = myelinate(winning_ast, task_id, train_pairs, desc)
+                    if module_name:
+                        solved.append(task_id)
+                        print(f"[DREAM] MYELINATED {task_id} -> {module_name}")
+                    # REM sleep after each solve
+                    try:
+                        run_rem_sleep()
+                    except Exception:
+                        pass
+                else:
+                    print(f"  >>> Failed {tid}")
+            except Exception as e:
+                print(f"  >>> {tid} crashed: {e}")
 
     total_time = time.perf_counter() - total_t0
     print(f"\n[DREAM] === Dream Cycle Complete ===")
-    print(f"[DREAM] Tasks attempted: {min(len(queue), max_tasks)}")
+    print(f"[DREAM] Tasks attempted: {n_tasks}")
     print(f"[DREAM] Tasks solved (myelinated): {len(solved)}")
     print(f"[DREAM] Total time: {total_time:.1f}s")
+    print(f"[DREAM] Effective rate: {total_time/max(n_tasks,1):.1f}s/task "
+          f"({n_cores} cores)")
 
     if solved:
         print(f"[DREAM] Solved task IDs: {solved}")
-        # Remove solved tasks from queue
         remaining = [t for t in queue if t not in set(solved)]
         save_dream_queue(remaining)
         print(f"[DREAM] Remaining in queue: {len(remaining)}")
+
+    return solved
 
 
 def _adaptive_budget(task_id: str, task_dir: str,

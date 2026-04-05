@@ -1029,6 +1029,7 @@ class GraphASTSwarm:
         best_fitness = -999999
         stagnation = 0
         generation = 0
+        phenotype_cache = {}
 
         while True:
             generation += 1
@@ -1036,10 +1037,15 @@ class GraphASTSwarm:
             if elapsed >= max_time_sec:
                 break
 
-            # Evaluate fitness
+            # Evaluate fitness (with phenotype cache / AST memoization)
             for org in population:
                 if org.fitness == -999.0:
-                    org.fitness = self._evaluate(org, train_pairs)
+                    ast_key = str(org.ast)
+                    if ast_key in phenotype_cache:
+                        org.fitness = phenotype_cache[ast_key]
+                    else:
+                        org.fitness = self._evaluate(org, train_pairs)
+                        phenotype_cache[ast_key] = org.fitness
 
             # Sort by fitness (higher = better, 0.0 = perfect)
             population.sort(key=lambda o: o.fitness, reverse=True)
@@ -1059,8 +1065,10 @@ class GraphASTSwarm:
                           f"({elapsed:.1f}s): {self._ast_to_str(best_ever)}")
                 return best_ever
 
-            # Early extinction
-            if stagnation >= 20 and best_fitness < -50:
+            # Early extinction (boredom kill switch)
+            if stagnation >= 150:
+                if verbose:
+                    print("[GRAPH-SWARM] Boredom threshold hit (150 gen stagnation). Aborting.")
                 break
 
             # Selection: top 20%

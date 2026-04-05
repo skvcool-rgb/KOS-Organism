@@ -1237,13 +1237,19 @@ class ASTGridSwarm:
         generation = 0
         best_ever = -9999.0
         stagnation = 0
+        phenotype_cache = {}
 
         while (time.perf_counter() - t0) < max_time_sec:
             generation += 1
 
             # --- FITNESS EVALUATION ---
             for org in population:
-                org.fitness = self._evaluate_fitness(org.ast, train_pairs)
+                ast_key = str(org.ast)
+                if ast_key in phenotype_cache:
+                    org.fitness = phenotype_cache[ast_key]
+                else:
+                    org.fitness = self._evaluate_fitness(org.ast, train_pairs)
+                    phenotype_cache[ast_key] = org.fitness
 
             population.sort(key=lambda x: x.fitness, reverse=True)
             best = population[0]
@@ -1257,6 +1263,12 @@ class ASTGridSwarm:
 
             # Early extinction: if no improvement in 15 generations, bail
             if stagnation >= 15 and best_ever < -20:
+                break
+
+            # Boredom kill switch: absolute stagnation cap
+            if stagnation >= 150:
+                if verbose:
+                    print("[AST-SWARM] Boredom threshold (150 gen stagnation). Aborting to save compute.")
                 break
 
             # --- APEX PREDATOR DETECTED ---
