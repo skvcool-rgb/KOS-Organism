@@ -326,13 +326,13 @@ class GenesisEngine:
         for hyp in self.hypothesis_tracker.top_k(20):
             trace.hypotheses_tested += 1
             try:
-                predicted = self.world_model.predict_outcome(
-                    state, hyp['actions']
+                predicted_grid = self.world_model.predict_outcome(
+                    state, hyp.action_sequence
                 )
-                if predicted is not None:
-                    s = self.world_model.surprise(predicted.grid, out0)
+                if predicted_grid is not None:
+                    s = self.world_model.surprise(predicted_grid, out0)
                     self.hypothesis_tracker.update(
-                        hyp['id'], out0, predicted.grid
+                        hyp.hypothesis_id, out0, predicted_grid
                     )
                     if s == 0.0:
                         # Perfect match on first pair -- verify on rest
@@ -340,14 +340,13 @@ class GenesisEngine:
                         for inp_i, out_i in train_pairs[1:]:
                             st_i = WorldState.from_grid(inp_i)
                             pred_i = self.world_model.predict_outcome(
-                                st_i, hyp['actions']
+                                st_i, hyp.action_sequence
                             )
-                            if pred_i is None or not np.array_equal(pred_i.grid, out_i):
+                            if pred_i is None or not np.array_equal(pred_i, out_i):
                                 all_match = False
                                 break
                         if all_match:
                             trace.solved = True
-                            # Apply to test input if available
                             trace.best_hypothesis_confidence = 1.0
                             return
             except Exception:
@@ -356,7 +355,7 @@ class GenesisEngine:
         # Update best confidence
         top = self.hypothesis_tracker.top_k(1)
         if top:
-            trace.best_hypothesis_confidence = top[0].get('confidence', 0.0)
+            trace.best_hypothesis_confidence = top[0].posterior
 
     # ------------------------------------------------------------------
     # L4: EVOLVE
