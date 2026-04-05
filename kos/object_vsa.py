@@ -1340,7 +1340,7 @@ class ObjectVSA:
                     palette.update(int(v) for v in np.unique(ex["input"]))
                     palette.update(int(v) for v in np.unique(ex["output"]))
 
-                ast_swarm = ASTGridSwarm(palette=palette)
+                ast_swarm = ASTGridSwarm(palette=palette, pure_relational=False)
 
                 train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
                                for ex in examples]
@@ -1636,7 +1636,7 @@ class ObjectVSA:
         # AST-evolved programs (Tree Swarm)
         if rule["type"] == "ast_evolved" and ASTGridSwarm:
             palette = set(rule.get("palette", range(10)))
-            ast_swarm = ASTGridSwarm(palette=palette)
+            ast_swarm = ASTGridSwarm(palette=palette, pure_relational=False)
             return ast_swarm._execute_ast(grid, rule["ast"])
 
         # Graph-evolved programs (Object-Graph Swarm)

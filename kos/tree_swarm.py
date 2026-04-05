@@ -49,11 +49,35 @@ class ASTGridSwarm:
     MAX_EXEC_STEPS = 500     # Prevent runaway execution
     MAX_AST_DEPTH = 3        # Cap tree generation depth
 
-    def __init__(self, palette: Optional[set] = None):
+    def __init__(self, palette: Optional[set] = None,
+                 pure_relational: bool = True):
         colors = sorted(palette) if palette else list(range(10))
         self.colors = colors
+        self.pure_relational = pure_relational
 
-        # Atomic leaf operations
+        # ================================================================
+        # PURE RELATIONAL DNA -- The organism is BLIND to absolute colors.
+        #
+        # It cannot say "Red" or "3". It can only say "the most frequent
+        # color" or "the color that appears exactly once". This makes it
+        # MATHEMATICALLY IMPOSSIBLE to overfit to the training palette.
+        #
+        # If pure_relational=False (benchmark awake mode), absolute colors
+        # are allowed for backward compatibility with existing captures.
+        # ================================================================
+
+        # Relational color tokens -- resolved dynamically at runtime
+        self.relational_tokens = [
+            "COLOR_MAX",        # Most frequent non-zero color
+            "COLOR_MIN",        # Least frequent non-zero color
+            "COLOR_BG",         # Background (most frequent overall, usually 0)
+            "COLOR_SECOND",     # Second most frequent non-zero color
+            "COLOR_UNIQUE",     # Color that appears exactly once
+            "COLOR_FG_1",       # First foreground color (sorted by value)
+            "COLOR_FG_2",       # Second foreground color (sorted by value)
+        ]
+
+        # Geometric / structural leaf operations (color-blind)
         self.atomic_ops = [
             "ROT90", "ROT180", "ROT270",
             "FLIP_H", "FLIP_V", "TRANSPOSE",
@@ -64,48 +88,35 @@ class ASTGridSwarm:
             "SORT_ROWS", "SORT_COLS",
             "DELETE_ROWS_ZERO", "DELETE_COLS_ZERO",
         ]
-        for c1 in colors:
-            for c2 in colors:
-                if c1 != c2:
-                    self.atomic_ops.append(("SWAP", c1, c2))
-                    self.atomic_ops.append(("RECOLOR", c1, c2))
-            if c1 != 0:
-                self.atomic_ops.append(("MASK", c1))
-                self.atomic_ops.append(("FILL_BG", c1))
 
-        # Relational color tokens -- resolved dynamically at runtime
-        # These let the swarm evolve "RECOLOR(COLOR_MIN, COLOR_MAX)" instead
-        # of hardcoding "RECOLOR(4, 7)" which overfits to training colors.
-        self.relational_tokens = [
-            "COLOR_MAX",        # Most frequent non-zero color
-            "COLOR_MIN",        # Least frequent non-zero color
-            "COLOR_BG",         # Background (most frequent overall, usually 0)
-            "COLOR_SECOND",     # Second most frequent non-zero color
-            "COLOR_UNIQUE",     # Color that appears exactly once
-        ]
-
-        # Add CURATED relational ops (not exhaustive -- keep search space tight)
-        # Only the highest-value relational combinations
+        # Relational color ops -- the ONLY way the organism touches color
         for rt in self.relational_tokens:
             self.atomic_ops.append(("MASK", rt))
             self.atomic_ops.append(("FILL_BG", rt))
-        # Key relational pairs (not all permutations)
-        self.atomic_ops.extend([
-            ("RECOLOR", "COLOR_MIN", "COLOR_MAX"),
-            ("RECOLOR", "COLOR_MAX", "COLOR_MIN"),
-            ("RECOLOR", "COLOR_UNIQUE", "COLOR_MAX"),
-            ("RECOLOR", "COLOR_UNIQUE", "COLOR_BG"),
-            ("SWAP", "COLOR_MAX", "COLOR_MIN"),
-            ("SWAP", "COLOR_MAX", "COLOR_UNIQUE"),
-            ("SWAP", "COLOR_MIN", "COLOR_UNIQUE"),
-            ("RECOLOR", "COLOR_SECOND", "COLOR_MAX"),
-            ("RECOLOR", "COLOR_MAX", "COLOR_BG"),
-        ])
+
+        # All pairwise relational SWAP and RECOLOR
+        for i, rt1 in enumerate(self.relational_tokens):
+            for j, rt2 in enumerate(self.relational_tokens):
+                if i != j:
+                    self.atomic_ops.append(("SWAP", rt1, rt2))
+                    self.atomic_ops.append(("RECOLOR", rt1, rt2))
 
         # High-value relational compound ops
-        self.atomic_ops.append("RECOLOR_ALL_TO_MAX")    # All non-bg → most frequent
+        self.atomic_ops.append("RECOLOR_ALL_TO_MAX")    # All non-bg -> most frequent
         self.atomic_ops.append("RECOLOR_NONMAX_TO_BG")  # Keep only most frequent color
-        self.atomic_ops.append("KEEP_MOST_FREQUENT")    # Keep most frequent, rest → 5
+        self.atomic_ops.append("KEEP_MOST_FREQUENT")    # Keep most frequent, rest -> 5
+
+        # Backward compatibility: if NOT pure relational, also add absolute ops
+        # (for benchmark awake mode where 3s budget needs the shortcut)
+        if not pure_relational:
+            for c1 in colors:
+                for c2 in colors:
+                    if c1 != c2:
+                        self.atomic_ops.append(("SWAP", c1, c2))
+                        self.atomic_ops.append(("RECOLOR", c1, c2))
+                if c1 != 0:
+                    self.atomic_ops.append(("MASK", c1))
+                    self.atomic_ops.append(("FILL_BG", c1))
 
         # Metamorphosis primitives -- shape-shifting operations
         self.atomic_ops.extend([
@@ -122,10 +133,14 @@ class ASTGridSwarm:
             "EXTRACT_QUADRANT_BR", # Bottom-right quarter
             "PAD_ZERO_1",          # Add 1-pixel border of zeros
         ])
-        # CROP_TO_COLOR: crop to bounding box of a specific color
-        for c in colors:
-            if c != 0:
-                self.atomic_ops.append(("CROP_TO_COLOR", c))
+        # CROP_TO_COLOR: relational in pure mode, absolute in compat mode
+        if pure_relational:
+            for rt in self.relational_tokens:
+                self.atomic_ops.append(("CROP_TO_COLOR", rt))
+        else:
+            for c in colors:
+                if c != 0:
+                    self.atomic_ops.append(("CROP_TO_COLOR", c))
 
         # Control flow operations (non-leaf)
         self.control_ops = ["IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ"]
@@ -152,12 +167,39 @@ class ASTGridSwarm:
                     ast_data = entry.get("ast")
                     if ast_data:
                         macro = self._json_to_tuple(ast_data)
+                        # In pure relational mode, reject macros with absolute colors
+                        if self.pure_relational and self._has_absolute_colors(macro):
+                            continue
                         self.learned_macros.append(macro)
                 if self.learned_macros:
                     print(f"[AST-SWARM] Loaded {len(self.learned_macros)} "
                           f"genetic macros from REM Sleep")
         except Exception:
             pass
+
+    @staticmethod
+    def _has_absolute_colors(ast):
+        """Check if an AST contains any hardcoded integer color values."""
+        if isinstance(ast, (int, float)):
+            return True  # Any integer = absolute color
+        if isinstance(ast, str):
+            return False  # String ops are fine
+        if isinstance(ast, tuple):
+            op = ast[0] if ast else None
+            if isinstance(op, str) and op in ("SWAP", "RECOLOR", "MASK",
+                                               "FILL_BG", "IF_COLOR",
+                                               "CROP_TO_COLOR"):
+                # Check args (skip index 0 which is the op name)
+                for arg in ast[1:]:
+                    if isinstance(arg, (int, float)):
+                        return True
+                    if isinstance(arg, tuple) and ASTGridSwarm._has_absolute_colors(arg):
+                        return True
+            elif isinstance(op, str) and op in ("SEQ", "OVERLAY", "FOR_EACH_OBJECT"):
+                for sub in ast[1:]:
+                    if ASTGridSwarm._has_absolute_colors(sub):
+                        return True
+        return False
 
     @staticmethod
     def _json_to_tuple(data):
@@ -215,6 +257,14 @@ class ASTGridSwarm:
             if len(uniques) > 0:
                 return int(uniques[0])
             return int(nz_colors[np.argmin(nz_counts)])
+        elif token == "COLOR_FG_1":
+            # First foreground color (sorted by value, not frequency)
+            sorted_fg = sorted(int(c) for c in nz_colors)
+            return sorted_fg[0] if sorted_fg else 0
+        elif token == "COLOR_FG_2":
+            # Second foreground color (sorted by value)
+            sorted_fg = sorted(int(c) for c in nz_colors)
+            return sorted_fg[1] if len(sorted_fg) >= 2 else sorted_fg[0]
 
         return 0
 
@@ -650,11 +700,12 @@ class ASTGridSwarm:
 
         control = random.choice(self.control_ops)
         if control == "IF_COLOR":
-            # 30% chance to use relational token for IF_COLOR condition
-            if random.random() < 0.3:
+            # Pure relational: organism is BLIND to absolute colors
+            if self.pure_relational:
                 c = random.choice(self.relational_tokens)
             else:
-                c = random.choice(self.colors) if self.colors else random.randint(0, 9)
+                c = random.choice(self.relational_tokens) if random.random() < 0.3 else \
+                    (random.choice(self.colors) if self.colors else random.randint(0, 9))
             return ("IF_COLOR", c,
                     self._guided_ast(hints, depth - 1),
                     self._guided_ast(hints, depth - 1))
@@ -686,11 +737,11 @@ class ASTGridSwarm:
 
         control = random.choice(self.control_ops)
         if control == "IF_COLOR":
-            # 30% chance relational token for condition
-            if random.random() < 0.3:
+            if self.pure_relational:
                 c = random.choice(self.relational_tokens)
             else:
-                c = random.choice(self.colors) if self.colors else random.randint(0, 9)
+                c = random.choice(self.relational_tokens) if random.random() < 0.3 else \
+                    (random.choice(self.colors) if self.colors else random.randint(0, 9))
             return ("IF_COLOR", c,
                     self._random_ast(depth - 1),
                     self._random_ast(depth - 1))
@@ -727,7 +778,10 @@ class ASTGridSwarm:
             # Possibly mutate the target color too
             c = ast[1]
             if random.random() < 0.15:
-                c = random.choice(self.colors) if self.colors else random.randint(0, 9)
+                if self.pure_relational:
+                    c = random.choice(self.relational_tokens)
+                else:
+                    c = random.choice(self.colors) if self.colors else random.randint(0, 9)
             return ("IF_COLOR", c,
                     self._mutate_tree(ast[2], mutation_chance),
                     self._mutate_tree(ast[3], mutation_chance))
@@ -819,15 +873,34 @@ class ASTGridSwarm:
 
         # Generate suggested fix operations
         ops = []
-        for pred_c, target_c in info['wrong_colors']:
-            if pred_c != target_c:
-                ops.append(("RECOLOR", pred_c, target_c))
-        for mc in info['missing_colors']:
-            if mc != 0:
-                ops.append(("FILL_BG", mc))
-        for ec in info['extra_colors']:
-            if ec != 0:
-                ops.append(("MASK", ec))
+        if self.pure_relational:
+            # Only suggest relational fixes -- no absolute colors
+            if info['wrong_colors']:
+                ops.extend([
+                    ("RECOLOR", "COLOR_MAX", "COLOR_MIN"),
+                    ("RECOLOR", "COLOR_MIN", "COLOR_MAX"),
+                    ("RECOLOR", "COLOR_UNIQUE", "COLOR_BG"),
+                    ("SWAP", "COLOR_MAX", "COLOR_MIN"),
+                    "RECOLOR_ALL_TO_MAX",
+                    "RECOLOR_NONMAX_TO_BG",
+                    "KEEP_MOST_FREQUENT",
+                ])
+            if info['missing_colors']:
+                for rt in self.relational_tokens:
+                    ops.append(("FILL_BG", rt))
+            if info['extra_colors']:
+                for rt in self.relational_tokens:
+                    ops.append(("MASK", rt))
+        else:
+            for pred_c, target_c in info['wrong_colors']:
+                if pred_c != target_c:
+                    ops.append(("RECOLOR", pred_c, target_c))
+            for mc in info['missing_colors']:
+                if mc != 0:
+                    ops.append(("FILL_BG", mc))
+            for ec in info['extra_colors']:
+                if ec != 0:
+                    ops.append(("MASK", ec))
         if info['shape_mismatch']:
             ops.extend([
                 "CROP_NONZERO",
@@ -1056,6 +1129,16 @@ class ASTGridSwarm:
 
         # Diff analysis: seed population with analytical priors
         diff_hints = self._analyze_diff(train_pairs)
+        # In pure relational mode, strip absolute color hints
+        if self.pure_relational and diff_hints:
+            clean_hints = []
+            for h in diff_hints:
+                if isinstance(h, str):
+                    clean_hints.append(h)  # Geometric ops are fine
+                elif isinstance(h, tuple) and not any(isinstance(x, (int, float)) for x in h[1:]):
+                    clean_hints.append(h)  # Already relational
+                # Skip absolute color hints (RECOLOR(3,8), SWAP(1,2), etc.)
+            diff_hints = clean_hints
         if diff_hints and verbose:
             hint_strs = []
             for h in diff_hints:

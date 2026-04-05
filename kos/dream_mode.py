@@ -178,8 +178,10 @@ def dream_on_task(task_id: str, task_dir: str,
     else:
         effective_pop = pop_size
 
-    # Create AST swarm
-    swarm = ASTGridSwarm(palette=palette)
+    # Create AST swarm -- PURE RELATIONAL: organism is blind to absolute colors
+    # It can only speak in relations (COLOR_MAX, COLOR_MIN, etc.)
+    # This makes overfitting to the training palette IMPOSSIBLE.
+    swarm = ASTGridSwarm(palette=palette, pure_relational=True)
 
     # Strategy: try without CV first (fast), then with CV (thorough)
     t0 = time.perf_counter()
