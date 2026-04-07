@@ -15,6 +15,9 @@ class DreamForge:
     Generates an Adversarial Curriculum by taking the exact ARC tasks
     that defeated the organism and generating 'Baby Versions' for targeted practice.
     """
+    def __init__(self, executor=None):
+        self.executor = executor
+
     def generate_frontier_curriculum(self, episodic_memory, raw_failed_tasks_dict, num_tasks=5):
         print(f"\n[DREAM FORGE] Engineering Adversarial Curriculum from "
               f"{len(episodic_memory)} historical failures...")
