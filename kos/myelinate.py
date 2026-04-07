@@ -36,6 +36,15 @@ def myelinate(ast, task_id: str, train_pairs: List[Tuple[np.ndarray, np.ndarray]
     Returns:
         The module name of the saved engine, or None on failure.
     """
+    # Deduplication: skip if this task already has a verified engine
+    manifest = _load_manifest()
+    for entry in manifest:
+        if isinstance(entry, dict):
+            existing_tid = entry.get("task_id", "")
+            if existing_tid == task_id:
+                print(f"[MYELINATE] Duplicate for {task_id} -- skipping (engine already exists)")
+                return entry.get("module")
+
     # Generate unique module name
     timestamp = int(time.time())
     module_name = f"learned_{task_id}_{timestamp}"
@@ -55,17 +64,6 @@ def myelinate(ast, task_id: str, train_pairs: List[Tuple[np.ndarray, np.ndarray]
         print(f"[MYELINATE] Generated code has errors: {e}")
         os.remove(filepath)
         return None
-
-    # Deduplication: skip if this task already has a verified engine
-    manifest = _load_manifest()
-    for entry in manifest:
-        if isinstance(entry, dict):
-            existing_tid = entry.get("task_id", "")
-            if existing_tid == task_id:
-                # Task already myelinated -- don't bloat the manifest
-                os.remove(filepath)
-                print(f"[MYELINATE] Duplicate for {task_id} -- skipping (engine already exists)")
-                return entry.get("module")
 
     # Update manifest with new entry
     manifest.append({
@@ -222,6 +220,9 @@ def _emit_val(val):
         if val.startswith("ORIG_"):
             return f'_resolve_color("{val[5:]}", _orig_grid)'
         return f'_resolve_color("{val}", _orig_grid)'
+    # Phase 2 literal colors: LIT_0 through LIT_9
+    if isinstance(val, str) and val.startswith("LIT_"):
+        return val[4:]  # LIT_8 -> "8"
     return repr(val)
 
 
@@ -248,9 +249,25 @@ def _transpile_node(ast, indent: int = 1) -> str:
                     f"{prefix}state[m1] = _c2\n"
                     f"{prefix}state[m2] = _c1\n")
 
+        elif op == "SWAP" and len(ast) == 4:
+            # Phase 2 format: ('SWAP', grid_ast, color1, color2)
+            grid_code = _transpile_node(ast[1], indent)
+            c1, c2 = _emit_val(ast[2]), _emit_val(ast[3])
+            return (grid_code +
+                    f"{prefix}_c1, _c2 = {c1}, {c2}\n"
+                    f"{prefix}m1, m2 = state == _c1, state == _c2\n"
+                    f"{prefix}state[m1] = _c2\n"
+                    f"{prefix}state[m2] = _c1\n")
+
         elif op == "RECOLOR" and len(ast) == 3:
             src, dst = _emit_val(ast[1]), _emit_val(ast[2])
             return f"{prefix}state[state == {src}] = {dst}\n"
+
+        elif op == "RECOLOR" and len(ast) == 4:
+            # Phase 2 format: ('RECOLOR', grid_ast, from_color, to_color)
+            grid_code = _transpile_node(ast[1], indent)
+            src, dst = _emit_val(ast[2]), _emit_val(ast[3])
+            return grid_code + f"{prefix}state[state == {src}] = {dst}\n"
 
         elif op == "MASK" and len(ast) == 2:
             v = _emit_val(ast[1])
@@ -307,9 +324,85 @@ def _transpile_node(ast, indent: int = 1) -> str:
                     f"{prefix}    r1, c1 = nz.max(axis=0)\n"
                     f"{prefix}    state = state[r0:r1+1, c0:c1+1].copy()\n")
 
+        elif op == "CROP_TO_COLOR" and len(ast) == 3:
+            # Phase 2 format: ('CROP_TO_COLOR', grid_ast, color)
+            grid_code = _transpile_node(ast[1], indent)
+            v = _emit_val(ast[2])
+            return (grid_code +
+                    f"{prefix}_cv = {v}\n"
+                    f"{prefix}nz = np.argwhere(state == _cv)\n"
+                    f"{prefix}if len(nz) > 0:\n"
+                    f"{prefix}    r0, c0 = nz.min(axis=0)\n"
+                    f"{prefix}    r1, c1 = nz.max(axis=0)\n"
+                    f"{prefix}    state = state[r0:r1+1, c0:c1+1].copy()\n")
+
+        elif op == "MASK_FILL" and len(ast) == 4:
+            # Phase 2: ('MASK_FILL', grid_ast, mask_ast, color)
+            grid_code = _transpile_node(ast[1], indent)
+            # Execute mask as separate state computation
+            v = _emit_val(ast[3])
+            return (grid_code +
+                    f"{prefix}_saved = state.copy()\n"
+                    f"{_transpile_node(ast[2], indent)}"
+                    f"{prefix}_mask = (state != 0).astype(bool)\n"
+                    f"{prefix}state = _saved\n"
+                    f"{prefix}state[_mask] = {v}\n")
+
+        elif op == "MASK_SELECT" and len(ast) == 3:
+            # Phase 2: ('MASK_SELECT', grid_ast, mask_ast)
+            grid_code = _transpile_node(ast[1], indent)
+            return (grid_code +
+                    f"{prefix}_saved = state.copy()\n"
+                    f"{_transpile_node(ast[2], indent)}"
+                    f"{prefix}_mask = (state != 0).astype(bool)\n"
+                    f"{prefix}state = np.zeros_like(_saved)\n"
+                    f"{prefix}state[_mask] = _saved[_mask]\n")
+
+        elif op == "NONZERO_MASK":
+            child_code = _transpile_node(ast[1], indent) if len(ast) > 1 else ""
+            return child_code + f"{prefix}state = (state != 0).astype(state.dtype)\n"
+
+        elif op == "MASK_NOT":
+            child_code = _transpile_node(ast[1], indent) if len(ast) > 1 else ""
+            return child_code + f"{prefix}state = (1 - (state != 0).astype(state.dtype))\n"
+
+        elif op == "FILL_BG" and len(ast) == 3:
+            # Phase 2 format: ('FILL_BG', grid_ast, color)
+            grid_code = _transpile_node(ast[1], indent)
+            v = _emit_val(ast[2])
+            return grid_code + f"{prefix}state[state == 0] = {v}\n"
+
         elif op == "RECOLOR_ALL_TO_MAX":
             return (f"{prefix}_cmax = _resolve_color('COLOR_MAX', _orig_grid)\n"
                     f"{prefix}state[state != 0] = _cmax\n")
+
+        # Generic unary op wrapping a sub-AST: op(child)
+        # e.g., ('MIRROR_V', ('MIRROR_H', 'INPUT')) or ('CROP_NONZERO', ('FLIP_H', 'INPUT'))
+        if len(ast) == 2:
+            child = ast[1]
+            # First execute the child (transforms state)
+            child_code = _transpile_node(child, indent)
+            # Then apply the leaf op on the result
+            leaf_code = _transpile_leaf(op, indent)
+            return child_code + leaf_code
+
+        # Generic binary op wrapping sub-ASTs: op(child1, child2)
+        # For RECOLOR/SWAP with sub-AST as grid arg
+        if len(ast) == 3 and op in ("RECOLOR", "SWAP"):
+            grid_child = ast[1] if not isinstance(ast[1], str) else None
+            if grid_child is not None:
+                # Execute grid sub-tree first, then apply recolor
+                child_code = _transpile_node(grid_child, indent)
+                c1, c2 = _emit_val(ast[1] if isinstance(ast[1], str) else "dummy"), _emit_val(ast[2])
+                if op == "SWAP":
+                    return (child_code +
+                            f"{prefix}_c1, _c2 = {_emit_val(ast[1])}, {_emit_val(ast[2])}\n"
+                            f"{prefix}m1, m2 = state == _c1, state == _c2\n"
+                            f"{prefix}state[m1] = _c2\n"
+                            f"{prefix}state[m2] = _c1\n")
+                else:
+                    return (child_code +
+                            f"{prefix}state[state == {_emit_val(ast[1])}] = {_emit_val(ast[2])}\n")
 
     # Fallback
     return f"{prefix}pass  # Unknown AST node: {repr(ast)}\n"
@@ -330,6 +423,8 @@ def _transpile_leaf(op: str, indent: int) -> str:
         "GRAVITY_LEFT": "state = _gravity(state, 'left')",
         "GRAVITY_RIGHT": "state = _gravity(state, 'right')",
         "IDENTITY": "pass",
+        "INPUT": "pass  # state is already the input grid",
+        "ORIG_INPUT": "state = _orig_grid.copy()",
         "CROP_NONZERO": ("nz = np.argwhere(state != 0)\n"
                          f"{prefix}if len(nz) > 0:\n"
                          f"{prefix}    r0, c0 = nz.min(axis=0)\n"
@@ -407,6 +502,40 @@ def _transpile_leaf(op: str, indent: int) -> str:
         ),
         "CROP_TO_COLOR": (
             "pass  # CROP_TO_COLOR as leaf is a no-op (needs color arg)"
+        ),
+        # Phase 2 new ops
+        "TILE_1X2": "state = np.tile(state, (1, 2))",
+        "TILE_2X1": "state = np.tile(state, (2, 1))",
+        "TILE_1X3": "state = np.tile(state, (1, 3))",
+        "TILE_3X1": "state = np.tile(state, (3, 1))",
+        "TILE_2X2": "state = np.tile(state, (2, 2))",
+        "TILE_3X3": "state = np.tile(state, (3, 3))",
+        "MIRROR_H": "state = np.concatenate([state, np.fliplr(state)], axis=1)",
+        "MIRROR_V": "state = np.concatenate([state, np.flipud(state)], axis=0)",
+        "REVERSE_ROWS": "state = state[::-1, :].copy()",
+        "REVERSE_COLS": "state = state[:, ::-1].copy()",
+        "DEDUP_ROWS": (
+            "_, idx = np.unique([tuple(r) for r in state], return_index=True, axis=0)\n"
+            f"{prefix}state = state[np.sort(idx)]"
+        ),
+        "DEDUP_COLS": (
+            "_, idx = np.unique([tuple(c) for c in state.T], return_index=True, axis=0)\n"
+            f"{prefix}state = state[:, np.sort(idx)]"
+        ),
+        "HOLLOW_RECT": (
+            "if state.shape[0] > 2 and state.shape[1] > 2:\n"
+            f"{prefix}    state = state.copy(); state[1:-1, 1:-1] = 0"
+        ),
+        "DOWNSCALE_3X": (
+            "h, w = state.shape\n"
+            f"{prefix}if h >= 3 and w >= 3:\n"
+            f"{prefix}    nh, nw = h // 3, w // 3\n"
+            f"{prefix}    result = np.zeros((nh, nw), dtype=state.dtype)\n"
+            f"{prefix}    for i in range(nh):\n"
+            f"{prefix}        for j in range(nw):\n"
+            f"{prefix}            block = state[i*3:(i+1)*3, j*3:(j+1)*3].ravel()\n"
+            f"{prefix}            result[i, j] = Counter(int(v) for v in block).most_common(1)[0][0]\n"
+            f"{prefix}    state = result"
         ),
     }
 

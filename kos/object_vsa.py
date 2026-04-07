@@ -126,10 +126,15 @@ try:
 except ImportError:
     ObjectGraphSwarm = None
 try:
-    from .bayesian_router import get_router as get_bayesian_router
+    from phase3.router import AdaptiveRouter
+    from phase3.fingerprint import fingerprint_task
 except ImportError:
-    get_bayesian_router = None
-
+    AdaptiveRouter = None
+    fingerprint_task = None
+try:
+    from kos.phase3.solve_phase3 import Phase3Cognition
+except ImportError:
+    Phase3Cognition = None
 SPATIAL_STEP = 17
 
 
@@ -151,6 +156,15 @@ class ObjectVSA:
         self.swarm = EvolutionarySwarm(vsa) if EvolutionarySwarm else None
         self.grid_swarm = None  # Initialized lazily per task with correct palette
 
+        # Phase 3: Meta-Learning Router + Cognition
+        self.router = AdaptiveRouter() if AdaptiveRouter else None
+        if Phase3Cognition and ASTGridSwarm:
+            self.phase3 = Phase3Cognition(
+                ast_swarm_factory=lambda palette: ASTGridSwarm(palette=palette, pure_relational=False)
+            )
+        else:
+            self.phase3 = None
+
         # Role vectors for binding attributes to objects
         self._ensure_role("ROLE_SHAPE")
         self._ensure_role("ROLE_COLOR")
@@ -160,6 +174,22 @@ class ObjectVSA:
     def _ensure_role(self, name: str):
         if not self.vsa.exists(name):
             self.vsa.create_node(name)
+
+    def _record_phase3(self, rule: dict, elapsed_ms: float):
+        """Record a successful solve in the Phase 3 strategy database."""
+        if self.router and hasattr(self, '_task_fingerprint') and self._task_fingerprint is not None:
+            try:
+                task_id = getattr(self, '_current_task_id', None)
+                if task_id:
+                    self.router.record_result(
+                        task_id=task_id,
+                        fingerprint=self._task_fingerprint,
+                        rule_type=rule.get('type', 'unknown'),
+                        time_ms=elapsed_ms,
+                        verified=True,
+                    )
+            except Exception:
+                pass
 
     def _ensure_val(self, val: int):
         name = f"val_{val}"
@@ -341,7 +371,19 @@ class ObjectVSA:
         return scene.astype(np.float32)
 
     def solve_object_level(self, examples: List[dict],
-                           timeout: float = 15.0) -> Optional[dict]:
+                           timeout: float = 15.0,
+                           task_id: str = None) -> Optional[dict]:
+        """Wrapper that runs the solver cascade and records results for Phase 3."""
+        t_start = time.perf_counter()
+        rule = self._solve_object_level_inner(examples, timeout=timeout, task_id=task_id)
+        if rule is not None:
+            elapsed_ms = (time.perf_counter() - t_start) * 1000
+            self._record_phase3(rule, elapsed_ms)
+        return rule
+
+    def _solve_object_level_inner(self, examples: List[dict],
+                                  timeout: float = 15.0,
+                                  task_id: str = None) -> Optional[dict]:
         """
         Object-level inductive solver.
 
@@ -366,8 +408,22 @@ class ObjectVSA:
         """
         t0 = time.perf_counter()
         self._last_examples = examples  # Cache for apply_rule partition solver
+        self._current_task_id = task_id  # For myelination bridge
         n = len(examples)
         print(f"[OBJECT-VSA] Analyzing {n} examples at object level...")
+
+        # Phase 3: Fingerprint task for meta-learning router
+        self._task_fingerprint = None
+        if self.router and fingerprint_task:
+            try:
+                self._task_fingerprint = fingerprint_task(examples)
+                strategy = self.router.route(examples, total_budget=timeout)
+                top3 = sorted(strategy.priors.items(), key=lambda x: -x[1])[:3]
+                if strategy.confidence > 0.3:
+                    top_str = ', '.join(f"{s}={p:.2f}" for s, p in top3)
+                    print(f"[PHASE3] Route: {top_str} (conf={strategy.confidence:.2f})")
+            except Exception:
+                pass
 
         # ══════════════════════════════════════════════════════════
         # STAGE -1: FRACTAL SOLVER — Dimensional Metamorphosis
@@ -419,7 +475,15 @@ class ObjectVSA:
                     predicted_size = pred_sz
                     elapsed = (time.perf_counter() - t0) * 1000
                     print(f"[SIZE-PREDICTOR] Predicted output: {predicted_size} ({elapsed:.1f}ms)")
-                    # Don't bail -- let this flow through to the swarm stages
+
+                    # ── SIZE TRANSFORM STAGE ──
+                    # Try deterministic size-changing transforms guided by predicted_size
+                    size_rule = self._try_size_transforms(examples, predicted_size, train_pairs_sp)
+                    if size_rule is not None:
+                        elapsed = (time.perf_counter() - t0) * 1000
+                        print(f"[SIZE-TRANSFORM] SOLVED in {elapsed:.1f}ms: {size_rule['description']}")
+                        return size_rule
+                    # If no deterministic transform works, fall through to swarm stages
                 else:
                     elapsed = (time.perf_counter() - t0) * 1000
                     print(f"[OBJECT-VSA] Size mismatch, predictor failed. {elapsed:.1f}ms")
@@ -963,6 +1027,9 @@ class ObjectVSA:
                 out_grid = np.array(ex["output"])
 
                 predicted = self.apply_rule(in_grid, rule)
+                if predicted.shape != out_grid.shape:
+                    verified = False
+                    break
                 if np.array_equal(predicted, out_grid):
                     pass  # Perfect match
                 else:
@@ -1292,6 +1359,85 @@ class ObjectVSA:
                 pass
 
         # ══════════════════════════════════════════════════════════
+        # STAGE 11.9: PHASE 2 — Typed Object-Centric Guided Synthesis
+        # Structured generation using perception, constraints, and beams.
+        # Replaces blind evolution with type-safe, constraint-driven search.
+        # ══════════════════════════════════════════════════════════
+        remaining_p2 = timeout - (time.perf_counter() - t0)
+        if remaining_p2 > 1.5:
+            try:
+                from phase2.solve_phase2 import solve_phase2
+                # Tight budget: enumeration is fast, random search gets remainder
+                p2_budget = min(remaining_p2 * 0.3, 2.0)  # Max 30% of remaining, cap at 2s
+                p2_rule = solve_phase2(examples, time_budget=p2_budget, verbose=True)
+                if p2_rule is not None:
+                    elapsed = (time.perf_counter() - t0) * 1000
+                    print(f"[PHASE2] SOLVED in {elapsed:.1f}ms: "
+                          f"{p2_rule['description'][:80]}")
+
+                    # ── Myelination Bridge: System 2 -> System 1 ──
+                    # Compile this AST into a permanent learned engine
+                    # so next cycle it fires in <1ms instead of re-synthesizing
+                    try:
+                        from .myelinate import myelinate
+                        task_id = getattr(self, '_current_task_id', None)
+                        if task_id and p2_rule.get('ast'):
+                            train_pairs = [(np.array(ex['input']),
+                                           np.array(ex['output']))
+                                          for ex in examples]
+                            mod = myelinate(
+                                p2_rule['ast'], task_id,
+                                train_pairs, p2_rule['description']
+                            )
+                            if mod:
+                                print(f"[MYELINATE] Phase2 -> {mod}")
+                    except Exception as mye:
+                        print(f"[MYELINATE] Skipped: {mye}")
+
+                    return p2_rule
+            except Exception as e:
+                print(f"[PHASE2] Error: {e}")
+
+        # ══════════════════════════════════════════════════════════
+        # STAGE 11.95: PHASE 3 COGNITION — Meta-Learning Loop
+        # Profiles the task, retrieves analogous past solutions,
+        # injects educated seeds into the swarm, and repairs failures.
+        # ══════════════════════════════════════════════════════════
+        remaining_p3 = timeout - (time.perf_counter() - t0)
+        if self.phase3 and remaining_p3 > 2.0:
+            try:
+                p3_budget = min(remaining_p3 * 0.4, 5.0)
+                p3_rule = self.phase3.solve(
+                    task_id=task_id or "unknown",
+                    examples=examples,
+                    time_budget=p3_budget,
+                )
+                if p3_rule is not None:
+                    elapsed = (time.perf_counter() - t0) * 1000
+                    print(f"[PHASE3] SOLVED in {elapsed:.1f}ms: "
+                          f"{p3_rule['description'][:80]}")
+
+                    # Myelinate Phase 3 solutions too
+                    try:
+                        from .myelinate import myelinate
+                        if task_id and p3_rule.get('ast'):
+                            train_pairs = [(np.array(ex['input']),
+                                           np.array(ex['output']))
+                                          for ex in examples]
+                            mod = myelinate(
+                                p3_rule['ast'], task_id,
+                                train_pairs, p3_rule['description']
+                            )
+                            if mod:
+                                print(f"[MYELINATE] Phase3 -> {mod}")
+                    except Exception:
+                        pass
+
+                    return p3_rule
+            except Exception as e:
+                print(f"[PHASE3] Error: {e}")
+
+        # ══════════════════════════════════════════════════════════
         # STAGE 12: EVOLUTIONARY SWARM — Darwinian VSA Synthesis
         # All deterministic heuristics exhausted. Let evolution find it.
         # ══════════════════════════════════════════════════════════
@@ -1492,6 +1638,120 @@ class ObjectVSA:
         print(f"[OBJECT-VSA] No consistent rule found. {elapsed:.1f}ms")
         return None
 
+    def _try_size_transforms(self, examples, predicted_size, train_pairs):
+        """Try deterministic size-changing transforms guided by predicted_size.
+
+        Attempts: tiling, pixel scaling, cropping, transpose, reshape.
+        Returns a rule dict if one works on ALL training pairs, else None.
+        """
+        if not train_pairs or predicted_size is None:
+            return None
+
+        in0, out0 = train_pairs[0]
+        ih, iw = in0.shape
+        oh, ow = predicted_size
+
+        # Helper: verify a transform function on all pairs
+        def verify(fn, desc):
+            for inp, out in train_pairs:
+                try:
+                    pred = fn(inp)
+                    if pred is None or pred.shape != out.shape or not np.array_equal(pred, out):
+                        return None
+                except Exception:
+                    return None
+            return {
+                "type": "size_transform",
+                "transform": desc,
+                "predicted_size": predicted_size,
+                "target_color": None,
+                "displacement": (0, 0),
+                "color_swap": None,
+                "description": f"SIZE-TRANSFORM: {desc}",
+                "worst_error": 0.0,
+            }
+
+        # ── Pixel repeat scaling (each pixel → NxM block) ──
+        if oh > 0 and ow > 0 and oh % ih == 0 and ow % iw == 0:
+            sh, sw = oh // ih, ow // iw
+            rule = verify(
+                lambda g, _sh=sh, _sw=sw: np.repeat(np.repeat(g, _sh, axis=0), _sw, axis=1),
+                f"UPSCALE({sh}x{sw})")
+            if rule:
+                return rule
+
+        # ── np.tile scaling ──
+        if oh > 0 and ow > 0 and oh % ih == 0 and ow % iw == 0:
+            th, tw = oh // ih, ow // iw
+            rule = verify(
+                lambda g, _th=th, _tw=tw: np.tile(g, (_th, _tw)),
+                f"TILE({th}x{tw})")
+            if rule:
+                return rule
+
+        # ── Crop from top-left ──
+        if oh <= ih and ow <= iw:
+            rule = verify(
+                lambda g, _oh=oh, _ow=ow: g[:_oh, :_ow],
+                f"CROP_TL({oh}x{ow})")
+            if rule:
+                return rule
+
+        # ── Crop non-zero bounding box ──
+        def crop_nonzero(g):
+            nz = np.nonzero(g)
+            if len(nz[0]) == 0:
+                return g
+            r0, r1 = nz[0].min(), nz[0].max() + 1
+            c0, c1 = nz[1].min(), nz[1].max() + 1
+            return g[r0:r1, c0:c1]
+
+        rule = verify(crop_nonzero, "CROP_NONZERO")
+        if rule:
+            return rule
+
+        # ── Transpose ──
+        if oh == iw and ow == ih:
+            rule = verify(lambda g: g.T, "TRANSPOSE")
+            if rule:
+                return rule
+
+        # ── Reshape (same number of cells) ──
+        if oh * ow == ih * iw:
+            rule = verify(
+                lambda g, _oh=oh, _ow=ow: g.ravel().reshape(_oh, _ow),
+                f"RESHAPE({oh}x{ow})")
+            if rule:
+                return rule
+
+        # ── Downscale by majority vote ──
+        if ih > 0 and iw > 0 and ih % oh == 0 and iw % ow == 0:
+            bh, bw = ih // oh, iw // ow
+
+            def downscale(g, _bh=bh, _bw=bw, _oh=oh, _ow=ow):
+                out = np.zeros((_oh, _ow), dtype=g.dtype)
+                for r in range(_oh):
+                    for c in range(_ow):
+                        block = g[r * _bh:(r + 1) * _bh, c * _bw:(c + 1) * _bw]
+                        vals, counts = np.unique(block, return_counts=True)
+                        out[r, c] = vals[counts.argmax()]
+                return out
+
+            rule = verify(downscale, f"DOWNSCALE({bh}x{bw})")
+            if rule:
+                return rule
+
+        # ── Pad with zeros ──
+        if oh >= ih and ow >= iw:
+            ph, pw = oh - ih, ow - iw
+            rule = verify(
+                lambda g, _ph=ph, _pw=pw: np.pad(g, ((0, _ph), (0, _pw)), constant_values=0),
+                f"PAD({ph},{pw})")
+            if rule:
+                return rule
+
+        return None
+
     def _try_grid_operations(self, examples: List[dict]) -> List[dict]:
         """Try common grid-level transformations."""
         rules = []
@@ -1678,6 +1938,55 @@ class ObjectVSA:
             elif sub == "border_contact":
                 return self.do_calculus.apply_conditional_recolor(grid, dc_rule)
 
+        # Size transform rules (predicted size + deterministic transform)
+        if rule["type"] == "size_transform":
+            desc = rule.get("transform", "")
+            ps = rule.get("predicted_size")
+            if desc.startswith("UPSCALE(") and ps:
+                oh, ow = ps
+                sh, sw = oh // max(h, 1), ow // max(w, 1)
+                return np.repeat(np.repeat(grid, sh, axis=0), sw, axis=1)
+            elif desc.startswith("TILE(") and ps:
+                oh, ow = ps
+                th, tw = oh // max(h, 1), ow // max(w, 1)
+                return np.tile(grid, (th, tw))
+            elif desc.startswith("CROP_TL(") and ps:
+                oh, ow = ps
+                return grid[:oh, :ow]
+            elif desc == "CROP_NONZERO":
+                nz = np.nonzero(grid)
+                if len(nz[0]) == 0:
+                    return grid
+                r0, r1 = nz[0].min(), nz[0].max() + 1
+                c0, c1 = nz[1].min(), nz[1].max() + 1
+                return grid[r0:r1, c0:c1]
+            elif desc == "TRANSPOSE":
+                return grid.T
+            elif desc.startswith("RESHAPE(") and ps:
+                oh, ow = ps
+                return grid.ravel().reshape(oh, ow)
+            elif desc.startswith("DOWNSCALE(") and ps:
+                oh, ow = ps
+                bh, bw = h // max(oh, 1), w // max(ow, 1)
+                out = np.zeros((oh, ow), dtype=grid.dtype)
+                for r in range(oh):
+                    for c in range(ow):
+                        block = grid[r * bh:(r + 1) * bh, c * bw:(c + 1) * bw]
+                        vals, counts = np.unique(block, return_counts=True)
+                        out[r, c] = vals[counts.argmax()]
+                return out
+            elif desc.startswith("PAD(") and ps:
+                oh, ow = ps
+                ph, pw = oh - h, ow - w
+                return np.pad(grid, ((0, ph), (0, pw)), constant_values=0)
+            # Fallback: use predicted_size from size predictor
+            if ps:
+                from kos.size_predictor import OutputSizePredictor
+                examples = self._last_examples if hasattr(self, '_last_examples') else []
+                train_pairs = [(np.array(ex["input"]), np.array(ex["output"])) for ex in examples]
+                return self._try_size_transforms(examples, ps, train_pairs) or grid
+            return grid
+
         # Grid-evolved programs (Grid Swarm)
         if rule["type"] == "grid_evolved":
             gs = EvolutionaryGridSwarm() if EvolutionaryGridSwarm else None
@@ -1700,6 +2009,20 @@ class ObjectVSA:
                     return eng["apply"](grid, rule)
                 except Exception:
                     pass
+
+        # Phase 2 typed AST programs (standalone executor)
+        if rule["type"] == "ast_evolved" and rule.get("_phase2"):
+            try:
+                from phase2.solve_phase2 import execute_typed_ast
+                from phase2.generator import _raw_to_typed
+                raw_ast = rule["ast"]
+                typed_ast = _raw_to_typed(raw_ast)
+                if typed_ast:
+                    result = execute_typed_ast(grid, typed_ast)
+                    if result is not None:
+                        return result
+            except Exception:
+                pass
 
         # AST-evolved programs (Tree Swarm)
         if rule["type"] == "ast_evolved" and ASTGridSwarm:

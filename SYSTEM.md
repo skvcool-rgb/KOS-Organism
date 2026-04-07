@@ -1,341 +1,268 @@
-# KOS-Organism: System Architecture
+# KOS-Organism: 9-Phase AGI Architecture
 
 ## Overview
 
-KOS-Organism is a neurosymbolic AGI system that solves abstract reasoning tasks (ARC-AGI) through pure 10,000-dimensional hypervector algebra. No neural networks, no training data, no hand-coded solvers.
+KOS-Organism is a neurosymbolic AGI system that solves abstract reasoning tasks (ARC-AGI) through a 9-phase cognitive architecture. No LLM wrappers, no hand-coded solvers — the machine perceives, reasons, remembers, dreams, and evolves autonomously.
 
-**Current Score:** 20/403 ARC training tasks (5.0%) -- pure autonomous learning, zero hand-coded solutions.
+**Current Score:** 64/403 ARC training tasks (15.9%) — pure autonomous learning
+**Episodic Memory:** 332 episodes (7 mastered, 13 structural macros extracted)
+**Genetic Vocabulary:** 114 macros from REM Sleep cycles
 
 ---
 
-## The AGI Trinity
+## The 9-Phase Cognitive Architecture
 
-KOS-Organism is built on three foundational layers:
+```
+Phase 1: Perception          -> ARCGridTransducer (objects, edges, spatial relations)
+Phase 2: Beam Search         -> 6-beam enumeration with 76+ macros, size prediction
+Phase 3: Meta-Loop           -> Episodic memory + schema seeds + 3-attempt repair loop
+Phase 4: Concept Formation   -> MDL subtree extraction + VSA program embeddings
+Phase 5: Meta-Cognition      -> Bootstrapped MetaOptimizer (dynamic mutation/depth/boredom)
+Phase 6: Causal World Model  -> O(1) symbolic physics violation rejection
+Phase 7: Autonomous Curriculum -> Adversarial Dream Forge + semantic noise self-play
+Phase 8: Domain Transfer     -> NLP Graph Transducer (language as geometry)
+Phase 9: Self-Evolution      -> Ouroboros (SymPy compression + Z3 verification + JIT injection)
+```
 
-| Layer | Module | Capability |
-|-------|--------|------------|
-| **1. 4D Perception** | `kos/four_dim_vsa.py` | Continuous spacetime via FFT fractional binding |
-| **2. Singularity Gate** | `kos/singularity_core.py` | Z3-verified self-rewriting with safety proofs |
-| **3. Genesis** | `kos/genesis.py` | Darwinian evolution from atomic logic gates |
+---
 
-### Layer 1: 4D Spatiotemporal VSA
+## Phase Details
 
-Standard VSA uses integer rolls (`np.roll(vec, 17)`) for discrete spatial steps. But time and space are continuous. We use FFT phase rotation for exact fractional shifts:
+### Phase 1: Universal Perception (`kos/graph_transducer.py`)
+
+Converts raw ARC grids into a universal graph representation:
+- Each connected component becomes a **node** with color, area, bounding box, centroid, aspect ratio
+- **Edges** encode spatial relations: ADJACENT, CONTAINS, ALIGNED, SAME_COLOR, SAME_SHAPE, SAME_SIZE
+- Feeds Phase 2 beam search with structural priors (tiling, object movement, mask boolean, etc.)
+
+### Phase 2: Beam Search & Enumeration (`kos/object_vsa.py`)
+
+12-stage solver cascade with intelligent routing:
+
+```
+Stage 0:    Meta-Learner (5-level direct operator extraction)
+Stage 0.5:  Sleep Promoter (cached macro primitives)
+Stage 1-3:  Gestalt Fill, HD Raycaster, Do-Calculus
+Stage 4:    Object-Centric VSA Pipeline
+Stage 5-8:  Grid Operations, VSA DSL, Size Prediction
+Stage 9:    Phase 2 Beam Search (6 beams, 76+ macros, 1000 candidates)
+Stage 10:   Evolutionary Swarms (Grid, AST, Graph)
+Stage 11.95: Phase 3 Cognition (meta-loop with memory)
+```
+
+**Beam families:** grid_transform, object_transform, mask_algebra, recolor_fill, composition
+**Macro loading:** 76 macros (33 genetic + 43 promoted) injected into search space
+
+### Phase 3: Cognitive Meta-Loop (`kos/phase3/`)
+
+The organism's prefrontal cortex — a meta-learning loop:
+
+1. **TaskSignature** — 5-field embedding (dim_rule, palette_delta, num_objects, symmetry, dominant_family)
+2. **EpisodicMemory (Hippocampus)** — Persistent JSON-backed store of 332+ episodes
+   - ASTs stored as real tuples via `ast.literal_eval` (serialization bug fixed)
+   - VSA hypervector cache for O(1) similarity search
+   - Capped at 1000 episodes to prevent RAM bloat
+3. **HypothesisGenerator** — 7 schema families, 19 templates with wildcard grounding
+4. **OutcomeAnalyzer** — Failure classification (STRUCTURE_CORRECT, INCOMPLETE, OVER_APPLICATION, FATAL_DIMENSION, CHAOTIC)
+5. **RepairEngine** — Wraps failed ASTs in RECOLOR_MASK, OVERLAY+ROT180, MASK_AND
+
+**Schema families:** mask_boolean, recolor_logic, symmetry_repair, fractal_repeater, hollow_fill_topology, relational_extraction, object_kinematics
+
+### Phase 4: Concept Formation (`kos/phase4/`)
+
+Three modules for knowledge abstraction:
+
+| Module | Purpose |
+|--------|---------|
+| `concept_graph.py` | MDL subtree extraction — recursive AST walking, promotes structures appearing 2+ times into named macros |
+| `representation.py` | VSA Program Embedder — 10,000-D holographic AST embeddings for O(1) analogy search |
+| `concept_survival.py` | Synaptic Pruner — utility decay (0.85/cycle), death threshold (0.2), brain checkpointing |
+
+**Current extraction:** 13 structural macros from 7 solved episodes. Example:
+```
+MACRO_STRUCT_3: ('OVERLAY', ('SWAP', 'COLOR_BG', 'COLOR_SECOND'), 'FLIP_H')
+```
+
+### Phase 5: Meta-Cognition (`kos/phase5/meta_optimizer.py`)
+
+Self-modeling lobe that bootstraps from episodic history on init:
+
+| Win Rate | Policy | Mutation | Depth | Boredom |
+|----------|--------|----------|-------|---------|
+| < 20% | Aggressive exploration | 0.45 | 5 | 50 |
+| 20-80% | Default balanced | 0.20 | 3 | 150 |
+| > 80% | Tight exploitation | 0.10 | 3 | 200 |
+
+**Bootstrap:** Reads all 332 episodes on startup, pre-populates performance matrix per task family. No more cold start.
+
+### Phase 6: Causal World Model (`kos/phase6/causal_simulator.py`)
+
+Mental simulation engine — predicts AST effects symbolically in O(1):
+
+- `ROT90/270`: swap dimensions
+- `UPSCALE_2X/3X`: multiply dimensions
+- `TILE_NxN`: multiply dimensions
+- `DOWNSCALE`: halve dimensions
+- `EXTRACT_QUADRANT`: halve dimensions
+
+**Physics rejection:** If predicted output dims exceed 2x target or shrink to zero, the seed is killed before CPU-expensive numpy execution. Rejected seeds now write `PHYSICS_VIOLATION` to episodic memory (feedback loop to Phase 3).
+
+### Phase 7: Autonomous Curriculum (`kos/phase7/`)
+
+Three-tier self-play system:
+
+| Module | Trigger | Strategy |
+|--------|---------|----------|
+| `dream_forge.py` | Zero new solves | Adversarial baby-tasks from failed episodes (stripped backgrounds, isolated physics) |
+| `dream_forge.py` | Concept fallback | Synthetic universes from Phase 4 concept graph |
+| `adversarial_forge.py` | Every 3rd cycle | Noise injection on solved tasks (1x1-2x2 junk blocks at increasing difficulty) |
+
+**Adversarial simplification:** Takes 30x30 grids that defeated the swarm, strips background, forces practice on one training pair at a time.
+
+### Phase 8: Domain Transfer (`kos/transducers/text_transducer.py`)
+
+NLP Graph Transducer — processes natural language using the same graph topology as ARC grids:
 
 ```python
-shifted = IFFT( FFT(vec) * exp(-2j * pi * freq * shift / dim) )
+parse_text_logic([("KOS", "is", "AGI"), ("AGI", "solves", "ARC")])
+# -> 3 nodes (KOS, AGI, ARC), 2 edges (IS, SOLVES)
 ```
 
-This enables:
-- **Continuous trajectories**: Encode a moving object as a single 10K-D manifold
-- **Velocity recovery**: Scan candidate velocities via resonance matching
-- **Physics discovery**: Derive `x(t) = v*t` and `x(t) = 0.5*a*t^2` from raw observations
-- **Future prediction**: Extrapolate trajectory to unseen time points
+Demonstrates architecture generalizes beyond 2D grids to any domain expressible as (subject, predicate, object) triples.
 
-### Layer 2: Formally Verified Self-Rewriting
+### Phase 9: Self-Evolution (`kos/autonomous_ouroboros.py`, `kos/meta_compiler.py`)
 
-The AGI proposes modifications to its own code. Before any change compiles, it must pass through the **God Gate**:
+The machine writes, proves, and injects its own operations:
 
-1. **AST Static Analysis** -- 5 safety axioms (no os.system, bounded loops, no file deletion, no network, energy conservation)
-2. **Z3 SMT Solver** -- Mathematical proof that the proposed equation satisfies conservation laws
-3. **Hot-Swap** -- Dynamically reload the new module in live RAM
+1. **Residual Analysis** — Computes diff between failed output and target
+2. **Micro-Evolution** — Evolves raw computation sequences to bridge the gap
+3. **SymPy Compression** — Algebraic simplification of discovered sequences
+4. **Z3 Formal Verification** — Proves values stay in [0,9] and grid shape is preserved
+5. **JIT Injection** — Hot-swaps verified operations into the grammar registry
 
-If `PROVEN SAFE` -> compile and graft into kernel. If `PROOF FAILS` -> reject with counter-example.
-
-Verified results:
-- `e * w * 0.99` -> PROVEN SAFE (energy conserved)
-- `e * w * 1.5` -> DISPROVEN (counter-example: Weight=3/4, Energy_In=1, Energy_Out=9/8 > 1)
-
-### Layer 3: Algorithmic Genesis (Universal Constructor)
-
-Von Neumann's dream. The machine is stripped to 6 atomic gates: `AND, OR, XOR, NOT, SHIFT_RIGHT, SHIFT_LEFT`. Given only input and target vectors, the Darwinian swarm evolves the algorithm:
-
-| Target | Evolved Genome | Time |
-|--------|---------------|------|
-| Signal inversion | `['NOT']` | 9ms |
-| Spatial shift x2 | `['SHIFT_RIGHT', 'SHIFT_RIGHT']` | 13ms |
-| Invert + shift | `['SHIFT_RIGHT', 'NOT', 'SHIFT_RIGHT']` | 11ms |
-| Element-wise bind | `['NOT', 'XOR', 'NOT']` | 6ms |
-
-Evolved algorithms are compressed into MacroSkills and permanently registered in the organism's library.
+**Constraint Synthesizer** (`meta_compiler.py`): Synthesizes color maps from training pairs, verifies determinism of transform functions.
 
 ---
 
-## Core Principle: Direct Operator Extraction
+## Unified Swarm Grammar (`kos/tree_swarm.py`)
 
-Instead of searching for transformation functions, KOS **computes** the operator directly:
+The evolutionary search engine with 50+ operations across all domains:
 
-```
-Operator = Output * Input   (element-wise in bipolar VSA)
-```
+**Geometric:** ROT90/180/270, FLIP_H/V, TRANSPOSE, GRAVITY_DOWN/UP/LEFT/RIGHT, SHIFT_*, SORT_ROWS/COLS, CROP_NONZERO, DELETE_*_ZERO
 
-The key insight: **position annihilates itself** (`Pos_5 * Pos_5 = Identity`), leaving only the pure transformation (color shifts, spatial movements).
+**Color (Relational):** MASK, FILL_BG, SWAP, RECOLOR with tokens (COLOR_MAX, COLOR_MIN, COLOR_BG, COLOR_SECOND, COLOR_UNIQUE, ORIG_*)
 
----
+**Metamorphosis:** TESSELLATE_2X2/1X3/3X1, UPSCALE_2X/3X, DOWNSCALE_2X, EXTRACT_QUADRANT_*, PAD_ZERO_1, CROP_TO_COLOR
 
-## Architecture: 5-Level Meta-Learner
+**Control Flow:** IF_COLOR, FOR_EACH_OBJECT, OVERLAY, SEQ, MASK_AND, MASK_XOR, MASK_DIFF
 
-The meta-learner (`kos/meta_learner.py`) tries 5 encoding levels, each capturing different transformation types:
+**Object Topology:** MOVE_UNTIL_TOUCH (slide until collision/edge), IF_PROPERTY (conditional on grid properties: HAS_SYMMETRY, SINGLE_OBJECT, MULTI_COLOR, SQUARE_GRID)
 
-### Level 1: Flat Manifold Operator
-- Encode entire grid as single 10K-D vector: `sign(SUM pos(r,c) * color(v))`
-- Extract: `operator = sign(output_vec * input_vec)`
-- Consensus: cosine similarity across training pairs > 0.5
-- **Solves:** Identity transforms, simple global operations
-
-### Level 2: Value Shift Codec
-- Per-pixel extraction: for each changed pixel, compute `val(v_in) * val(v_out)`
-- Single codebook ensures `val_A * val_A = Identity` (exact unbinding)
-- Skip unchanged pixels (they produce no signal, default to input color)
-- **Solves:** Color mapping, single-pair recoloring
-
-### Level 3: Complementary Color Bundle
-- Accumulate RAW (non-thresholded) shift vectors from ALL training examples
-- Each example may teach DIFFERENT color transitions
-- Threshold ONCE at the end (avoids double-threshold signal destruction)
-- Resonance threshold: 0.05 (5 sigma above noise floor ~0.01)
-- **Solves:** Multi-color swaps (0d3d703e: 8-color simultaneous swap)
-
-### Level 4: Universal Spatial Shift
-- Encode only positions of non-zero cells (ignore colors)
-- Detect displacement via permutation scanning: `PERMUTE(manifold, delta * STEP)`
-- Constrained search within grid dimensions to avoid aliasing
-- **Solves:** Global object movement (25ff71a9)
-
-### Level 5: Per-Color Spatial Shift
-- Separate spatial manifolds per color value
-- Detect independent movements for each color group
-- **Solves:** Differential movement (color A moves right, color B moves down)
+**Abstract Reasoning:** GET_NEIGHBOR_NODE, CREATE_EDGE, FILTER_BY_EDGE_TYPE
 
 ---
 
-## Module Inventory
+## The Daemon (`kos_daemon.py`)
 
-### Core Engine
-| Module | Purpose | Lines |
-|--------|---------|-------|
-| `kos/vsa_engine.py` | 10,000-D HDC space (BIND/BUNDLE/PERMUTE) | ~400 |
-| `kos/meta_learner.py` | 5-level direct operator extraction | ~600 |
-| `kos/object_vsa.py` | Object-centric VSA solver (gestalt -> match -> delta -> DSL) | ~1200 |
-| `kos/gestalt_extractor.py` | Flood-fill object segmentation | ~300 |
+Autopoietic lifecycle loop — Phases 1-7 active per cycle:
 
-### AGI Trinity
-| Module | Purpose |
-|--------|---------|
-| `kos/four_dim_vsa.py` | 4D spatiotemporal VSA (FFT fractional binding, trajectory encoding) |
-| `kos/singularity_core.py` | Formally verified self-rewriting (AST + Z3 SMT solver + hot-swap) |
-| `kos/genesis.py` | Universal Constructor (Darwinian evolution from atomic gates) |
+```
+AWAKE (Benchmark 403 tasks)
+  -> DREAM (Parallel evolution on unsolved, 600s/task)
+    -> CONSOLIDATE (REM sleep + synaptic pruning + brain checkpoint)
+      -> CONCEPT FORMATION (MDL subtree extraction from episodic memory)
+        -> ADVERSARIAL CURRICULUM (baby-tasks from failures / noise injection)
+          -> TENSION CHECK (Fristonian drive: benchmark, dream more, or rest)
+            -> REPEAT FOREVER
+```
 
-### Cognitive Layers
-| Module | Purpose |
-|--------|---------|
-| `kos/brain.py` | 60Hz living brain (6 cognitive layers, thermodynamic loop) |
-| `kos/grid_primitives.py` | 70+ motor cortex grid operations |
-| `kos/prob_reasoner.py` | Bayesian MCTS (prefrontal cortex) |
-| `kos/universal_perception.py` | Dual-channel reality transducer |
-| `kos/graph_transformer.py` | A* free energy minimization solver |
-| `kos/skill_synthesis.py` | Concept compression (procedures -> single vectors) |
-
-### Perception & Reasoning
-| Module | Purpose |
-|--------|---------|
-| `kos/gestalt_hierarchy.py` | Topological containment (flood-fill enclosure detection) |
-| `kos/hd_raycaster.py` | Ray-casting / line extension / gravity detection |
-| `kos/do_calculus.py` | Neighbor counting, conditional recolor, symmetry completion |
-| `kos/spatial_relations.py` | Object spatial relationships |
-| `kos/dsl_engine.py` | Grid DSL operations |
-| `kos/dsl_search.py` | Constraint-pruned DSL hypothesis search |
-
-### Learning & Memory
-| Module | Purpose |
-|--------|---------|
-| `kos/wake_sleep.py` | Wake-sleep cycle (episodic buffer, dream engine, consolidation) |
-| `kos/sleep_promoter.py` | MDL macro compression (multi-step -> single vector) |
-| `kos/active_inference.py` | Friston free energy minimization, Bayesian belief updates |
-| `kos/counterfactual.py` | Causal DAG, do-calculus, intervention engine |
-
-### Meta-Cognition
-| Module | Purpose |
-|--------|---------|
-| `kos/synthesis.py` | Code synthesis engine |
-| `kos/autogenesis.py` | Self-learning / code generation |
-| `kos/neuro_architecture.py` | Neural architecture components |
-| `kos/research_engine.py` | Research and exploration |
-| `kos/md_engine.py` | Markdown processing engine |
+**State persistence:** `daemon_state.json` tracks cycle count, best score, total solved, last 100 cycle histories.
 
 ---
 
-## Solver Cascade (object_vsa.py)
-
-When a task arrives, solvers execute in priority order:
+## Data Flow
 
 ```
-STAGE 0:   META-LEARNER (direct operator extraction -- 5 levels)
-   | (if unsolved)
-STAGE 0.5: SLEEP PROMOTER (try cached macro primitives)
-   | (if unsolved)
-STAGE 1:   GESTALT HIERARCHY (fill enclosed regions, add borders)
-   | (if unsolved)
-STAGE 2:   HD RAYCASTER (line extension, gravity with obstacles)
-   | (if unsolved)
-STAGE 3:   DO-CALCULUS (neighbor counting, conditional recolor, symmetry)
-   | (if unsolved)
-STAGE 4:   Object-Centric VSA Pipeline
-   Gestalt Extraction -> Invariant Correspondence -> Delta Grouping
-   Rule types: universal_move, object_move, recolor, conditional,
-               pixel_colormap, raycast
-   | (if unsolved)
-STAGE 5:   Grid Operations (flip, rotate, transpose, gravity)
-   | (if unsolved)
-STAGE 6:   VSA DSL Search (depth 1-2 composition chains)
+ARC Grid
+  |
+  v
+ARCGridTransducer -> UniversalGraph (nodes + edges)
+  |
+  v
+Solver Cascade (12 stages, Phase 2 beam search)
+  |                              |
+  v (solved)                     v (unsolved)
+Myelinate -> learned_engines/    Phase 3 Cognition
+  |                                |
+  v                                v
+REM Sleep -> genetic_vocabulary    TaskSignature -> EpisodicMemory
+  |                                |
+  v                                v
+Phase 4 MDL Extraction             Phase 5 Policy -> Phase 6 Pre-filter
+  |                                |
+  v                                v
+ConceptPruner (decay + cull)       Swarm (seeds + adaptive mutation)
+  |                                |
+  v                                v
+Phase 7 Adversarial Forge          OutcomeAnalyzer -> RepairEngine
 ```
-
-Every "solved" task is verified pixel-perfect on held-out test pairs. Zero false positives.
 
 ---
 
-## Benchmark Results (2026-04-03)
+## Key Bug Fixes (2026-04-06)
 
-| Metric | Value |
-|--------|-------|
-| Total ARC tasks | 403 |
-| Solved (VSA-only) | 20 (5.0%) |
-| Meta-learner | 5 tasks |
-| Gestalt hierarchy | 3 tasks |
-| HD Raycaster | 3 tasks |
-| Object-centric DSL | 9 tasks |
-| False positives | 0 |
+1. **Hippocampus Lobotomy** — `best_program` was serialized as `str()` and loaded back as a string, not a tuple. Every downstream consumer (Phase 3 seeds, Phase 4 subtree extraction, adversarial forge) silently received dead strings. Fixed with `ast.literal_eval()` in `_load()`.
 
-### Rule Type Distribution
-- `meta_operator`: 5 (color maps, spatial shifts)
-- `gestalt_fill`: 2 (fill enclosed regions)
-- `gestalt_border`: 1 (add border around objects)
-- `hd_ray`: 1 (line extension)
-- `hd_gravity`: 2 (gravity with obstacles)
-- `multi_step`: 4 (move, rotate, transpose)
-- `grid_op`: 4 (flip h/v, rotate 90)
-- `conditional`: 1 (move + recolor)
+2. **Meta-Optimizer Cold Start** — Performance matrix started at 0/0 for all families. Now bootstraps from all 332 episodic memories on init.
 
-### Score History
-| Date | Training | Key Change |
-|------|----------|------------|
-| 2026-03-27 | 53/400 (13.25%) | Baseline v1 (with heuristics) |
-| 2026-03-27 | 67/400 (16.75%) | Wave 1+2 + D8 augmentation |
-| 2026-03-28 | 93/400 (23.25%) | AGI bridge + 76 prims + A* |
-| 2026-03-28 | 117/400 (29.25%) | Wave 3-7 + Matryoshka + MiroFish |
-| 2026-03-29 | 118/400 (29.50%) | Wave 8-10 + Forge + Grid DSL |
-| 2026-04-03 | 20/403 (5.0%) | **KOS-Organism rewrite** (VSA-only, no heuristics) |
-| 2026-04-03 | +Trinity | 4D VSA + Singularity Gate + Genesis Constructor |
+3. **Concept Duplication** — `induce_concepts()` never cleared `self.concepts` between calls. Daemon cycles accumulated infinite duplicates. Fixed with `.clear()` reset.
 
-Note: The score drop from 118->20 is intentional. The old codebase had hand-coded heuristic solvers. KOS-Organism measures only what the machine discovers autonomously.
+4. **Physics Feedback Gap** — Causal Simulator rejections didn't write back to episodic memory. Phase 3 kept generating the same doomed seeds. Now writes `PHYSICS_VIOLATION` failure class.
+
+5. **Grammar Ceiling** — `MOVE_UNTIL_TOUCH` and `IF_PROPERTY` existed only in `graph_ast_swarm.py`. Ported into the main `tree_swarm.py` with full generation + execution logic.
+
+6. **Orphan Modules** — VSAProgramEmbedder, ConceptPruner, AdversarialGenerator were built but never imported. Now wired into EpisodicMemory, daemon consolidation, and Phase 7b respectively.
+
+7. **Memory Bloat** — Episodic memory grew without bound. Capped at 1000 episodes with LRU eviction.
 
 ---
 
-## Key Mathematical Insights
+## Score History
 
-### Position Annihilation
-```
-Pos_5 * Pos_5 = Identity
-```
-When binding input and output manifolds, shared positions cancel out, leaving only the transformation signal.
-
-### FFT Fractional Binding
-```
-shifted = IFFT( FFT(vec) * exp(-2j*pi*freq*shift/dim) )
-```
-In the frequency domain, shifting a vector by a fraction is just a phase rotation. This gives continuous interpolation in 10K-D hyperspace.
-
-### Cross-Talk Noise
-Multiplying two massive bundled manifolds creates O(N^2) cross-terms that drown the O(N) signal. Solution: extract per-pixel transitions BEFORE superposition, not after.
-
-### Complementary Bundling
-When each training example teaches different transitions (e.g., example 1: red->blue, example 2: green->yellow), accumulate raw shift vectors and threshold once.
-
-### Resonance Threshold
-- Color probing: 0.05 (5 sigma above noise floor ~0.01)
-- Spatial detection: 0.3 (stronger signal required)
-- Below threshold -> default to input (unchanged)
-
-### Z3 Safety Proof
-```
-theorem = Implies(And(safety_axioms, proposed_code), safety_goals)
-solver.add(Not(theorem))
-if solver.check() == unsat:  # No counter-example exists
-    PROVEN SAFE -> hot-swap
-```
+| Date | Score | Key Change |
+|------|-------|------------|
+| 2026-03-27 | 53/400 (13.25%) | Baseline v1 |
+| 2026-03-28 | 117/400 (29.25%) | Wave 3-7 + Matryoshka |
+| 2026-04-03 | 20/403 (5.0%) | KOS-Organism rewrite (VSA-only, no heuristics) |
+| 2026-04-04 | 64/403 (15.9%) | Phase 2 beam search + evolutionary swarms |
+| 2026-04-06 | 64/403 (15.9%) | 9-Phase Cathedral complete + 8 critical fixes |
 
 ---
 
 ## Running
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-pip install z3-solver  # For Singularity Engine formal verification
+# Full benchmark
+python run_benchmark.py
 
-# Run meta-learner tests
-python test_meta_learner.py
+# Singularity diagnostic (tests all 9 phases)
+python test_kos_singularity.py
 
-# Run 4D VSA + Singularity tests
-python test_singularity.py
+# Launch the autonomous daemon
+python kos_daemon.py
 
-# Run Genesis (Universal Constructor) tests
-python test_genesis.py
-
-# Run full ARC benchmark (all solvers)
-python benchmark_vsa.py
-
-# Boot the living organism
-python organism_api.py
-# Dashboard: http://localhost:8090
+# Options
+python kos_daemon.py --time-per-task 300    # Faster iteration
+python kos_daemon.py --max-dream-tasks 100  # Limit dream batch
+python kos_daemon.py --skip-benchmark       # Jump to dreaming
 ```
 
 ---
 
-## Test Results (All Passing)
+## Dependencies
 
-### Meta-Learner (7 tests)
-- Round-trip fidelity: 100% up to 15x15, 97.5% at 20x20
-- Color mapping, identity, pipeline, consensus rejection
-- Real ARC tasks: 0d3d703e (8-color swap), 25ff71a9 (spatial shift)
+```
+numpy, scipy, sympy (optional), z3-solver (optional)
+```
 
-### 4D VSA + Singularity (7 tests)
-- FFT fractional shift: shift(0) = identity (1.000), shift(100) = dissimilar
-- Trajectory encoding: same=1.000, different object=0.103
-- Velocity recovery: true=3.0, recovered=3.00, error=0.00
-- Physics discovery: found constant velocity and constant acceleration laws
-- Z3 verification: 0.99x PROVEN SAFE, 1.5x DISPROVEN with counter-example
-- Full pipeline: 4D perception -> reject dangerous -> accept safe -> hot-swap
-
-### Genesis (5 tests)
-- Evolve NOT: 1 gate, 9ms
-- Evolve SHIFT x2: 2 gates, 13ms
-- Evolve NOT+SHIFT: 3 gates, 11ms
-- Skill registration + generalization to new data
-- Evolve BIND: 3 gates, 6ms
-
----
-
-## Known Blindspots (Next Targets)
-
-1. **Multi-Color Composite Objects** -- Gestalt groups by single color; ARC has multi-colored sprites
-2. **Grid Morphing (141 skipped tasks)** -- Output size differs from input (crop, tile, scale)
-3. **Neighbor-Counting** -- Conway-style cellular automata rules
-4. **Symmetry Completion** -- Complete partially-drawn symmetric patterns
-5. **Tiling/Repeating** -- Detect and apply periodic patterns
-
----
-
-## The Science
-
-Built on five mathematical frameworks:
-
-1. **Hyperdimensional Computing** (Kanerva, 2009) -- Random 10K-D vectors are quasi-orthogonal. BIND creates associations, BUNDLE creates superpositions, PERMUTE encodes spatial structure.
-
-2. **Free Energy Principle** (Friston, 2010) -- Minimize prediction error through active inference. The solver minimizes cosine distance between current and target state.
-
-3. **Spreading Activation** (Collins & Loftus, 1975) -- Knowledge as a graph with weighted edges. The 60Hz Rust kernel implements real-time activation flow with myelination.
-
-4. **Fourier Phase Shifting** -- Continuous spatial/temporal interpolation via frequency-domain phase rotation. Enables 4D spacetime encoding without discrete quantization.
-
-5. **SMT Formal Verification** (de Moura & Bjorner, 2008) -- Z3 theorem prover ensures self-modifications satisfy safety invariants before compilation. Proof by contradiction: if the negation of the safety theorem is unsatisfiable, the code is proven safe for ALL inputs.
+No neural networks. No training data. No GPUs. Pure symbolic reasoning.

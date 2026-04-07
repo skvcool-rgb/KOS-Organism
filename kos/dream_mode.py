@@ -473,7 +473,8 @@ def run_dream_cycle(task_dir: str, max_tasks: int = 50,
     queue = sort_dream_queue_by_curriculum(queue, task_dir)
 
     n_tasks = min(len(queue), max_tasks)
-    n_cores = max(1, os.cpu_count() - 1) if os.cpu_count() else 1
+    # Cap at 8 workers to prevent OOM when Ouroboros triggers in multiple workers
+    n_cores = min(8, max(1, os.cpu_count() - 1)) if os.cpu_count() else 1
 
     print(f"[DREAM] Dream queue: {len(queue)} unsolved tasks")
     print(f"[DREAM] Processing {n_tasks} tasks across {n_cores} cores")

@@ -55,6 +55,7 @@ class ASTGridSwarm:
     MAX_EXEC_DEPTH = 8       # Prevent infinite recursion
     MAX_EXEC_STEPS = 500     # Prevent runaway execution
     MAX_AST_DEPTH = 3        # Cap tree generation depth
+    MUTATION_RATE = 0.20     # Base mutation rate (Phase 5 can override)
 
     def __init__(self, palette: Optional[set] = None,
                  pure_relational: bool = True):
@@ -200,11 +201,19 @@ class ASTGridSwarm:
             "COUNT_OBJECTS_H",   # Output height = number of connected objects
         ])
 
+        # --- ABSTRACT REASONING / NLP GENES ---
+        self.atomic_ops.extend([
+            "GET_NEIGHBOR_NODE",       # Hop across an edge
+            "CREATE_EDGE",             # Invent a new relationship
+            "FILTER_BY_EDGE_TYPE",     # E.g., Follow only 'PARENT' edges
+        ])
+
         # Control flow operations (non-leaf — these BRANCH into sub-ASTs)
         # MASK_AND/XOR/DIFF are binary branching ops like OVERLAY
         self.control_ops = [
             "IF_COLOR", "FOR_EACH_OBJECT", "OVERLAY", "SEQ",
             "MASK_AND", "MASK_XOR", "MASK_DIFF",
+            "MOVE_UNTIL_TOUCH", "IF_PROPERTY",
         ]
 
         # Macro library for cross-task recall
@@ -468,6 +477,87 @@ class ASTGridSwarm:
                     return np.where((g1 > 0) & (g2 == 0), g1, 0).astype(grid.dtype)
                 return grid
 
+            # --- OBJECT TOPOLOGY OPS (ported from graph_ast_swarm) ---
+            elif op == "MOVE_UNTIL_TOUCH" and len(ast) == 2:
+                # ("MOVE_UNTIL_TOUCH", direction_str)
+                # Slides all non-bg objects in direction until they touch another object or edge
+                from scipy.ndimage import label
+                direction = ast[1] if isinstance(ast[1], str) else "DOWN"
+                result = np.copy(grid)
+                bg = 0
+                labeled, n_objs = label(grid > bg)
+                deltas = {"UP": (-1, 0), "DOWN": (1, 0), "LEFT": (0, -1), "RIGHT": (0, 1)}
+                dr, dc = deltas.get(direction, (1, 0))
+                h, w = grid.shape
+
+                for obj_id in range(1, n_objs + 1):
+                    obj_mask = (labeled == obj_id)
+                    obj_pixels = grid[obj_mask]
+                    rows, cols = np.where(obj_mask)
+
+                    # Clear object from result
+                    result[obj_mask] = bg
+
+                    # Slide until blocked
+                    for step in range(1, max(h, w)):
+                        new_rows = rows + dr * step
+                        new_cols = cols + dc * step
+
+                        # Check bounds
+                        if (new_rows < 0).any() or (new_rows >= h).any():
+                            new_rows = rows + dr * (step - 1)
+                            new_cols = cols + dc * (step - 1)
+                            break
+                        if (new_cols < 0).any() or (new_cols >= w).any():
+                            new_rows = rows + dr * (step - 1)
+                            new_cols = cols + dc * (step - 1)
+                            break
+
+                        # Check collision with other objects
+                        collision = False
+                        for r, c in zip(new_rows, new_cols):
+                            if result[r, c] != bg:
+                                collision = True
+                                break
+                        if collision:
+                            new_rows = rows + dr * (step - 1)
+                            new_cols = cols + dc * (step - 1)
+                            break
+                    else:
+                        new_rows = rows + dr * (max(h, w) - 1)
+                        new_cols = cols + dc * (max(h, w) - 1)
+                        new_rows = np.clip(new_rows, 0, h - 1)
+                        new_cols = np.clip(new_cols, 0, w - 1)
+
+                    # Place object at new position
+                    for r, c, val in zip(new_rows, new_cols, obj_pixels):
+                        result[r, c] = val
+
+                return result
+
+            elif op == "IF_PROPERTY" and len(ast) == 4:
+                # ("IF_PROPERTY", condition_str, true_ast, false_ast)
+                # Evaluate a grid-level property and branch execution
+                condition = ast[1] if isinstance(ast[1], str) else "HAS_SYMMETRY"
+
+                cond_result = False
+                if condition == "HAS_SYMMETRY":
+                    cond_result = (np.array_equal(grid, np.fliplr(grid))
+                                   or np.array_equal(grid, np.flipud(grid)))
+                elif condition == "SINGLE_OBJECT":
+                    from scipy.ndimage import label
+                    _, n = label(grid > 0)
+                    cond_result = (n == 1)
+                elif condition == "MULTI_COLOR":
+                    cond_result = len(set(grid.flatten()) - {0}) > 1
+                elif condition == "SQUARE_GRID":
+                    cond_result = (grid.shape[0] == grid.shape[1])
+
+                if cond_result:
+                    return self._execute_ast(grid, ast[2], depth + 1, step_counter, orig_grid)
+                else:
+                    return self._execute_ast(grid, ast[3], depth + 1, step_counter, orig_grid)
+
         return grid
 
     def _exec_leaf(self, grid: np.ndarray, op: str) -> np.ndarray:
@@ -615,6 +705,67 @@ class ASTGridSwarm:
                     return np.pad(grid, ((0, pad_h), (0, 0)),
                                   mode='constant', constant_values=0)
             return grid
+
+        # --- ABSTRACT REASONING / NLP GENES ---
+        # These are no-ops on raw grids but become active when the executor
+        # operates on graph-structured data via the Universal Transducer.
+        # On grids: GET_NEIGHBOR_NODE treats adjacent non-zero cells as neighbors
+        elif op == "GET_NEIGHBOR_NODE":
+            # Grid interpretation: extract cells adjacent to non-zero regions
+            from scipy.ndimage import binary_dilation
+            mask = grid > 0
+            dilated = binary_dilation(mask)
+            border = dilated & ~mask
+            result = np.zeros_like(grid)
+            result[border] = 1
+            return result
+
+        elif op == "CREATE_EDGE":
+            # Grid interpretation: draw lines between isolated non-zero regions
+            from scipy.ndimage import label as _label
+            bg = int(np.bincount(grid.ravel()).argmax())
+            labeled, n = _label(grid != bg)
+            if n < 2:
+                return grid
+            result = grid.copy()
+            # Connect centroids of first two components
+            centroids = []
+            for i in range(1, min(n + 1, 4)):
+                ys, xs = np.where(labeled == i)
+                if len(ys) > 0:
+                    centroids.append((int(np.mean(ys)), int(np.mean(xs))))
+            if len(centroids) >= 2:
+                r0, c0 = centroids[0]
+                r1, c1 = centroids[1]
+                # Bresenham-style line
+                steps = max(abs(r1 - r0), abs(c1 - c0), 1)
+                for s in range(steps + 1):
+                    t = s / steps
+                    r = int(r0 + t * (r1 - r0))
+                    c = int(c0 + t * (c1 - c0))
+                    if 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]:
+                        if result[r, c] == bg:
+                            result[r, c] = grid[centroids[0]] if grid[centroids[0]] != bg else 1
+            return result
+
+        elif op == "FILTER_BY_EDGE_TYPE":
+            # Grid interpretation: keep only the most connected color
+            bg = int(np.bincount(grid.ravel()).argmax())
+            colors = [c for c in np.unique(grid) if c != bg]
+            if not colors:
+                return grid
+            # Find color with most adjacency (most "edges")
+            best_color = bg
+            best_adj = -1
+            for c in colors:
+                mask = (grid == c)
+                from scipy.ndimage import binary_dilation
+                neighbors = binary_dilation(mask) & ~mask & (grid != bg)
+                adj_count = int(np.sum(neighbors))
+                if adj_count > best_adj:
+                    best_adj = adj_count
+                    best_color = c
+            return np.where(grid == best_color, best_color, 0).astype(grid.dtype)
 
         return grid
 
@@ -850,8 +1001,8 @@ class ASTGridSwarm:
             return ("IF_COLOR", c,
                     self._guided_ast(hints, depth - 1),
                     self._guided_ast(hints, depth - 1))
-        elif control == "OVERLAY":
-            return ("OVERLAY",
+        elif control in ("OVERLAY", "MASK_AND", "MASK_XOR", "MASK_DIFF"):
+            return (control,
                     self._guided_ast(hints, depth - 1),
                     self._guided_ast(hints, depth - 1))
         elif control == "FOR_EACH_OBJECT":
@@ -859,6 +1010,14 @@ class ASTGridSwarm:
         elif control == "SEQ":
             n_steps = random.randint(2, 3)
             return ("SEQ",) + tuple(self._guided_ast(hints, depth - 1) for _ in range(n_steps))
+        elif control == "MOVE_UNTIL_TOUCH":
+            direction = random.choice(["UP", "DOWN", "LEFT", "RIGHT"])
+            return ("MOVE_UNTIL_TOUCH", direction)
+        elif control == "IF_PROPERTY":
+            condition = random.choice(["HAS_SYMMETRY", "SINGLE_OBJECT", "MULTI_COLOR", "SQUARE_GRID"])
+            return ("IF_PROPERTY", condition,
+                    self._guided_ast(hints, depth - 1),
+                    self._guided_ast(hints, depth - 1))
 
         if hints and random.random() < 0.60:
             return random.choice(hints)
@@ -895,6 +1054,14 @@ class ASTGridSwarm:
         elif control == "SEQ":
             n_steps = random.randint(2, 3)
             return ("SEQ",) + tuple(self._random_ast(depth - 1) for _ in range(n_steps))
+        elif control == "MOVE_UNTIL_TOUCH":
+            direction = random.choice(["UP", "DOWN", "LEFT", "RIGHT"])
+            return ("MOVE_UNTIL_TOUCH", direction)
+        elif control == "IF_PROPERTY":
+            condition = random.choice(["HAS_SYMMETRY", "SINGLE_OBJECT", "MULTI_COLOR", "SQUARE_GRID"])
+            return ("IF_PROPERTY", condition,
+                    self._random_ast(depth - 1),
+                    self._random_ast(depth - 1))
 
         return random.choice(self.atomic_ops)
 
@@ -1146,7 +1313,8 @@ class ASTGridSwarm:
     # ================================================================
     def breed_program(self, train_pairs: List[Tuple[np.ndarray, np.ndarray]],
                       pop_size: int = 500, max_time_sec: float = 2.0,
-                      verbose: bool = True, cross_validate: bool = True) -> Optional[tuple]:
+                      verbose: bool = True, cross_validate: bool = True,
+                      seed_programs: list = None) -> Optional[tuple]:
         """
         Evolve an AST program that perfectly solves ALL training pairs.
 
@@ -1184,7 +1352,8 @@ class ASTGridSwarm:
 
                 # Evolve on training fold only
                 winning_ast = self._breed_inner(
-                    train_fold, pop_size, time_per_fold, verbose)
+                    train_fold, pop_size, time_per_fold, verbose,
+                    seed_programs=seed_programs)
 
                 if winning_ast is not None:
                     # Validate on held-out pair
@@ -1239,17 +1408,19 @@ class ASTGridSwarm:
                 print(f"\n[AST-SWARM] All {n_folds} cross-val folds failed. "
                       f"Fallback: evolve on full set ({fallback_budget:.2f}s)")
             return self._breed_inner(
-                train_pairs, pop_size, fallback_budget, verbose)
+                train_pairs, pop_size, fallback_budget, verbose,
+                seed_programs=seed_programs)
 
         # Not enough pairs for cross-validation, or disabled -- use full budget
         if verbose and n_pairs < 3 and cross_validate:
             print(f"\n[AST-SWARM] Only {n_pairs} training pair(s), "
                   f"skipping cross-validation")
-        return self._breed_inner(train_pairs, pop_size, max_time_sec, verbose)
+        return self._breed_inner(train_pairs, pop_size, max_time_sec, verbose,
+                                 seed_programs=seed_programs)
 
     def _breed_inner(self, train_pairs: List[Tuple[np.ndarray, np.ndarray]],
                      pop_size: int, max_time_sec: float,
-                     verbose: bool) -> Optional[tuple]:
+                     verbose: bool, seed_programs: list = None) -> Optional[tuple]:
         """
         Core evolutionary loop. Evolves an AST that scores fitness=0 on
         all provided train_pairs. Extracted from breed_program so it can
@@ -1291,15 +1462,26 @@ class ASTGridSwarm:
 
         # Generation 0: 50% guided (if hints available), 50% random
         population = []
+        # Phase 3 seed injection: educated priors from episodic memory
+        if seed_programs:
+            for sp in seed_programs[:pop_size // 4]:  # Cap at 25% of population
+                if isinstance(sp, (tuple, list)):
+                    try:
+                        population.append(TreeOrganism(sp))
+                    except Exception:
+                        pass
+            if verbose and population:
+                print(f"[AST-SWARM] Phase3 injected {len(population)} seed organisms")
+
         if diff_hints:
-            guided_count = pop_size // 2
+            guided_count = (pop_size - len(population)) // 2
             for _ in range(guided_count):
                 population.append(TreeOrganism(self._guided_ast(diff_hints, depth=self.MAX_AST_DEPTH)))
-            for _ in range(pop_size - guided_count):
+            for _ in range(pop_size - len(population)):
                 population.append(TreeOrganism(self._random_ast(depth=self.MAX_AST_DEPTH)))
         else:
-            population = [TreeOrganism(self._random_ast(depth=self.MAX_AST_DEPTH))
-                          for _ in range(pop_size)]
+            while len(population) < pop_size:
+                population.append(TreeOrganism(self._random_ast(depth=self.MAX_AST_DEPTH)))
 
         t0 = time.perf_counter()
         generation = 0
@@ -1358,8 +1540,8 @@ class ASTGridSwarm:
             survivors = population[:elite_count]
 
             # --- BREEDING ---
-            # Adaptive mutation: boost on stagnation
-            mut_chance = min(0.5, 0.20 + stagnation * 0.02)
+            # Adaptive mutation: boost on stagnation (Phase 5 can override MUTATION_RATE)
+            mut_chance = min(0.5, self.MUTATION_RATE + stagnation * 0.02)
 
             # Compute error gradients for top organisms (Fristonian Active Inference)
             top_gradients = {}

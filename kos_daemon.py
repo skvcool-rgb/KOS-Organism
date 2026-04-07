@@ -24,6 +24,16 @@ import argparse
 import traceback
 from datetime import datetime
 
+# Ensure project root is importable (early, before phase imports)
+_ROOT_EARLY = os.path.dirname(os.path.abspath(__file__))
+if _ROOT_EARLY not in sys.path:
+    sys.path.insert(0, _ROOT_EARLY)
+
+from kos.phase4.concept_graph import ConceptFormationEngine
+from kos.phase4.concept_survival import ConceptPruner
+from kos.phase7.dream_forge import DreamForge
+from kos.phase7.adversarial_forge import AdversarialGenerator
+
 # Ensure project root is importable
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
@@ -139,6 +149,13 @@ def phase_consolidate():
     except Exception as e:
         print(f"[CONSOLIDATE] REM sleep error: {e}")
 
+    # Synaptic Pruning: decay weak macros, kill bloat, checkpoint brain state
+    try:
+        pruner = ConceptPruner()
+        pruner.decay_and_cull()
+    except Exception as e:
+        print(f"[CONSOLIDATE] Synaptic pruning error: {e}")
+
     # Count and verify engines
     manifest_path = os.path.join(ROOT, "kos", "learned_engines", "manifest.json")
     if not os.path.exists(manifest_path):
@@ -149,14 +166,24 @@ def phase_consolidate():
         with open(manifest_path) as f:
             manifest = json.load(f)
 
-        total = len(manifest)
+        # manifest can be a list (array of entries) or dict
+        if isinstance(manifest, list):
+            entries = manifest
+        else:
+            entries = list(manifest.values())
+
+        total = len(entries)
         verified = 0
 
-        for task_id, entry in manifest.items():
-            engine_file = entry.get("file", "")
-            engine_path = os.path.join(ROOT, "kos", "learned_engines", engine_file)
-            if os.path.exists(engine_path):
-                verified += 1
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            engine_file = entry.get("file", entry.get("module", ""))
+            if engine_file:
+                engine_path = os.path.join(ROOT, "kos", "learned_engines",
+                                           engine_file + ".py" if not engine_file.endswith(".py") else engine_file)
+                if os.path.exists(engine_path):
+                    verified += 1
 
         print(f"[CONSOLIDATE] Engines: {total} total, {verified} verified on disk")
         return (total, verified)
@@ -214,20 +241,28 @@ def daemon_loop(task_dir: str, time_per_task: float, max_dream_tasks: int,
                 pop_size: int, skip_benchmark: bool = False):
     """
     The main autopoietic loop. Runs forever.
-    Awake -> Dream -> Consolidate -> Tension Check -> Repeat
+    Awake -> Dream -> Consolidate -> Concept Formation -> Tension Check -> Repeat
+    When human tasks are conquered, Phase 7 Dream Forge generates synthetic universes.
     """
     state = _load_daemon_state()
 
+    # Phase 4: Concept Formation Engine (persistent across cycles)
+    concept_engine = ConceptFormationEngine()
+
+    # Phase 7: Dream Forge (synthetic curriculum generator)
+    dream_forge = DreamForge(executor=None)  # Executor injected when swarm available
+
     print(f"""
-    ╔═══════════════════════════════════════════════════════════╗
-    ║           KOS DAEMON -- AUTOPOIETIC LIFECYCLE            ║
-    ║                                                          ║
-    ║  The organism never sleeps. It cycles through:           ║
-    ║    AWAKE -> DREAM -> CONSOLIDATE -> AWAKE -> ...         ║
-    ║                                                          ║
-    ║  Cycle: {state['cycle']:<5}  Best Score: {state['best_score']:<5}               ║
-    ║  Total Solved (cumulative): {state['total_solved']:<5}                    ║
-    ╚═══════════════════════════════════════════════════════════╝
+    +===========================================================+
+    |     KOS DAEMON -- OMNI-PHASE AUTOPOIETIC LIFECYCLE        |
+    |              Phases 1-7 Active                            |
+    |                                                           |
+    |  The organism never sleeps. It cycles through:            |
+    |    AWAKE -> DREAM -> CONSOLIDATE -> CONCEPTS -> ...       |
+    |                                                           |
+    |  Cycle: {state['cycle']:<5}  Best Score: {state['best_score']:<5}                |
+    |  Total Solved (cumulative): {state['total_solved']:<5}                     |
+    +===========================================================+
     """)
 
     while True:
@@ -242,7 +277,7 @@ def daemon_loop(task_dir: str, time_per_task: float, max_dream_tasks: int,
         newly_solved = 0
 
         # ---- PHASE 1: AWAKE (Benchmark) ----
-        if not skip_benchmark or cycle > 1:
+        if not skip_benchmark:
             score = phase_awake(task_dir)
             if score is not None:
                 if isinstance(score, (int, float)):
@@ -250,8 +285,8 @@ def daemon_loop(task_dir: str, time_per_task: float, max_dream_tasks: int,
                     print(f"\n[AWAKE] Score: {score}")
                     print(f"[AWAKE] Best ever: {state['best_score']}")
         else:
-            print(f"\n[AWAKE] Skipping benchmark (--skip-benchmark)")
-            skip_benchmark = False  # Only skip first cycle
+            print(f"\n[AWAKE] Skipping benchmark (tension: dream_more)")
+            skip_benchmark = False  # Reset for next cycle
 
         # ---- PHASE 2: DREAM (Parallel Evolution) ----
         solved = phase_dream(task_dir, time_per_task, max_dream_tasks,
@@ -262,7 +297,98 @@ def daemon_loop(task_dir: str, time_per_task: float, max_dream_tasks: int,
         # ---- PHASE 3: CONSOLIDATE (REM Sleep) ----
         total_engines, verified = phase_consolidate()
 
-        # ---- PHASE 4: TENSION CHECK ----
+        # ---- PHASE 4: CONCEPT FORMATION (MDL Subtree Extraction) ----
+        try:
+            from kos.phase3.episodic_memory import EpisodicMemory
+            episodic = EpisodicMemory()
+            memory_bank = episodic.episodes
+            if memory_bank:
+                concept_engine.induce_concepts(memory_bank)
+                n_concepts = len(concept_engine.concepts)
+                print(f"[PHASE 4] {n_concepts} structural macros extracted "
+                      f"from {len(memory_bank)} episodes (MDL compression)")
+        except Exception as e:
+            print(f"[PHASE 4] Concept formation skipped: {e}")
+
+        # ---- PHASE 7: ADVERSARIAL CURRICULUM (targeted failure practice) ----
+        if newly_solved == 0:
+            try:
+                from kos.phase3.episodic_memory import EpisodicMemory
+                episodic = EpisodicMemory()
+                memory_bank = episodic.episodes
+
+                if memory_bank:
+                    # Try adversarial curriculum from raw failed tasks first
+                    import json, os, numpy as np
+                    failed_tasks_dict = {}
+                    task_files_dir = task_dir
+                    for ep in memory_bank:
+                        if ep.failure_class == "SOLVED":
+                            continue
+                        task_path = os.path.join(task_files_dir, ep.task_id + ".json")
+                        if os.path.exists(task_path):
+                            try:
+                                with open(task_path) as f:
+                                    raw = json.load(f)
+                                class RawTask:
+                                    pass
+                                rt = RawTask()
+                                rt.train_pairs = [(np.array(ex["input"]), np.array(ex["output"]))
+                                                  for ex in raw.get("train", [])]
+                                failed_tasks_dict[ep.task_id] = rt
+                            except Exception:
+                                pass
+
+                    if failed_tasks_dict:
+                        synth_tasks = dream_forge.generate_frontier_curriculum(
+                            memory_bank, failed_tasks_dict, num_tasks=5
+                        )
+                        print(f"[PHASE 7] Generated {len(synth_tasks)} adversarial baby-tasks")
+
+                        for synth_id, synth_task in synth_tasks.items():
+                            try:
+                                from kos.phase3.solve_phase3 import Phase3Cognition
+                                from kos.tree_swarm import ASTGridSwarm
+                                p3 = Phase3Cognition(
+                                    ast_swarm_factory=lambda pal: ASTGridSwarm(pal)
+                                )
+                                examples = [{"input": inp.tolist(), "output": out.tolist()}
+                                            for inp, out in synth_task.train_pairs]
+                                result = p3.solve(synth_id, examples, time_budget=5.0)
+                                if result:
+                                    print(f"[PHASE 7] Adversarial task {synth_id} SOLVED "
+                                          f"-- weakness converted to strength")
+                            except Exception as e:
+                                print(f"[PHASE 7] Adversarial task {synth_id} failed: {e}")
+                    elif concept_engine.concepts:
+                        # Fallback to concept-based synthetic curriculum
+                        synth_tasks = dream_forge.generate_synthetic_curriculum(
+                            concept_engine, num_tasks=5
+                        )
+                        print(f"[PHASE 7] Generated {len(synth_tasks)} concept-based synthetic tasks")
+            except Exception as e:
+                print(f"[PHASE 7] Dream Forge error: {e}")
+
+        # ---- PHASE 7b: ADVERSARIAL SELF-PLAY (harden solved tasks every 3 cycles) ----
+        if cycle % 3 == 0:
+            try:
+                from kos.phase3.episodic_memory import EpisodicMemory
+                from kos.tree_swarm import ASTGridSwarm
+                episodic = EpisodicMemory()
+                solved_eps = [ep for ep in episodic.episodes
+                              if ep.failure_class == "SOLVED"
+                              and isinstance(ep.best_program, tuple)]
+                if solved_eps:
+                    adv_swarm = ASTGridSwarm(set(range(10)))
+                    adv_forge = AdversarialGenerator(executor=adv_swarm)
+                    adv_tasks = adv_forge.generate_frontier_curriculum(solved_eps, num_tasks=3)
+                    if adv_tasks:
+                        print(f"[PHASE 7b] Injected {len(adv_tasks)} adversarial noise tasks "
+                              f"into self-play")
+            except Exception as e:
+                print(f"[PHASE 7b] Adversarial forge error: {e}")
+
+        # ---- TENSION CHECK ----
         action = phase_tension_check(state, newly_solved)
 
         # Record cycle history
@@ -287,9 +413,24 @@ def daemon_loop(task_dir: str, time_per_task: float, max_dream_tasks: int,
         print(f"[CYCLE {cycle}] Total engines: {total_engines}")
         print(f"[CYCLE {cycle}] Next action: {action}")
 
-        # Brief cooldown between cycles
-        print(f"\n[DAEMON] Cooling down 5s before next cycle...")
-        time.sleep(5)
+        # ---- ACT ON TENSION ----
+        # The tension check steers the next cycle's behavior
+        if action == "benchmark":
+            # High frustration or new solves -- run awake benchmark next
+            # (default behavior, skip_benchmark stays False)
+            print(f"\n[DAEMON] Tension says BENCHMARK -- will measure progress next cycle")
+            time.sleep(5)
+        elif action == "dream_more":
+            # High curiosity -- skip benchmark, go straight to dreaming
+            print(f"\n[DAEMON] Tension says DREAM MORE -- skipping next benchmark")
+            skip_benchmark = True
+            time.sleep(5)
+        elif action == "rest":
+            # Low tension -- longer cooldown to let the system settle
+            print(f"\n[DAEMON] Tension says REST -- extended cooldown (30s)")
+            time.sleep(30)
+        else:
+            time.sleep(5)
 
 
 def main():

@@ -153,5 +153,4072 @@
     "source_task": "6f8cd79b",
     "description": "FOR_EACH(SWAP(0,8))",
     "depth": 2
+  },
+  {
+    "name": "SEQ_RECOLOR_ALL_TO_MAX_RECOLOR04",
+    "ast": [
+      "SEQ",
+      "RECOLOR_ALL_TO_MAX",
+      [
+        "RECOLOR",
+        0,
+        4
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "RECOLOR_ALL_TO_MAX -> RECOLOR(0,4)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_RECOLORCOLOR_BG1_OVERLAY_SWAP20_SHIFT_RIGHT_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            "COLOR_BG",
+            "COLOR_SECOND"
+          ],
+          [
+            "RECOLOR",
+            "COLOR_BG",
+            1
+          ]
+        ],
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            2,
+            0
+          ],
+          "SHIFT_RIGHT"
+        ],
+        [
+          "RECOLOR",
+          2,
+          "COLOR_BG"
+        ]
+      ],
+      "EXTRACT_QUADRANT_TL",
+      [
+        "RECOLOR",
+        2,
+        7
+      ],
+      [
+        "FILL_BG",
+        7
+      ]
+    ],
+    "source_task": "44f52bb0",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), RECOLOR(COLOR_BG,1)) -> OVERLAY(SWAP(2,0), SHIFT_RIGHT) -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7)",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_RECOLORCOLOR_BG1_OVERLAY_SWAP20_SHIFT_RIGHT_RECOLOR2COLOR_BG",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_BG",
+          "COLOR_SECOND"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_BG",
+          1
+        ]
+      ],
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          2,
+          0
+        ],
+        "SHIFT_RIGHT"
+      ],
+      [
+        "RECOLOR",
+        2,
+        "COLOR_BG"
+      ]
+    ],
+    "source_task": "44f52bb0",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), RECOLOR(COLOR_BG,1)) -> OVERLAY(SWAP(2,0), SHIFT_RIGHT) -> RECOLOR(2,COLOR_BG)",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_RECOLORCOLOR_BG1",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_SECOND"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_BG",
+        1
+      ]
+    ],
+    "source_task": "44f52bb0",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), RECOLOR(COLOR_BG,1))",
+    "depth": 2
+  },
+  {
+    "name": "OVERLAY_SWAP20_SHIFT_RIGHT",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        2,
+        0
+      ],
+      "SHIFT_RIGHT"
+    ],
+    "source_task": "44f52bb0",
+    "description": "OVERLAY(SWAP(2,0), SHIFT_RIGHT)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SWAPCOLOR_MAXCOLOR_SECOND_SEQ_SEQ_UPSCALE_2X_RECOLORCOLOR_UNIQUECOLOR_MAX_CROP_NONZERO_SEQ_DELETE_COLS_ZERO_DELETE_COLS_ZERO_CROP_NONZERO_SEQ_DELETE_ROWS_ZERO_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_SECOND"
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "UPSCALE_2X",
+          [
+            "RECOLOR",
+            "COLOR_UNIQUE",
+            "COLOR_MAX"
+          ],
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_COLS_ZERO",
+          "DELETE_COLS_ZERO",
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_ROWS_ZERO",
+          "CROP_NONZERO"
+        ]
+      ]
+    ],
+    "source_task": "f25fbde4",
+    "description": "SWAP(COLOR_MAX,COLOR_SECOND) -> UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO -> DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO -> DELETE_ROWS_ZERO -> CROP_NONZERO",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_SEQ_UPSCALE_2X_RECOLORCOLOR_UNIQUECOLOR_MAX_CROP_NONZERO_SEQ_DELETE_COLS_ZERO_DELETE_COLS_ZERO_CROP_NONZERO_SEQ_DELETE_ROWS_ZERO_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        "UPSCALE_2X",
+        [
+          "RECOLOR",
+          "COLOR_UNIQUE",
+          "COLOR_MAX"
+        ],
+        "CROP_NONZERO"
+      ],
+      [
+        "SEQ",
+        "DELETE_COLS_ZERO",
+        "DELETE_COLS_ZERO",
+        "CROP_NONZERO"
+      ],
+      [
+        "SEQ",
+        "DELETE_ROWS_ZERO",
+        "CROP_NONZERO"
+      ]
+    ],
+    "source_task": "f25fbde4",
+    "description": "UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO -> DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO -> DELETE_ROWS_ZERO -> CROP_NONZERO",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_UPSCALE_2X_RECOLORCOLOR_UNIQUECOLOR_MAX_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      "UPSCALE_2X",
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ],
+      "CROP_NONZERO"
+    ],
+    "source_task": "f25fbde4",
+    "description": "UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SWAPCOLOR_MAXCOLOR_MIN_RECOLOR30_RECOLOR20",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        3,
+        0
+      ],
+      [
+        "RECOLOR",
+        2,
+        0
+      ]
+    ],
+    "source_task": "aabf363d",
+    "description": "SWAP(COLOR_MAX,COLOR_MIN) -> RECOLOR(3,0) -> RECOLOR(2,0)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_IF4_RECOLOR15_RECOLOR95",
+    "ast": [
+      "SEQ",
+      [
+        "IF_COLOR",
+        4,
+        [
+          "RECOLOR",
+          1,
+          5
+        ],
+        [
+          "IF_COLOR",
+          "COLOR_MIN",
+          [
+            "SWAP",
+            6,
+            9
+          ],
+          [
+            "IF_COLOR",
+            1,
+            [
+              "RECOLOR",
+              6,
+              "COLOR_BG"
+            ],
+            "GRAVITY_LEFT"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        9,
+        5
+      ]
+    ],
+    "source_task": "63613498",
+    "description": "IF(4, RECOLOR(1,5), IF(COLOR_MIN, SWAP(6,9), IF(1, RECOLOR(6,COLOR_BG), GRAVITY_LEFT))) -> RECOLOR(9,5)",
+    "depth": 5
+  },
+  {
+    "name": "IF4_RECOLOR15_1",
+    "ast": [
+      "IF_COLOR",
+      4,
+      [
+        "RECOLOR",
+        1,
+        5
+      ],
+      [
+        "IF_COLOR",
+        "COLOR_MIN",
+        [
+          "SWAP",
+          6,
+          9
+        ],
+        [
+          "IF_COLOR",
+          1,
+          [
+            "RECOLOR",
+            6,
+            "COLOR_BG"
+          ],
+          "GRAVITY_LEFT"
+        ]
+      ]
+    ],
+    "source_task": "63613498",
+    "description": "IF(4, RECOLOR(1,5), IF(COLOR_MIN, SWAP(6,9), IF(1, RECOLOR(6,COLOR_BG), GRAVITY_LEFT)))",
+    "depth": 4
+  },
+  {
+    "name": "IFCOLOR_MIN_SWAP69",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_MIN",
+      [
+        "SWAP",
+        6,
+        9
+      ],
+      [
+        "IF_COLOR",
+        1,
+        [
+          "RECOLOR",
+          6,
+          "COLOR_BG"
+        ],
+        "GRAVITY_LEFT"
+      ]
+    ],
+    "source_task": "63613498",
+    "description": "IF(COLOR_MIN, SWAP(6,9), IF(1, RECOLOR(6,COLOR_BG), GRAVITY_LEFT))",
+    "depth": 3
+  },
+  {
+    "name": "IF1_RECOLOR6COLOR_BG",
+    "ast": [
+      "IF_COLOR",
+      1,
+      [
+        "RECOLOR",
+        6,
+        "COLOR_BG"
+      ],
+      "GRAVITY_LEFT"
+    ],
+    "source_task": "63613498",
+    "description": "IF(1, RECOLOR(6,COLOR_BG), GRAVITY_LEFT)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_SEQ_SWAP52_SEQ_RECOLOR7COLOR_MIN_RECOLOR3COLOR_BG_FOR_EACH_SWAP57_FOR_EACH_RECOLOR75_MACRO_MACRO_IF4_DELETE_ROWS_ZERO_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "SWAP",
+            5,
+            2
+          ],
+          [
+            "SEQ",
+            [
+              "RECOLOR",
+              7,
+              "COLOR_MIN"
+            ],
+            [
+              "RECOLOR",
+              3,
+              "COLOR_BG"
+            ],
+            [
+              "FOR_EACH_OBJECT",
+              [
+                "SWAP",
+                5,
+                7
+              ]
+            ]
+          ],
+          [
+            "FOR_EACH_OBJECT",
+            [
+              "RECOLOR",
+              7,
+              5
+            ]
+          ]
+        ],
+        [
+          "MASK",
+          "COLOR_MIN"
+        ],
+        [
+          "CROP_TO_COLOR",
+          4
+        ]
+      ],
+      [
+        "IF_COLOR",
+        4,
+        "DELETE_ROWS_ZERO",
+        "CROP_NONZERO"
+      ],
+      "CROP_NONZERO",
+      [
+        "RECOLOR",
+        2,
+        5
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "SWAP(5,2) -> RECOLOR(7,COLOR_MIN) -> RECOLOR(3,COLOR_BG) -> FOR_EACH(SWAP(5,7)) -> FOR_EACH(RECOLOR(7,5)) -> MASK(COLOR_MIN) -> ('CROP_TO_COLOR', 4) -> IF(4, DELETE_ROWS_ZERO, CROP_NONZERO) -> CROP_NONZERO -> RECOLOR(2,5)",
+    "depth": 6
+  },
+  {
+    "name": "SEQ_SEQ_SWAP52_SEQ_RECOLOR7COLOR_MIN_RECOLOR3COLOR_BG_FOR_EACH_SWAP57_FOR_EACH_RECOLOR75_MACRO_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SWAP",
+          5,
+          2
+        ],
+        [
+          "SEQ",
+          [
+            "RECOLOR",
+            7,
+            "COLOR_MIN"
+          ],
+          [
+            "RECOLOR",
+            3,
+            "COLOR_BG"
+          ],
+          [
+            "FOR_EACH_OBJECT",
+            [
+              "SWAP",
+              5,
+              7
+            ]
+          ]
+        ],
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "RECOLOR",
+            7,
+            5
+          ]
+        ]
+      ],
+      [
+        "MASK",
+        "COLOR_MIN"
+      ],
+      [
+        "CROP_TO_COLOR",
+        4
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "SWAP(5,2) -> RECOLOR(7,COLOR_MIN) -> RECOLOR(3,COLOR_BG) -> FOR_EACH(SWAP(5,7)) -> FOR_EACH(RECOLOR(7,5)) -> MASK(COLOR_MIN) -> ('CROP_TO_COLOR', 4)",
+    "depth": 5
+  },
+  {
+    "name": "SEQ_SWAP52_SEQ_RECOLOR7COLOR_MIN_RECOLOR3COLOR_BG_FOR_EACH_SWAP57_FOR_EACH_RECOLOR75",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        5,
+        2
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          7,
+          "COLOR_MIN"
+        ],
+        [
+          "RECOLOR",
+          3,
+          "COLOR_BG"
+        ],
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "SWAP",
+            5,
+            7
+          ]
+        ]
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "RECOLOR",
+          7,
+          5
+        ]
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "SWAP(5,2) -> RECOLOR(7,COLOR_MIN) -> RECOLOR(3,COLOR_BG) -> FOR_EACH(SWAP(5,7)) -> FOR_EACH(RECOLOR(7,5))",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_RECOLOR7COLOR_MIN_RECOLOR3COLOR_BG_FOR_EACH_SWAP57",
+    "ast": [
+      "SEQ",
+      [
+        "RECOLOR",
+        7,
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        3,
+        "COLOR_BG"
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "SWAP",
+          5,
+          7
+        ]
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "RECOLOR(7,COLOR_MIN) -> RECOLOR(3,COLOR_BG) -> FOR_EACH(SWAP(5,7))",
+    "depth": 3
+  },
+  {
+    "name": "FOR_EACH_SWAP57",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "SWAP",
+        5,
+        7
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "FOR_EACH(SWAP(5,7))",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_RECOLOR75",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "RECOLOR",
+        7,
+        5
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "FOR_EACH(RECOLOR(7,5))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO",
+    "ast": [
+      "SEQ",
+      "DELETE_ROWS_ZERO",
+      [
+        "SWAP",
+        "COLOR_MIN",
+        "COLOR_MAX"
+      ],
+      "DELETE_COLS_ZERO"
+    ],
+    "source_task": "b94a9452",
+    "description": "DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_SEQ_RECOLOR_ALL_TO_MAX_RECOLOR04",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "SEQ",
+        "RECOLOR_ALL_TO_MAX",
+        [
+          "RECOLOR",
+          0,
+          4
+        ]
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "FOR_EACH(RECOLOR_ALL_TO_MAX -> RECOLOR(0,4))",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_SWAPCOLOR_MAXCOLOR_MIN_SWAP50",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_MIN"
+      ],
+      [
+        "SWAP",
+        5,
+        0
+      ]
+    ],
+    "source_task": "f76d97a5",
+    "description": "SWAP(COLOR_MAX,COLOR_MIN) -> SWAP(5,0)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR70",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "RECOLOR",
+            9,
+            5
+          ]
+        ],
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "OVERLAY",
+              [
+                "SWAP",
+                "COLOR_BG",
+                "COLOR_SECOND"
+              ],
+              "FLIP_H"
+            ],
+            "DOWNSCALE_2X",
+            [
+              "RECOLOR",
+              2,
+              "COLOR_BG"
+            ]
+          ],
+          "EXTRACT_QUADRANT_TL",
+          [
+            "RECOLOR",
+            2,
+            7
+          ],
+          [
+            "FILL_BG",
+            7
+          ]
+        ],
+        [
+          "SEQ",
+          "GRAVITY_RIGHT",
+          "FLIP_V",
+          [
+            "RECOLOR",
+            "COLOR_UNIQUE",
+            "COLOR_MAX"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        7,
+        0
+      ]
+    ],
+    "source_task": "239be575",
+    "description": "RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(7,0)",
+    "depth": 6
+  },
+  {
+    "name": "SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          9,
+          5
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "SWAP",
+              "COLOR_BG",
+              "COLOR_SECOND"
+            ],
+            "FLIP_H"
+          ],
+          "DOWNSCALE_2X",
+          [
+            "RECOLOR",
+            2,
+            "COLOR_BG"
+          ]
+        ],
+        "EXTRACT_QUADRANT_TL",
+        [
+          "RECOLOR",
+          2,
+          7
+        ],
+        [
+          "FILL_BG",
+          7
+        ]
+      ],
+      [
+        "SEQ",
+        "GRAVITY_RIGHT",
+        "FLIP_V",
+        [
+          "RECOLOR",
+          "COLOR_UNIQUE",
+          "COLOR_MAX"
+        ]
+      ]
+    ],
+    "source_task": "239be575",
+    "description": "RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX)",
+    "depth": 5
+  },
+  {
+    "name": "SEQ_RECOLOR95",
+    "ast": [
+      "SEQ",
+      [
+        "RECOLOR",
+        9,
+        5
+      ]
+    ],
+    "source_task": "239be575",
+    "description": "RECOLOR(9,5)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            "COLOR_BG",
+            "COLOR_SECOND"
+          ],
+          "FLIP_H"
+        ],
+        "DOWNSCALE_2X",
+        [
+          "RECOLOR",
+          2,
+          "COLOR_BG"
+        ]
+      ],
+      "EXTRACT_QUADRANT_TL",
+      [
+        "RECOLOR",
+        2,
+        7
+      ],
+      [
+        "FILL_BG",
+        7
+      ]
+    ],
+    "source_task": "239be575",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7)",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_BG",
+          "COLOR_SECOND"
+        ],
+        "FLIP_H"
+      ],
+      "DOWNSCALE_2X",
+      [
+        "RECOLOR",
+        2,
+        "COLOR_BG"
+      ]
+    ],
+    "source_task": "239be575",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG)",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_SECOND"
+      ],
+      "FLIP_H"
+    ],
+    "source_task": "239be575",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX",
+    "ast": [
+      "SEQ",
+      "GRAVITY_RIGHT",
+      "FLIP_V",
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ]
+    ],
+    "source_task": "239be575",
+    "description": "GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H_SHIFT_RIGHT_EXTRACT_QUADRANT_BR",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        "EXTRACT_QUADRANT_BR",
+        [
+          "OVERLAY",
+          [
+            "IF_COLOR",
+            8,
+            [
+              "SEQ",
+              "DELETE_ROWS_ZERO",
+              [
+                "SWAP",
+                "COLOR_MIN",
+                "COLOR_MAX"
+              ],
+              "DELETE_COLS_ZERO"
+            ],
+            [
+              "SEQ",
+              [
+                "RECOLOR",
+                2,
+                5
+              ],
+              "ROT180",
+              "SHIFT_UP"
+            ]
+          ],
+          "FLIP_H"
+        ]
+      ],
+      "SHIFT_RIGHT",
+      "EXTRACT_QUADRANT_BR",
+      [
+        "RECOLOR",
+        0,
+        5
+      ]
+    ],
+    "source_task": "f9012d9b",
+    "description": "EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5)",
+    "depth": 6
+  },
+  {
+    "name": "SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H",
+    "ast": [
+      "SEQ",
+      "EXTRACT_QUADRANT_BR",
+      [
+        "OVERLAY",
+        [
+          "IF_COLOR",
+          8,
+          [
+            "SEQ",
+            "DELETE_ROWS_ZERO",
+            [
+              "SWAP",
+              "COLOR_MIN",
+              "COLOR_MAX"
+            ],
+            "DELETE_COLS_ZERO"
+          ],
+          [
+            "SEQ",
+            [
+              "RECOLOR",
+              2,
+              5
+            ],
+            "ROT180",
+            "SHIFT_UP"
+          ]
+        ],
+        "FLIP_H"
+      ]
+    ],
+    "source_task": "f9012d9b",
+    "description": "EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H)",
+    "depth": 5
+  },
+  {
+    "name": "OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H",
+    "ast": [
+      "OVERLAY",
+      [
+        "IF_COLOR",
+        8,
+        [
+          "SEQ",
+          "DELETE_ROWS_ZERO",
+          [
+            "SWAP",
+            "COLOR_MIN",
+            "COLOR_MAX"
+          ],
+          "DELETE_COLS_ZERO"
+        ],
+        [
+          "SEQ",
+          [
+            "RECOLOR",
+            2,
+            5
+          ],
+          "ROT180",
+          "SHIFT_UP"
+        ]
+      ],
+      "FLIP_H"
+    ],
+    "source_task": "f9012d9b",
+    "description": "OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H)",
+    "depth": 4
+  },
+  {
+    "name": "IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO",
+    "ast": [
+      "IF_COLOR",
+      8,
+      [
+        "SEQ",
+        "DELETE_ROWS_ZERO",
+        [
+          "SWAP",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ],
+        "DELETE_COLS_ZERO"
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          2,
+          5
+        ],
+        "ROT180",
+        "SHIFT_UP"
+      ]
+    ],
+    "source_task": "f9012d9b",
+    "description": "IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP)",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_RECOLOR25_ROT180_SHIFT_UP",
+    "ast": [
+      "SEQ",
+      [
+        "RECOLOR",
+        2,
+        5
+      ],
+      "ROT180",
+      "SHIFT_UP"
+    ],
+    "source_task": "f9012d9b",
+    "description": "RECOLOR(2,5) -> ROT180 -> SHIFT_UP",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR21_EXTRACT_QUADRANT_BL",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "RECOLOR",
+            9,
+            5
+          ]
+        ],
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "OVERLAY",
+              [
+                "SWAP",
+                "COLOR_BG",
+                "COLOR_SECOND"
+              ],
+              "FLIP_H"
+            ],
+            "DOWNSCALE_2X",
+            [
+              "RECOLOR",
+              2,
+              "COLOR_BG"
+            ]
+          ],
+          "EXTRACT_QUADRANT_TL",
+          [
+            "RECOLOR",
+            2,
+            7
+          ],
+          [
+            "FILL_BG",
+            7
+          ]
+        ],
+        [
+          "SEQ",
+          "GRAVITY_RIGHT",
+          "FLIP_V",
+          [
+            "RECOLOR",
+            "COLOR_UNIQUE",
+            "COLOR_MAX"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        2,
+        1
+      ],
+      "EXTRACT_QUADRANT_BL",
+      [
+        "RECOLOR",
+        4,
+        2
+      ]
+    ],
+    "source_task": "d9fac9be",
+    "description": "RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(2,1) -> EXTRACT_QUADRANT_BL -> RECOLOR(4,2)",
+    "depth": 6
+  },
+  {
+    "name": "SEQ_CROP_NONZERO_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      [
+        "OVERLAY",
+        [
+          "IF_COLOR",
+          8,
+          [
+            "SEQ",
+            "DELETE_ROWS_ZERO",
+            [
+              "SWAP",
+              "COLOR_MIN",
+              "COLOR_MAX"
+            ],
+            "DELETE_COLS_ZERO"
+          ],
+          [
+            "SEQ",
+            [
+              "RECOLOR",
+              2,
+              5
+            ],
+            "ROT180",
+            "SHIFT_UP"
+          ]
+        ],
+        "FLIP_H"
+      ]
+    ],
+    "source_task": "7468f01a",
+    "description": "CROP_NONZERO -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H)",
+    "depth": 5
+  },
+  {
+    "name": "SEQ_IFCOLOR_BG_SEQ_SEQ_MACRO_SEQ_SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H_SHIFT_RIGHT_EXTRACT_QUADRANT_BR_SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR70_IFCOLOR_MIN_RECOLOR54_OVERLAY_SWAP61_MACRO_RECOLOR45_RECOLOR62",
+    "ast": [
+      "SEQ",
+      [
+        "IF_COLOR",
+        "COLOR_BG",
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "FILL_BG",
+              6
+            ],
+            [
+              "SEQ",
+              [
+                "SEQ",
+                "EXTRACT_QUADRANT_BR",
+                [
+                  "OVERLAY",
+                  [
+                    "IF_COLOR",
+                    8,
+                    [
+                      "SEQ",
+                      "DELETE_ROWS_ZERO",
+                      [
+                        "SWAP",
+                        "COLOR_MIN",
+                        "COLOR_MAX"
+                      ],
+                      "DELETE_COLS_ZERO"
+                    ],
+                    [
+                      "SEQ",
+                      [
+                        "RECOLOR",
+                        2,
+                        5
+                      ],
+                      "ROT180",
+                      "SHIFT_UP"
+                    ]
+                  ],
+                  "FLIP_H"
+                ]
+              ],
+              "SHIFT_RIGHT",
+              "EXTRACT_QUADRANT_BR",
+              [
+                "RECOLOR",
+                0,
+                5
+              ]
+            ],
+            [
+              "SEQ",
+              [
+                "SEQ",
+                [
+                  "SEQ",
+                  [
+                    "RECOLOR",
+                    9,
+                    5
+                  ]
+                ],
+                [
+                  "SEQ",
+                  [
+                    "SEQ",
+                    [
+                      "OVERLAY",
+                      [
+                        "SWAP",
+                        "COLOR_BG",
+                        "COLOR_SECOND"
+                      ],
+                      "FLIP_H"
+                    ],
+                    "DOWNSCALE_2X",
+                    [
+                      "RECOLOR",
+                      2,
+                      "COLOR_BG"
+                    ]
+                  ],
+                  "EXTRACT_QUADRANT_TL",
+                  [
+                    "RECOLOR",
+                    2,
+                    7
+                  ],
+                  [
+                    "FILL_BG",
+                    7
+                  ]
+                ],
+                [
+                  "SEQ",
+                  "GRAVITY_RIGHT",
+                  "FLIP_V",
+                  [
+                    "RECOLOR",
+                    "COLOR_UNIQUE",
+                    "COLOR_MAX"
+                  ]
+                ]
+              ],
+              [
+                "RECOLOR",
+                7,
+                0
+              ]
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_MIN",
+            [
+              "RECOLOR",
+              5,
+              4
+            ],
+            [
+              "RECOLOR",
+              2,
+              8
+            ]
+          ],
+          [
+            "OVERLAY",
+            [
+              "SWAP",
+              6,
+              1
+            ],
+            [
+              "FILL_BG",
+              1
+            ]
+          ]
+        ],
+        [
+          "RECOLOR",
+          1,
+          2
+        ]
+      ],
+      [
+        "RECOLOR",
+        4,
+        5
+      ],
+      [
+        "RECOLOR",
+        6,
+        2
+      ],
+      [
+        "RECOLOR",
+        8,
+        6
+      ]
+    ],
+    "source_task": "b9b7f026",
+    "description": "IF(COLOR_BG, FILL_BG(6) -> EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5) -> RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(7,0) -> IF(COLOR_MIN, RECOLOR(5,4), RECOLOR(2,8)) -> OVERLAY(SWAP(6,1), FILL_BG(1)), RECOLOR(1,2)) -> RECOLOR(4,5) -> RECOLOR(6,2) -> RECOLOR(8,6)",
+    "depth": 10
+  },
+  {
+    "name": "IFCOLOR_BG_SEQ_SEQ_MACRO_SEQ_SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H_SHIFT_RIGHT_EXTRACT_QUADRANT_BR_SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR70_IFCOLOR_MIN_RECOLOR54_OVERLAY_SWAP61_MACRO",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_BG",
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "FILL_BG",
+            6
+          ],
+          [
+            "SEQ",
+            [
+              "SEQ",
+              "EXTRACT_QUADRANT_BR",
+              [
+                "OVERLAY",
+                [
+                  "IF_COLOR",
+                  8,
+                  [
+                    "SEQ",
+                    "DELETE_ROWS_ZERO",
+                    [
+                      "SWAP",
+                      "COLOR_MIN",
+                      "COLOR_MAX"
+                    ],
+                    "DELETE_COLS_ZERO"
+                  ],
+                  [
+                    "SEQ",
+                    [
+                      "RECOLOR",
+                      2,
+                      5
+                    ],
+                    "ROT180",
+                    "SHIFT_UP"
+                  ]
+                ],
+                "FLIP_H"
+              ]
+            ],
+            "SHIFT_RIGHT",
+            "EXTRACT_QUADRANT_BR",
+            [
+              "RECOLOR",
+              0,
+              5
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "SEQ",
+              [
+                "SEQ",
+                [
+                  "RECOLOR",
+                  9,
+                  5
+                ]
+              ],
+              [
+                "SEQ",
+                [
+                  "SEQ",
+                  [
+                    "OVERLAY",
+                    [
+                      "SWAP",
+                      "COLOR_BG",
+                      "COLOR_SECOND"
+                    ],
+                    "FLIP_H"
+                  ],
+                  "DOWNSCALE_2X",
+                  [
+                    "RECOLOR",
+                    2,
+                    "COLOR_BG"
+                  ]
+                ],
+                "EXTRACT_QUADRANT_TL",
+                [
+                  "RECOLOR",
+                  2,
+                  7
+                ],
+                [
+                  "FILL_BG",
+                  7
+                ]
+              ],
+              [
+                "SEQ",
+                "GRAVITY_RIGHT",
+                "FLIP_V",
+                [
+                  "RECOLOR",
+                  "COLOR_UNIQUE",
+                  "COLOR_MAX"
+                ]
+              ]
+            ],
+            [
+              "RECOLOR",
+              7,
+              0
+            ]
+          ]
+        ],
+        [
+          "IF_COLOR",
+          "COLOR_MIN",
+          [
+            "RECOLOR",
+            5,
+            4
+          ],
+          [
+            "RECOLOR",
+            2,
+            8
+          ]
+        ],
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            6,
+            1
+          ],
+          [
+            "FILL_BG",
+            1
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        1,
+        2
+      ]
+    ],
+    "source_task": "b9b7f026",
+    "description": "IF(COLOR_BG, FILL_BG(6) -> EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5) -> RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(7,0) -> IF(COLOR_MIN, RECOLOR(5,4), RECOLOR(2,8)) -> OVERLAY(SWAP(6,1), FILL_BG(1)), RECOLOR(1,2))",
+    "depth": 9
+  },
+  {
+    "name": "SEQ_SEQ_MACRO_SEQ_SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H_SHIFT_RIGHT_EXTRACT_QUADRANT_BR_SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR70_IFCOLOR_MIN_RECOLOR54_OVERLAY_SWAP61_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "FILL_BG",
+          6
+        ],
+        [
+          "SEQ",
+          [
+            "SEQ",
+            "EXTRACT_QUADRANT_BR",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                8,
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ],
+                [
+                  "SEQ",
+                  [
+                    "RECOLOR",
+                    2,
+                    5
+                  ],
+                  "ROT180",
+                  "SHIFT_UP"
+                ]
+              ],
+              "FLIP_H"
+            ]
+          ],
+          "SHIFT_RIGHT",
+          "EXTRACT_QUADRANT_BR",
+          [
+            "RECOLOR",
+            0,
+            5
+          ]
+        ],
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "SEQ",
+              [
+                "RECOLOR",
+                9,
+                5
+              ]
+            ],
+            [
+              "SEQ",
+              [
+                "SEQ",
+                [
+                  "OVERLAY",
+                  [
+                    "SWAP",
+                    "COLOR_BG",
+                    "COLOR_SECOND"
+                  ],
+                  "FLIP_H"
+                ],
+                "DOWNSCALE_2X",
+                [
+                  "RECOLOR",
+                  2,
+                  "COLOR_BG"
+                ]
+              ],
+              "EXTRACT_QUADRANT_TL",
+              [
+                "RECOLOR",
+                2,
+                7
+              ],
+              [
+                "FILL_BG",
+                7
+              ]
+            ],
+            [
+              "SEQ",
+              "GRAVITY_RIGHT",
+              "FLIP_V",
+              [
+                "RECOLOR",
+                "COLOR_UNIQUE",
+                "COLOR_MAX"
+              ]
+            ]
+          ],
+          [
+            "RECOLOR",
+            7,
+            0
+          ]
+        ]
+      ],
+      [
+        "IF_COLOR",
+        "COLOR_MIN",
+        [
+          "RECOLOR",
+          5,
+          4
+        ],
+        [
+          "RECOLOR",
+          2,
+          8
+        ]
+      ],
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          6,
+          1
+        ],
+        [
+          "FILL_BG",
+          1
+        ]
+      ]
+    ],
+    "source_task": "b9b7f026",
+    "description": "FILL_BG(6) -> EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5) -> RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(7,0) -> IF(COLOR_MIN, RECOLOR(5,4), RECOLOR(2,8)) -> OVERLAY(SWAP(6,1), FILL_BG(1))",
+    "depth": 8
+  },
+  {
+    "name": "SEQ_MACRO_SEQ_SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H_SHIFT_RIGHT_EXTRACT_QUADRANT_BR_SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR70",
+    "ast": [
+      "SEQ",
+      [
+        "FILL_BG",
+        6
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "EXTRACT_QUADRANT_BR",
+          [
+            "OVERLAY",
+            [
+              "IF_COLOR",
+              8,
+              [
+                "SEQ",
+                "DELETE_ROWS_ZERO",
+                [
+                  "SWAP",
+                  "COLOR_MIN",
+                  "COLOR_MAX"
+                ],
+                "DELETE_COLS_ZERO"
+              ],
+              [
+                "SEQ",
+                [
+                  "RECOLOR",
+                  2,
+                  5
+                ],
+                "ROT180",
+                "SHIFT_UP"
+              ]
+            ],
+            "FLIP_H"
+          ]
+        ],
+        "SHIFT_RIGHT",
+        "EXTRACT_QUADRANT_BR",
+        [
+          "RECOLOR",
+          0,
+          5
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "RECOLOR",
+              9,
+              5
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "SEQ",
+              [
+                "OVERLAY",
+                [
+                  "SWAP",
+                  "COLOR_BG",
+                  "COLOR_SECOND"
+                ],
+                "FLIP_H"
+              ],
+              "DOWNSCALE_2X",
+              [
+                "RECOLOR",
+                2,
+                "COLOR_BG"
+              ]
+            ],
+            "EXTRACT_QUADRANT_TL",
+            [
+              "RECOLOR",
+              2,
+              7
+            ],
+            [
+              "FILL_BG",
+              7
+            ]
+          ],
+          [
+            "SEQ",
+            "GRAVITY_RIGHT",
+            "FLIP_V",
+            [
+              "RECOLOR",
+              "COLOR_UNIQUE",
+              "COLOR_MAX"
+            ]
+          ]
+        ],
+        [
+          "RECOLOR",
+          7,
+          0
+        ]
+      ]
+    ],
+    "source_task": "b9b7f026",
+    "description": "FILL_BG(6) -> EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5) -> RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(7,0)",
+    "depth": 7
+  },
+  {
+    "name": "IFCOLOR_MIN_RECOLOR54",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_MIN",
+      [
+        "RECOLOR",
+        5,
+        4
+      ],
+      [
+        "RECOLOR",
+        2,
+        8
+      ]
+    ],
+    "source_task": "b9b7f026",
+    "description": "IF(COLOR_MIN, RECOLOR(5,4), RECOLOR(2,8))",
+    "depth": 2
+  },
+  {
+    "name": "OVERLAY_SWAP61_MACRO",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        6,
+        1
+      ],
+      [
+        "FILL_BG",
+        1
+      ]
+    ],
+    "source_task": "b9b7f026",
+    "description": "OVERLAY(SWAP(6,1), FILL_BG(1))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_MACRO_KEEP_MOST_FREQUENT",
+    "ast": [
+      "SEQ",
+      [
+        "MASK",
+        "ORIG_COLOR_MAX"
+      ],
+      "KEEP_MOST_FREQUENT"
+    ],
+    "source_task": "9565186b",
+    "description": "MASK(ORIG_COLOR_MAX) -> KEEP_MOST_FREQUENT",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_IFORIG_COLOR_MAX_RECOLORCOLOR_SECONDORIG_COLOR_SECOND",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_MAX",
+        [
+          "RECOLOR",
+          "COLOR_SECOND",
+          "ORIG_COLOR_SECOND"
+        ],
+        [
+          "SEQ",
+          [
+            "MASK",
+            "COLOR_FG_1"
+          ],
+          [
+            "RECOLOR",
+            "COLOR_SECOND",
+            "ORIG_COLOR_BG"
+          ],
+          [
+            "SWAP",
+            "COLOR_MAX",
+            "COLOR_FG_2"
+          ]
+        ]
+      ]
+    ],
+    "source_task": "aabf363d",
+    "description": "FOR_EACH(IF(ORIG_COLOR_MAX, RECOLOR(COLOR_SECOND,ORIG_COLOR_SECOND), MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2)))",
+    "depth": 4
+  },
+  {
+    "name": "IFORIG_COLOR_MAX_RECOLORCOLOR_SECONDORIG_COLOR_SECOND",
+    "ast": [
+      "IF_COLOR",
+      "ORIG_COLOR_MAX",
+      [
+        "RECOLOR",
+        "COLOR_SECOND",
+        "ORIG_COLOR_SECOND"
+      ],
+      [
+        "SEQ",
+        [
+          "MASK",
+          "COLOR_FG_1"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_SECOND",
+          "ORIG_COLOR_BG"
+        ],
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_FG_2"
+        ]
+      ]
+    ],
+    "source_task": "aabf363d",
+    "description": "IF(ORIG_COLOR_MAX, RECOLOR(COLOR_SECOND,ORIG_COLOR_SECOND), MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2))",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_MACRO_RECOLORCOLOR_SECONDORIG_COLOR_BG_SWAPCOLOR_MAXCOLOR_FG_2",
+    "ast": [
+      "SEQ",
+      [
+        "MASK",
+        "COLOR_FG_1"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_SECOND",
+        "ORIG_COLOR_BG"
+      ],
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_FG_2"
+      ]
+    ],
+    "source_task": "aabf363d",
+    "description": "MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2)",
+    "depth": 2
+  },
+  {
+    "name": "OVERLAY_OVERLAY_OVERLAY_EXTRACT_QUADRANT_TL_EXTRACT_QUADRANT_BR_EXTRACT_QUADRANT_BL_OVERLAY_EXTRACT_QUADRANT_TR_SORT_COLS",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        [
+          "OVERLAY",
+          "EXTRACT_QUADRANT_TL",
+          "EXTRACT_QUADRANT_BR"
+        ],
+        "EXTRACT_QUADRANT_BL"
+      ],
+      [
+        "OVERLAY",
+        "EXTRACT_QUADRANT_TR",
+        "SORT_COLS"
+      ]
+    ],
+    "source_task": "75b8110e",
+    "description": "OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS))",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_OVERLAY_EXTRACT_QUADRANT_TL_EXTRACT_QUADRANT_BR_EXTRACT_QUADRANT_BL",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        "EXTRACT_QUADRANT_TL",
+        "EXTRACT_QUADRANT_BR"
+      ],
+      "EXTRACT_QUADRANT_BL"
+    ],
+    "source_task": "75b8110e",
+    "description": "OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_FOR_EACH_FOR_EACH_MACRO_SEQ_MACRO_RECOLORCOLOR_SECONDORIG_COLOR_BG_SWAPCOLOR_MAXCOLOR_FG_2_SWAPCOLOR_SECONDCOLOR_FG_2",
+    "ast": [
+      "SEQ",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "CROP_TO_COLOR",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "MASK",
+          "COLOR_FG_1"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_SECOND",
+          "ORIG_COLOR_BG"
+        ],
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "SWAP",
+        "COLOR_SECOND",
+        "COLOR_FG_2"
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "FOR_EACH(FOR_EACH(('CROP_TO_COLOR', 'COLOR_UNIQUE'))) -> MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2) -> SWAP(COLOR_SECOND,COLOR_FG_2)",
+    "depth": 3
+  },
+  {
+    "name": "FOR_EACH_FOR_EACH_MACRO",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ]
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "FOR_EACH(FOR_EACH(('CROP_TO_COLOR', 'COLOR_UNIQUE')))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_OVERLAY_SEQ_OVERLAY_OVERLAY_OVERLAY_EXTRACT_QUADRANT_TL_EXTRACT_QUADRANT_BR_EXTRACT_QUADRANT_BL_OVERLAY_EXTRACT_QUADRANT_TR_SORT_COLS_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_MACRO_RECOLORCOLOR_FG_1ORIG_COLOR_MIN_RECOLORCOLOR_UNIQUECOLOR_BG",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              [
+                "OVERLAY",
+                "EXTRACT_QUADRANT_TL",
+                "EXTRACT_QUADRANT_BR"
+              ],
+              "EXTRACT_QUADRANT_BL"
+            ],
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TR",
+              "SORT_COLS"
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "FILL_BG",
+                  "COLOR_MAX"
+                ],
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ]
+              ],
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "FILL_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_MIN"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_BG"
+      ]
+    ],
+    "source_task": "445eab21",
+    "description": "OVERLAY(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN)) -> RECOLOR(COLOR_UNIQUE,COLOR_BG)",
+    "depth": 8
+  },
+  {
+    "name": "OVERLAY_SEQ_OVERLAY_OVERLAY_OVERLAY_EXTRACT_QUADRANT_TL_EXTRACT_QUADRANT_BR_EXTRACT_QUADRANT_BL_OVERLAY_EXTRACT_QUADRANT_TR_SORT_COLS_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_MACRO_RECOLORCOLOR_FG_1ORIG_COLOR_MIN",
+    "ast": [
+      "OVERLAY",
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TL",
+              "EXTRACT_QUADRANT_BR"
+            ],
+            "EXTRACT_QUADRANT_BL"
+          ],
+          [
+            "OVERLAY",
+            "EXTRACT_QUADRANT_TR",
+            "SORT_COLS"
+          ]
+        ],
+        [
+          "IF_COLOR",
+          "COLOR_UNIQUE",
+          "EXTRACT_QUADRANT_TL",
+          [
+            "OVERLAY",
+            [
+              "IF_COLOR",
+              "COLOR_SECOND",
+              [
+                "FILL_BG",
+                "COLOR_MAX"
+              ],
+              [
+                "SEQ",
+                "DELETE_ROWS_ZERO",
+                [
+                  "SWAP",
+                  "COLOR_MIN",
+                  "COLOR_MAX"
+                ],
+                "DELETE_COLS_ZERO"
+              ]
+            ],
+            "DELETE_ROWS_ZERO"
+          ]
+        ],
+        [
+          "FILL_BG",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_FG_1",
+        "ORIG_COLOR_MIN"
+      ]
+    ],
+    "source_task": "445eab21",
+    "description": "OVERLAY(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN))",
+    "depth": 7
+  },
+  {
+    "name": "SEQ_OVERLAY_OVERLAY_OVERLAY_EXTRACT_QUADRANT_TL_EXTRACT_QUADRANT_BR_EXTRACT_QUADRANT_BL_OVERLAY_EXTRACT_QUADRANT_TR_SORT_COLS_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "OVERLAY",
+          [
+            "OVERLAY",
+            "EXTRACT_QUADRANT_TL",
+            "EXTRACT_QUADRANT_BR"
+          ],
+          "EXTRACT_QUADRANT_BL"
+        ],
+        [
+          "OVERLAY",
+          "EXTRACT_QUADRANT_TR",
+          "SORT_COLS"
+        ]
+      ],
+      [
+        "IF_COLOR",
+        "COLOR_UNIQUE",
+        "EXTRACT_QUADRANT_TL",
+        [
+          "OVERLAY",
+          [
+            "IF_COLOR",
+            "COLOR_SECOND",
+            [
+              "FILL_BG",
+              "COLOR_MAX"
+            ],
+            [
+              "SEQ",
+              "DELETE_ROWS_ZERO",
+              [
+                "SWAP",
+                "COLOR_MIN",
+                "COLOR_MAX"
+              ],
+              "DELETE_COLS_ZERO"
+            ]
+          ],
+          "DELETE_ROWS_ZERO"
+        ]
+      ],
+      [
+        "FILL_BG",
+        "COLOR_FG_2"
+      ]
+    ],
+    "source_task": "445eab21",
+    "description": "OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2)",
+    "depth": 6
+  },
+  {
+    "name": "IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_UNIQUE",
+      "EXTRACT_QUADRANT_TL",
+      [
+        "OVERLAY",
+        [
+          "IF_COLOR",
+          "COLOR_SECOND",
+          [
+            "FILL_BG",
+            "COLOR_MAX"
+          ],
+          [
+            "SEQ",
+            "DELETE_ROWS_ZERO",
+            [
+              "SWAP",
+              "COLOR_MIN",
+              "COLOR_MAX"
+            ],
+            "DELETE_COLS_ZERO"
+          ]
+        ],
+        "DELETE_ROWS_ZERO"
+      ]
+    ],
+    "source_task": "445eab21",
+    "description": "IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), DELETE_ROWS_ZERO))",
+    "depth": 5
+  },
+  {
+    "name": "OVERLAY_IFCOLOR_SECOND_MACRO_DELETE_ROWS_ZERO",
+    "ast": [
+      "OVERLAY",
+      [
+        "IF_COLOR",
+        "COLOR_SECOND",
+        [
+          "FILL_BG",
+          "COLOR_MAX"
+        ],
+        [
+          "SEQ",
+          "DELETE_ROWS_ZERO",
+          [
+            "SWAP",
+            "COLOR_MIN",
+            "COLOR_MAX"
+          ],
+          "DELETE_COLS_ZERO"
+        ]
+      ],
+      "DELETE_ROWS_ZERO"
+    ],
+    "source_task": "445eab21",
+    "description": "OVERLAY(IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), DELETE_ROWS_ZERO)",
+    "depth": 4
+  },
+  {
+    "name": "IFCOLOR_SECOND_MACRO",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_SECOND",
+      [
+        "FILL_BG",
+        "COLOR_MAX"
+      ],
+      [
+        "SEQ",
+        "DELETE_ROWS_ZERO",
+        [
+          "SWAP",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ],
+        "DELETE_COLS_ZERO"
+      ]
+    ],
+    "source_task": "445eab21",
+    "description": "IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO)",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_CROP_NONZERO_FOR_EACH_SWAPCOLOR_FG_1COLOR_MIN_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "SWAP",
+          "COLOR_FG_1",
+          "COLOR_MIN"
+        ]
+      ],
+      "CROP_NONZERO"
+    ],
+    "source_task": "b94a9452",
+    "description": "CROP_NONZERO -> FOR_EACH(SWAP(COLOR_FG_1,COLOR_MIN)) -> CROP_NONZERO",
+    "depth": 3
+  },
+  {
+    "name": "FOR_EACH_SWAPCOLOR_FG_1COLOR_MIN",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "SWAP",
+        "COLOR_FG_1",
+        "COLOR_MIN"
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "FOR_EACH(SWAP(COLOR_FG_1,COLOR_MIN))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_SWAPCOLOR_UNIQUECOLOR_MAX_SEQ_RECOLORCOLOR_MINORIG_COLOR_FG_2_MACRO_RECOLORCOLOR_MINCOLOR_MAX_RECOLORCOLOR_MINCOLOR_MAX_RECOLOR_ALL_TO_MAX",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SWAP",
+          "COLOR_UNIQUE",
+          "COLOR_MAX"
+        ],
+        [
+          "SEQ",
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "ORIG_COLOR_FG_2"
+          ],
+          [
+            "CROP_TO_COLOR",
+            "COLOR_UNIQUE"
+          ],
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_MAX"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ]
+      ],
+      "RECOLOR_ALL_TO_MAX"
+    ],
+    "source_task": "5117e062",
+    "description": "SWAP(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX) -> RECOLOR(COLOR_MIN,COLOR_MAX) -> RECOLOR_ALL_TO_MAX",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_SWAPCOLOR_UNIQUECOLOR_MAX_SEQ_RECOLORCOLOR_MINORIG_COLOR_FG_2_MACRO_RECOLORCOLOR_MINCOLOR_MAX_RECOLORCOLOR_MINCOLOR_MAX",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "ORIG_COLOR_FG_2"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_MAX"
+      ]
+    ],
+    "source_task": "5117e062",
+    "description": "SWAP(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX) -> RECOLOR(COLOR_MIN,COLOR_MAX)",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_RECOLORCOLOR_MINORIG_COLOR_FG_2_MACRO_RECOLORCOLOR_MINCOLOR_MAX",
+    "ast": [
+      "SEQ",
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "ORIG_COLOR_FG_2"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_UNIQUE"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_MAX"
+      ]
+    ],
+    "source_task": "5117e062",
+    "description": "RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SWAPCOLOR_BGCOLOR_MIN_RECOLORORIG_COLOR_BGCOLOR_FG_1_SEQ_FOR_EACH_RECOLORCOLOR_MINCOLOR_UNIQUE_MACRO_OVERLAY_FOR_EACH_IFORIG_COLOR_FG_1_RECOLORORIG_COLOR_BGCOLOR_MAX_SWAPCOLOR_FG_1COLOR_UNIQUE",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_BG",
+        "COLOR_FG_1"
+      ],
+      [
+        "SEQ",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_UNIQUE"
+          ]
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "OVERLAY",
+          [
+            "FOR_EACH_OBJECT",
+            [
+              "IF_COLOR",
+              "ORIG_COLOR_FG_1",
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_MAX"
+              ],
+              [
+                "RECOLOR",
+                "COLOR_MIN",
+                "COLOR_FG_2"
+              ]
+            ]
+          ],
+          [
+            "SWAP",
+            "COLOR_FG_1",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "ORIG_COLOR_BG"
+      ]
+    ],
+    "source_task": "ce602527",
+    "description": "SWAP(COLOR_BG,COLOR_MIN) -> RECOLOR(ORIG_COLOR_BG,COLOR_FG_1) -> FOR_EACH(RECOLOR(COLOR_MIN,COLOR_UNIQUE)) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(FOR_EACH(IF(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))), SWAP(COLOR_FG_1,COLOR_UNIQUE)) -> RECOLOR(COLOR_MIN,ORIG_COLOR_BG)",
+    "depth": 6
+  },
+  {
+    "name": "SEQ_FOR_EACH_RECOLORCOLOR_MINCOLOR_UNIQUE_MACRO_OVERLAY_FOR_EACH_IFORIG_COLOR_FG_1_RECOLORORIG_COLOR_BGCOLOR_MAX_SWAPCOLOR_FG_1COLOR_UNIQUE",
+    "ast": [
+      "SEQ",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_UNIQUE"
+        ]
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_UNIQUE"
+      ],
+      [
+        "OVERLAY",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "IF_COLOR",
+            "ORIG_COLOR_FG_1",
+            [
+              "RECOLOR",
+              "ORIG_COLOR_BG",
+              "COLOR_MAX"
+            ],
+            [
+              "RECOLOR",
+              "COLOR_MIN",
+              "COLOR_FG_2"
+            ]
+          ]
+        ],
+        [
+          "SWAP",
+          "COLOR_FG_1",
+          "COLOR_UNIQUE"
+        ]
+      ]
+    ],
+    "source_task": "ce602527",
+    "description": "FOR_EACH(RECOLOR(COLOR_MIN,COLOR_UNIQUE)) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(FOR_EACH(IF(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))), SWAP(COLOR_FG_1,COLOR_UNIQUE))",
+    "depth": 5
+  },
+  {
+    "name": "FOR_EACH_RECOLORCOLOR_MINCOLOR_UNIQUE",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_UNIQUE"
+      ]
+    ],
+    "source_task": "ce602527",
+    "description": "FOR_EACH(RECOLOR(COLOR_MIN,COLOR_UNIQUE))",
+    "depth": 2
+  },
+  {
+    "name": "OVERLAY_FOR_EACH_IFORIG_COLOR_FG_1_RECOLORORIG_COLOR_BGCOLOR_MAX_SWAPCOLOR_FG_1COLOR_UNIQUE",
+    "ast": [
+      "OVERLAY",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "IF_COLOR",
+          "ORIG_COLOR_FG_1",
+          [
+            "RECOLOR",
+            "ORIG_COLOR_BG",
+            "COLOR_MAX"
+          ],
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_FG_2"
+          ]
+        ]
+      ],
+      [
+        "SWAP",
+        "COLOR_FG_1",
+        "COLOR_UNIQUE"
+      ]
+    ],
+    "source_task": "ce602527",
+    "description": "OVERLAY(FOR_EACH(IF(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))), SWAP(COLOR_FG_1,COLOR_UNIQUE))",
+    "depth": 4
+  },
+  {
+    "name": "FOR_EACH_IFORIG_COLOR_FG_1_RECOLORORIG_COLOR_BGCOLOR_MAX",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_FG_1",
+        [
+          "RECOLOR",
+          "ORIG_COLOR_BG",
+          "COLOR_MAX"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_FG_2"
+        ]
+      ]
+    ],
+    "source_task": "ce602527",
+    "description": "FOR_EACH(IF(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2)))",
+    "depth": 3
+  },
+  {
+    "name": "IFORIG_COLOR_FG_1_RECOLORORIG_COLOR_BGCOLOR_MAX",
+    "ast": [
+      "IF_COLOR",
+      "ORIG_COLOR_FG_1",
+      [
+        "RECOLOR",
+        "ORIG_COLOR_BG",
+        "COLOR_MAX"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_FG_2"
+      ]
+    ],
+    "source_task": "ce602527",
+    "description": "IF(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_SEQ_MACRO_CROP_NONZERO_FLIP_H",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "CROP_TO_COLOR",
+          "ORIG_COLOR_FG_2"
+        ],
+        "CROP_NONZERO"
+      ],
+      "FLIP_H"
+    ],
+    "source_task": "7468f01a",
+    "description": "('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO -> FLIP_H",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_SEQ_MACRO_KEEP_MOST_FREQUENT",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "SEQ",
+        [
+          "MASK",
+          "ORIG_COLOR_MAX"
+        ],
+        "KEEP_MOST_FREQUENT"
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "FOR_EACH(MASK(ORIG_COLOR_MAX) -> KEEP_MOST_FREQUENT)",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_MACRO_SEQ_MACRO_SEQ_ROT180_DELETE_ROWS_ZERO_SWAPCOLOR_FG_2COLOR_BG",
+    "ast": [
+      "SEQ",
+      [
+        "FILL_BG",
+        "ORIG_COLOR_BG"
+      ],
+      [
+        "SEQ",
+        [
+          "CROP_TO_COLOR",
+          "COLOR_FG_1"
+        ],
+        [
+          "SEQ",
+          "ROT180",
+          "DELETE_ROWS_ZERO"
+        ],
+        [
+          "SWAP",
+          "COLOR_FG_2",
+          "COLOR_BG"
+        ]
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "FILL_BG(ORIG_COLOR_BG) -> ('CROP_TO_COLOR', 'COLOR_FG_1') -> ROT180 -> DELETE_ROWS_ZERO -> SWAP(COLOR_FG_2,COLOR_BG)",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_MACRO_SEQ_ROT180_DELETE_ROWS_ZERO_SWAPCOLOR_FG_2COLOR_BG",
+    "ast": [
+      "SEQ",
+      [
+        "CROP_TO_COLOR",
+        "COLOR_FG_1"
+      ],
+      [
+        "SEQ",
+        "ROT180",
+        "DELETE_ROWS_ZERO"
+      ],
+      [
+        "SWAP",
+        "COLOR_FG_2",
+        "COLOR_BG"
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "('CROP_TO_COLOR', 'COLOR_FG_1') -> ROT180 -> DELETE_ROWS_ZERO -> SWAP(COLOR_FG_2,COLOR_BG)",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_FOR_EACH_KEEP_MOST_FREQUENT",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "FOR_EACH_OBJECT",
+        "KEEP_MOST_FREQUENT"
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "FOR_EACH(FOR_EACH(KEEP_MOST_FREQUENT))",
+    "depth": 2
+  },
+  {
+    "name": "FOR_EACH_FOR_EACH_IFORIG_COLOR_MAX_RECOLORCOLOR_SECONDORIG_COLOR_SECOND",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "IF_COLOR",
+          "ORIG_COLOR_MAX",
+          [
+            "RECOLOR",
+            "COLOR_SECOND",
+            "ORIG_COLOR_SECOND"
+          ],
+          [
+            "SEQ",
+            [
+              "MASK",
+              "COLOR_FG_1"
+            ],
+            [
+              "RECOLOR",
+              "COLOR_SECOND",
+              "ORIG_COLOR_BG"
+            ],
+            [
+              "SWAP",
+              "COLOR_MAX",
+              "COLOR_FG_2"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "source_task": "aabf363d",
+    "description": "FOR_EACH(FOR_EACH(IF(ORIG_COLOR_MAX, RECOLOR(COLOR_SECOND,ORIG_COLOR_SECOND), MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2))))",
+    "depth": 5
+  },
+  {
+    "name": "SEQ_IFCOLOR_MAX_SEQ_SEQ_MACRO_CROP_NONZERO_FLIP_H_SEQ_FOR_EACH_MACRO_RECOLORORIG_COLOR_MAXCOLOR_FG_2_SWAPCOLOR_FG_2COLOR_SECOND_RECOLORCOLOR_UNIQUECOLOR_FG_1",
+    "ast": [
+      "SEQ",
+      [
+        "IF_COLOR",
+        "COLOR_MAX",
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "CROP_TO_COLOR",
+              "ORIG_COLOR_FG_2"
+            ],
+            "CROP_NONZERO"
+          ],
+          "FLIP_H"
+        ],
+        [
+          "MASK",
+          "COLOR_BG"
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "MASK",
+            "ORIG_COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_MAX",
+          "COLOR_FG_2"
+        ],
+        [
+          "SWAP",
+          "COLOR_FG_2",
+          "COLOR_SECOND"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_FG_1"
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "IF(COLOR_MAX, ('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO -> FLIP_H, MASK(COLOR_BG)) -> FOR_EACH(MASK(ORIG_COLOR_FG_2)) -> RECOLOR(ORIG_COLOR_MAX,COLOR_FG_2) -> SWAP(COLOR_FG_2,COLOR_SECOND) -> RECOLOR(COLOR_UNIQUE,COLOR_FG_1)",
+    "depth": 4
+  },
+  {
+    "name": "IFCOLOR_MAX_SEQ_SEQ_MACRO_CROP_NONZERO_FLIP_H",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_MAX",
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "CROP_TO_COLOR",
+            "ORIG_COLOR_FG_2"
+          ],
+          "CROP_NONZERO"
+        ],
+        "FLIP_H"
+      ],
+      [
+        "MASK",
+        "COLOR_BG"
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "IF(COLOR_MAX, ('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO -> FLIP_H, MASK(COLOR_BG))",
+    "depth": 3
+  },
+  {
+    "name": "SEQ_FOR_EACH_MACRO_RECOLORORIG_COLOR_MAXCOLOR_FG_2_SWAPCOLOR_FG_2COLOR_SECOND",
+    "ast": [
+      "SEQ",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "MASK",
+          "ORIG_COLOR_FG_2"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_MAX",
+        "COLOR_FG_2"
+      ],
+      [
+        "SWAP",
+        "COLOR_FG_2",
+        "COLOR_SECOND"
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "FOR_EACH(MASK(ORIG_COLOR_FG_2)) -> RECOLOR(ORIG_COLOR_MAX,COLOR_FG_2) -> SWAP(COLOR_FG_2,COLOR_SECOND)",
+    "depth": 3
+  },
+  {
+    "name": "FOR_EACH_MACRO",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "MASK",
+        "ORIG_COLOR_FG_2"
+      ]
+    ],
+    "source_task": "72ca375d",
+    "description": "FOR_EACH(MASK(ORIG_COLOR_FG_2))",
+    "depth": 2
+  },
+  {
+    "name": "IFCOLOR_SECOND_SEQ_OVERLAY_SWAPCOLOR_MAXCOLOR_MIN_MACRO_DELETE_ROWS_ZERO_CROP_NONZERO",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_SECOND",
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            "COLOR_MAX",
+            "COLOR_MIN"
+          ],
+          [
+            "CROP_TO_COLOR",
+            "COLOR_MIN"
+          ]
+        ],
+        "DELETE_ROWS_ZERO",
+        "CROP_NONZERO"
+      ],
+      [
+        "OVERLAY",
+        "CROP_NONZERO",
+        "CROP_NONZERO"
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "IF(COLOR_SECOND, OVERLAY(SWAP(COLOR_MAX,COLOR_MIN), ('CROP_TO_COLOR', 'COLOR_MIN')) -> DELETE_ROWS_ZERO -> CROP_NONZERO, OVERLAY(CROP_NONZERO, CROP_NONZERO))",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_OVERLAY_SWAPCOLOR_MAXCOLOR_MIN_MACRO_DELETE_ROWS_ZERO_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_MIN"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_MIN"
+        ]
+      ],
+      "DELETE_ROWS_ZERO",
+      "CROP_NONZERO"
+    ],
+    "source_task": "b94a9452",
+    "description": "OVERLAY(SWAP(COLOR_MAX,COLOR_MIN), ('CROP_TO_COLOR', 'COLOR_MIN')) -> DELETE_ROWS_ZERO -> CROP_NONZERO",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_SWAPCOLOR_MAXCOLOR_MIN_MACRO",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_MIN"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_MIN"
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "OVERLAY(SWAP(COLOR_MAX,COLOR_MIN), ('CROP_TO_COLOR', 'COLOR_MIN'))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_CROP_NONZERO_RECOLORCOLOR_FG_1ORIG_COLOR_FG_1_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      [
+        "RECOLOR",
+        "COLOR_FG_1",
+        "ORIG_COLOR_FG_1"
+      ],
+      [
+        "IF_COLOR",
+        "COLOR_UNIQUE",
+        "EXTRACT_QUADRANT_TL",
+        [
+          "OVERLAY",
+          [
+            "IF_COLOR",
+            "COLOR_SECOND",
+            [
+              "IF_COLOR",
+              "COLOR_UNIQUE",
+              "EXTRACT_QUADRANT_TL",
+              [
+                "OVERLAY",
+                "DOWNSCALE_2X",
+                "DELETE_ROWS_ZERO"
+              ]
+            ],
+            [
+              "RECOLOR",
+              "ORIG_COLOR_FG_2",
+              "COLOR_FG_2"
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "OVERLAY",
+              [
+                "MASK",
+                "ORIG_COLOR_UNIQUE"
+              ],
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_FG_2"
+              ]
+            ],
+            [
+              "MASK",
+              "COLOR_UNIQUE"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE)))",
+    "depth": 6
+  },
+  {
+    "name": "IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_1",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_UNIQUE",
+      "EXTRACT_QUADRANT_TL",
+      [
+        "OVERLAY",
+        [
+          "IF_COLOR",
+          "COLOR_SECOND",
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              "DOWNSCALE_2X",
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "RECOLOR",
+            "ORIG_COLOR_FG_2",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "MASK",
+              "ORIG_COLOR_UNIQUE"
+            ],
+            [
+              "RECOLOR",
+              "ORIG_COLOR_BG",
+              "COLOR_FG_2"
+            ]
+          ],
+          [
+            "MASK",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE)))",
+    "depth": 5
+  },
+  {
+    "name": "OVERLAY_IFCOLOR_SECOND_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_SEQ_OVERLAY_MACRO_RECOLORORIG_COLOR_BGCOLOR_FG_2_MACRO",
+    "ast": [
+      "OVERLAY",
+      [
+        "IF_COLOR",
+        "COLOR_SECOND",
+        [
+          "IF_COLOR",
+          "COLOR_UNIQUE",
+          "EXTRACT_QUADRANT_TL",
+          [
+            "OVERLAY",
+            "DOWNSCALE_2X",
+            "DELETE_ROWS_ZERO"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_FG_2",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          [
+            "MASK",
+            "ORIG_COLOR_UNIQUE"
+          ],
+          [
+            "RECOLOR",
+            "ORIG_COLOR_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "MASK",
+          "COLOR_UNIQUE"
+        ]
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "OVERLAY(IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE))",
+    "depth": 4
+  },
+  {
+    "name": "IFCOLOR_SECOND_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_SECOND",
+      [
+        "IF_COLOR",
+        "COLOR_UNIQUE",
+        "EXTRACT_QUADRANT_TL",
+        [
+          "OVERLAY",
+          "DOWNSCALE_2X",
+          "DELETE_ROWS_ZERO"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_FG_2",
+        "COLOR_FG_2"
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2))",
+    "depth": 3
+  },
+  {
+    "name": "IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_2",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_UNIQUE",
+      "EXTRACT_QUADRANT_TL",
+      [
+        "OVERLAY",
+        "DOWNSCALE_2X",
+        "DELETE_ROWS_ZERO"
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_OVERLAY_MACRO_RECOLORORIG_COLOR_BGCOLOR_FG_2_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "MASK",
+          "ORIG_COLOR_UNIQUE"
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_BG",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "MASK",
+        "COLOR_UNIQUE"
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE)",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_MACRO_RECOLORORIG_COLOR_BGCOLOR_FG_2",
+    "ast": [
+      "OVERLAY",
+      [
+        "MASK",
+        "ORIG_COLOR_UNIQUE"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_BG",
+        "COLOR_FG_2"
+      ]
+    ],
+    "source_task": "2013d3e2",
+    "description": "OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_MACRO_FOR_EACH_MACRO_OVERLAY_RECOLORORIG_COLOR_UNIQUECOLOR_FG_1_RECOLORCOLOR_FG_2ORIG_COLOR_BG",
+    "ast": [
+      "SEQ",
+      [
+        "MASK",
+        "COLOR_FG_2"
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FILL_BG",
+          "COLOR_MIN"
+        ]
+      ],
+      [
+        "OVERLAY",
+        [
+          "RECOLOR",
+          "ORIG_COLOR_UNIQUE",
+          "COLOR_FG_1"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_2",
+          "ORIG_COLOR_BG"
+        ]
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "MASK(COLOR_FG_2) -> FOR_EACH(FILL_BG(COLOR_MIN)) -> OVERLAY(RECOLOR(ORIG_COLOR_UNIQUE,COLOR_FG_1), RECOLOR(COLOR_FG_2,ORIG_COLOR_BG))",
+    "depth": 3
+  },
+  {
+    "name": "FOR_EACH_MACRO_1",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "FILL_BG",
+        "COLOR_MIN"
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "FOR_EACH(FILL_BG(COLOR_MIN))",
+    "depth": 2
+  },
+  {
+    "name": "OVERLAY_RECOLORORIG_COLOR_UNIQUECOLOR_FG_1_RECOLORCOLOR_FG_2ORIG_COLOR_BG",
+    "ast": [
+      "OVERLAY",
+      [
+        "RECOLOR",
+        "ORIG_COLOR_UNIQUE",
+        "COLOR_FG_1"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_FG_2",
+        "ORIG_COLOR_BG"
+      ]
+    ],
+    "source_task": "5582e5ca",
+    "description": "OVERLAY(RECOLOR(ORIG_COLOR_UNIQUE,COLOR_FG_1), RECOLOR(COLOR_FG_2,ORIG_COLOR_BG))",
+    "depth": 2
+  },
+  {
+    "name": "OVERLAY_OVERLAY_SWAPCOLOR_BGCOLOR_MAX_OVERLAY_SWAPCOLOR_MAXCOLOR_SECOND_SEQ_CROP_NONZERO_RECOLORCOLOR_FG_1ORIG_COLOR_FG_1_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_FOR_EACH_FOR_EACH_KEEP_MOST_FREQUENT",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_BG",
+          "COLOR_MAX"
+        ],
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            "COLOR_MAX",
+            "COLOR_SECOND"
+          ],
+          [
+            "SEQ",
+            "CROP_NONZERO",
+            [
+              "RECOLOR",
+              "COLOR_FG_1",
+              "ORIG_COLOR_FG_1"
+            ],
+            [
+              "IF_COLOR",
+              "COLOR_UNIQUE",
+              "EXTRACT_QUADRANT_TL",
+              [
+                "OVERLAY",
+                [
+                  "IF_COLOR",
+                  "COLOR_SECOND",
+                  [
+                    "IF_COLOR",
+                    "COLOR_UNIQUE",
+                    "EXTRACT_QUADRANT_TL",
+                    [
+                      "OVERLAY",
+                      "DOWNSCALE_2X",
+                      "DELETE_ROWS_ZERO"
+                    ]
+                  ],
+                  [
+                    "RECOLOR",
+                    "ORIG_COLOR_FG_2",
+                    "COLOR_FG_2"
+                  ]
+                ],
+                [
+                  "SEQ",
+                  [
+                    "OVERLAY",
+                    [
+                      "MASK",
+                      "ORIG_COLOR_UNIQUE"
+                    ],
+                    [
+                      "RECOLOR",
+                      "ORIG_COLOR_BG",
+                      "COLOR_FG_2"
+                    ]
+                  ],
+                  [
+                    "MASK",
+                    "COLOR_UNIQUE"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FOR_EACH_OBJECT",
+          "KEEP_MOST_FREQUENT"
+        ]
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "OVERLAY(OVERLAY(SWAP(COLOR_BG,COLOR_MAX), OVERLAY(SWAP(COLOR_MAX,COLOR_SECOND), CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE))))), FOR_EACH(FOR_EACH(KEEP_MOST_FREQUENT)))",
+    "depth": 9
+  },
+  {
+    "name": "OVERLAY_SWAPCOLOR_BGCOLOR_MAX_OVERLAY_SWAPCOLOR_MAXCOLOR_SECOND_SEQ_CROP_NONZERO_RECOLORCOLOR_FG_1ORIG_COLOR_FG_1_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_MAX"
+      ],
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_SECOND"
+        ],
+        [
+          "SEQ",
+          "CROP_NONZERO",
+          [
+            "RECOLOR",
+            "COLOR_FG_1",
+            "ORIG_COLOR_FG_1"
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "IF_COLOR",
+                  "COLOR_UNIQUE",
+                  "EXTRACT_QUADRANT_TL",
+                  [
+                    "OVERLAY",
+                    "DOWNSCALE_2X",
+                    "DELETE_ROWS_ZERO"
+                  ]
+                ],
+                [
+                  "RECOLOR",
+                  "ORIG_COLOR_FG_2",
+                  "COLOR_FG_2"
+                ]
+              ],
+              [
+                "SEQ",
+                [
+                  "OVERLAY",
+                  [
+                    "MASK",
+                    "ORIG_COLOR_UNIQUE"
+                  ],
+                  [
+                    "RECOLOR",
+                    "ORIG_COLOR_BG",
+                    "COLOR_FG_2"
+                  ]
+                ],
+                [
+                  "MASK",
+                  "COLOR_UNIQUE"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "OVERLAY(SWAP(COLOR_BG,COLOR_MAX), OVERLAY(SWAP(COLOR_MAX,COLOR_SECOND), CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE)))))",
+    "depth": 8
+  },
+  {
+    "name": "OVERLAY_SWAPCOLOR_MAXCOLOR_SECOND_SEQ_CROP_NONZERO_RECOLORCOLOR_FG_1ORIG_COLOR_FG_1_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_SECOND"
+      ],
+      [
+        "SEQ",
+        "CROP_NONZERO",
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_FG_1"
+        ],
+        [
+          "IF_COLOR",
+          "COLOR_UNIQUE",
+          "EXTRACT_QUADRANT_TL",
+          [
+            "OVERLAY",
+            [
+              "IF_COLOR",
+              "COLOR_SECOND",
+              [
+                "IF_COLOR",
+                "COLOR_UNIQUE",
+                "EXTRACT_QUADRANT_TL",
+                [
+                  "OVERLAY",
+                  "DOWNSCALE_2X",
+                  "DELETE_ROWS_ZERO"
+                ]
+              ],
+              [
+                "RECOLOR",
+                "ORIG_COLOR_FG_2",
+                "COLOR_FG_2"
+              ]
+            ],
+            [
+              "SEQ",
+              [
+                "OVERLAY",
+                [
+                  "MASK",
+                  "ORIG_COLOR_UNIQUE"
+                ],
+                [
+                  "RECOLOR",
+                  "ORIG_COLOR_BG",
+                  "COLOR_FG_2"
+                ]
+              ],
+              [
+                "MASK",
+                "COLOR_UNIQUE"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "source_task": "9565186b",
+    "description": "OVERLAY(SWAP(COLOR_MAX,COLOR_SECOND), CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE))))",
+    "depth": 7
+  },
+  {
+    "name": "SEQ_SEQ_SWAPCOLOR_UNIQUECOLOR_MIN_RECOLORORIG_COLOR_SECONDCOLOR_SECOND_SEQ_SEQ_UPSCALE_2X_RECOLORCOLOR_UNIQUECOLOR_MAX_CROP_NONZERO_SEQ_DELETE_COLS_ZERO_DELETE_COLS_ZERO_CROP_NONZERO_SEQ_DELETE_ROWS_ZERO_CROP_NONZERO_IFORIG_COLOR_MIN_RECOLORCOLOR_UNIQUECOLOR_MAX",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SWAP",
+          "COLOR_UNIQUE",
+          "COLOR_MIN"
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_SECOND",
+          "COLOR_SECOND"
+        ],
+        [
+          "SEQ",
+          [
+            "SEQ",
+            "UPSCALE_2X",
+            [
+              "RECOLOR",
+              "COLOR_UNIQUE",
+              "COLOR_MAX"
+            ],
+            "CROP_NONZERO"
+          ],
+          [
+            "SEQ",
+            "DELETE_COLS_ZERO",
+            "DELETE_COLS_ZERO",
+            "CROP_NONZERO"
+          ],
+          [
+            "SEQ",
+            "DELETE_ROWS_ZERO",
+            "CROP_NONZERO"
+          ]
+        ]
+      ],
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_MIN",
+        [
+          "RECOLOR",
+          "COLOR_UNIQUE",
+          "COLOR_MAX"
+        ],
+        "SORT_COLS"
+      ]
+    ],
+    "source_task": "f25fbde4",
+    "description": "SWAP(COLOR_UNIQUE,COLOR_MIN) -> RECOLOR(ORIG_COLOR_SECOND,COLOR_SECOND) -> UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO -> DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO -> DELETE_ROWS_ZERO -> CROP_NONZERO -> IF(ORIG_COLOR_MIN, RECOLOR(COLOR_UNIQUE,COLOR_MAX), SORT_COLS)",
+    "depth": 5
+  },
+  {
+    "name": "SEQ_SWAPCOLOR_UNIQUECOLOR_MIN_RECOLORORIG_COLOR_SECONDCOLOR_SECOND_SEQ_SEQ_UPSCALE_2X_RECOLORCOLOR_UNIQUECOLOR_MAX_CROP_NONZERO_SEQ_DELETE_COLS_ZERO_DELETE_COLS_ZERO_CROP_NONZERO_SEQ_DELETE_ROWS_ZERO_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_UNIQUE",
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_SECOND",
+        "COLOR_SECOND"
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "UPSCALE_2X",
+          [
+            "RECOLOR",
+            "COLOR_UNIQUE",
+            "COLOR_MAX"
+          ],
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_COLS_ZERO",
+          "DELETE_COLS_ZERO",
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_ROWS_ZERO",
+          "CROP_NONZERO"
+        ]
+      ]
+    ],
+    "source_task": "f25fbde4",
+    "description": "SWAP(COLOR_UNIQUE,COLOR_MIN) -> RECOLOR(ORIG_COLOR_SECOND,COLOR_SECOND) -> UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO -> DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO -> DELETE_ROWS_ZERO -> CROP_NONZERO",
+    "depth": 4
+  },
+  {
+    "name": "IFORIG_COLOR_MIN_RECOLORCOLOR_UNIQUECOLOR_MAX",
+    "ast": [
+      "IF_COLOR",
+      "ORIG_COLOR_MIN",
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ],
+      "SORT_COLS"
+    ],
+    "source_task": "f25fbde4",
+    "description": "IF(ORIG_COLOR_MIN, RECOLOR(COLOR_UNIQUE,COLOR_MAX), SORT_COLS)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_OVERLAY_SEQ_OVERLAY_OVERLAY_OVERLAY_EXTRACT_QUADRANT_TL_EXTRACT_QUADRANT_BR_EXTRACT_QUADRANT_BL_OVERLAY_EXTRACT_QUADRANT_TR_SORT_COLS_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_MACRO_RECOLORCOLOR_FG_1ORIG_COLOR_MIN_RECOLOR_ALL_TO_MAX",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              [
+                "OVERLAY",
+                "EXTRACT_QUADRANT_TL",
+                "EXTRACT_QUADRANT_BR"
+              ],
+              "EXTRACT_QUADRANT_BL"
+            ],
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TR",
+              "SORT_COLS"
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "FILL_BG",
+                  "COLOR_MAX"
+                ],
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ]
+              ],
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "FILL_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_MIN"
+        ]
+      ],
+      "RECOLOR_ALL_TO_MAX"
+    ],
+    "source_task": "445eab21",
+    "description": "OVERLAY(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF(COLOR_SECOND, FILL_BG(COLOR_MAX), DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN)) -> RECOLOR_ALL_TO_MAX",
+    "depth": 8
+  },
+  {
+    "name": "SEQ_OVERLAY_SWAPCOLOR_MAXCOLOR_UNIQUE_DELETE_COLS_ZERO_SEQ_OVERLAY_CROP_TO_NONBG_RECOLORCOLOR_MAXCOLOR_SECOND_IFORIG_COLOR_FG_2_DELETE_ROWS_ZERO",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_UNIQUE"
+        ],
+        "DELETE_COLS_ZERO"
+      ],
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          "CROP_TO_NONBG",
+          [
+            "RECOLOR",
+            "COLOR_MAX",
+            "COLOR_SECOND"
+          ]
+        ],
+        [
+          "IF_COLOR",
+          "ORIG_COLOR_FG_2",
+          "DELETE_ROWS_ZERO",
+          "DELETE_COLS_ZERO"
+        ]
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "OVERLAY(SWAP(COLOR_MAX,COLOR_UNIQUE), DELETE_COLS_ZERO) -> OVERLAY(CROP_TO_NONBG, RECOLOR(COLOR_MAX,COLOR_SECOND)) -> IF(ORIG_COLOR_FG_2, DELETE_ROWS_ZERO, DELETE_COLS_ZERO)",
+    "depth": 4
+  },
+  {
+    "name": "OVERLAY_SWAPCOLOR_MAXCOLOR_UNIQUE_DELETE_COLS_ZERO",
+    "ast": [
+      "OVERLAY",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_UNIQUE"
+      ],
+      "DELETE_COLS_ZERO"
+    ],
+    "source_task": "b94a9452",
+    "description": "OVERLAY(SWAP(COLOR_MAX,COLOR_UNIQUE), DELETE_COLS_ZERO)",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_OVERLAY_CROP_TO_NONBG_RECOLORCOLOR_MAXCOLOR_SECOND_IFORIG_COLOR_FG_2_DELETE_ROWS_ZERO",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        "CROP_TO_NONBG",
+        [
+          "RECOLOR",
+          "COLOR_MAX",
+          "COLOR_SECOND"
+        ]
+      ],
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_FG_2",
+        "DELETE_ROWS_ZERO",
+        "DELETE_COLS_ZERO"
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "OVERLAY(CROP_TO_NONBG, RECOLOR(COLOR_MAX,COLOR_SECOND)) -> IF(ORIG_COLOR_FG_2, DELETE_ROWS_ZERO, DELETE_COLS_ZERO)",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_CROP_TO_NONBG_RECOLORCOLOR_MAXCOLOR_SECOND",
+    "ast": [
+      "OVERLAY",
+      "CROP_TO_NONBG",
+      [
+        "RECOLOR",
+        "COLOR_MAX",
+        "COLOR_SECOND"
+      ]
+    ],
+    "source_task": "b94a9452",
+    "description": "OVERLAY(CROP_TO_NONBG, RECOLOR(COLOR_MAX,COLOR_SECOND))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_IFCOLOR_SECOND_IFCOLOR_UNIQUE_EXTRACT_QUADRANT_TL_SEQ_RECOLORCOLOR_MINORIG_COLOR_FG_2_MACRO_MACRO_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "IF_COLOR",
+        "COLOR_SECOND",
+        [
+          "IF_COLOR",
+          "COLOR_UNIQUE",
+          "EXTRACT_QUADRANT_TL",
+          [
+            "OVERLAY",
+            "DOWNSCALE_2X",
+            "DELETE_ROWS_ZERO"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_FG_2",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "ORIG_COLOR_FG_2"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_MAX"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_MIN"
+        ]
+      ],
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_SECOND"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MAX",
+        "COLOR_MIN"
+      ]
+    ],
+    "source_task": "39a8645d",
+    "description": "IF(COLOR_SECOND, IF(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)) -> RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_MAX') -> ('CROP_TO_COLOR', 'COLOR_MIN') -> ('CROP_TO_COLOR', 'ORIG_COLOR_SECOND') -> ('CROP_TO_COLOR', 'ORIG_COLOR_MIN') -> RECOLOR(COLOR_MAX,COLOR_MIN)",
+    "depth": 4
+  },
+  {
+    "name": "SEQ_RECOLORCOLOR_MINORIG_COLOR_FG_2_MACRO_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "ORIG_COLOR_FG_2"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_MAX"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_MIN"
+      ]
+    ],
+    "source_task": "39a8645d",
+    "description": "RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_MAX') -> ('CROP_TO_COLOR', 'COLOR_MIN')",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_MACRO_SEQ_DELETE_COLS_ZERO_CROP_NONZERO",
+    "ast": [
+      "SEQ",
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_MIN"
+      ],
+      [
+        "SEQ",
+        "DELETE_COLS_ZERO",
+        "CROP_NONZERO"
+      ]
+    ],
+    "source_task": "0b148d64",
+    "description": "('CROP_TO_COLOR', 'ORIG_COLOR_MIN') -> DELETE_COLS_ZERO -> CROP_NONZERO",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_MACRO_MACRO_OVERLAY_RECOLORORIG_COLOR_FG_2COLOR_FG_2_MACRO",
+    "ast": [
+      "SEQ",
+      [
+        "MASK_AND",
+        "ROT270",
+        [
+          "IF_COLOR",
+          "COLOR_FG_2",
+          [
+            "MASK",
+            "COLOR_MIN"
+          ],
+          [
+            "MASK_XOR",
+            [
+              "RECOLOR",
+              "COLOR_FG_2",
+              "COLOR_FG_1"
+            ],
+            [
+              "RECOLOR",
+              "ORIG_COLOR_FG_1",
+              "COLOR_FG_1"
+            ]
+          ]
+        ]
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_UNIQUE"
+      ],
+      [
+        "OVERLAY",
+        [
+          "RECOLOR",
+          "ORIG_COLOR_FG_2",
+          "COLOR_FG_2"
+        ],
+        [
+          "MASK_AND",
+          [
+            "RECOLOR",
+            "ORIG_COLOR_FG_2",
+            "COLOR_MIN"
+          ],
+          "DELETE_COLS_ZERO"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_SECOND",
+        "COLOR_UNIQUE"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_FG_1",
+        "COLOR_FG_2"
+      ],
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_UNIQUE",
+        [
+          "RECOLOR",
+          "COLOR_UNIQUE",
+          "ORIG_COLOR_UNIQUE"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_BG"
+        ]
+      ],
+      [
+        "MASK_DIFF",
+        "TESSELLATE_2X2",
+        [
+          "RECOLOR",
+          "COLOR_BG",
+          "ORIG_COLOR_FG_2"
+        ]
+      ]
+    ],
+    "source_task": "ff805c23",
+    "description": "('MASK_AND', 'ROT270', ('IF_COLOR', 'COLOR_FG_2', ('MASK', 'COLOR_MIN'), ('MASK_XOR', ('RECOLOR', 'COLOR_FG_2', 'COLOR_FG_1'), ('RECOLOR', 'ORIG_COLOR_FG_1', 'COLOR_FG_1')))) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2), ('MASK_AND', ('RECOLOR', 'ORIG_COLOR_FG_2', 'COLOR_MIN'), 'DELETE_COLS_ZERO')) -> RECOLOR(COLOR_SECOND,COLOR_UNIQUE) -> RECOLOR(ORIG_COLOR_FG_1,COLOR_FG_2) -> IF(ORIG_COLOR_UNIQUE, RECOLOR(COLOR_UNIQUE,ORIG_COLOR_UNIQUE), ('CROP_TO_COLOR', 'COLOR_BG')) -> ('MASK_DIFF', 'TESSELLATE_2X2', ('RECOLOR', 'COLOR_BG', 'ORIG_COLOR_FG_2'))",
+    "depth": 3
+  },
+  {
+    "name": "OVERLAY_RECOLORORIG_COLOR_FG_2COLOR_FG_2_MACRO",
+    "ast": [
+      "OVERLAY",
+      [
+        "RECOLOR",
+        "ORIG_COLOR_FG_2",
+        "COLOR_FG_2"
+      ],
+      [
+        "MASK_AND",
+        [
+          "RECOLOR",
+          "ORIG_COLOR_FG_2",
+          "COLOR_MIN"
+        ],
+        "DELETE_COLS_ZERO"
+      ]
+    ],
+    "source_task": "ff805c23",
+    "description": "OVERLAY(RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2), ('MASK_AND', ('RECOLOR', 'ORIG_COLOR_FG_2', 'COLOR_MIN'), 'DELETE_COLS_ZERO'))",
+    "depth": 2
+  },
+  {
+    "name": "IFORIG_COLOR_UNIQUE_RECOLORCOLOR_UNIQUEORIG_COLOR_UNIQUE",
+    "ast": [
+      "IF_COLOR",
+      "ORIG_COLOR_UNIQUE",
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "ORIG_COLOR_UNIQUE"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_BG"
+      ]
+    ],
+    "source_task": "ff805c23",
+    "description": "IF(ORIG_COLOR_UNIQUE, RECOLOR(COLOR_UNIQUE,ORIG_COLOR_UNIQUE), ('CROP_TO_COLOR', 'COLOR_BG'))",
+    "depth": 2
+  },
+  {
+    "name": "SEQ_MACRO_SEQ_SEQ_EXTRACT_QUADRANT_BR_OVERLAY_IF8_SEQ_DELETE_ROWS_ZERO_SWAPCOLOR_MINCOLOR_MAX_DELETE_COLS_ZERO_FLIP_H_SHIFT_RIGHT_EXTRACT_QUADRANT_BR_SEQ_SEQ_SEQ_RECOLOR95_SEQ_SEQ_OVERLAY_SWAPCOLOR_BGCOLOR_SECOND_FLIP_H_DOWNSCALE_2X_RECOLOR2COLOR_BG_EXTRACT_QUADRANT_TL_RECOLOR27_SEQ_GRAVITY_RIGHT_FLIP_V_RECOLORCOLOR_UNIQUECOLOR_MAX_RECOLOR70_1",
+    "ast": [
+      "SEQ",
+      [
+        "FILL_BG",
+        6
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "EXTRACT_QUADRANT_BR",
+          [
+            "OVERLAY",
+            [
+              "IF_COLOR",
+              8,
+              [
+                "SEQ",
+                "DELETE_ROWS_ZERO",
+                [
+                  "SWAP",
+                  "COLOR_MIN",
+                  "COLOR_MAX"
+                ],
+                "DELETE_COLS_ZERO"
+              ],
+              [
+                "SEQ",
+                [
+                  "RECOLOR",
+                  2,
+                  5
+                ],
+                "ROT180",
+                "SHIFT_UP"
+              ]
+            ],
+            "FLIP_H"
+          ]
+        ],
+        "SHIFT_RIGHT",
+        "EXTRACT_QUADRANT_BR",
+        [
+          "RECOLOR",
+          0,
+          5
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "RECOLOR",
+              9,
+              5
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "SEQ",
+              [
+                "OVERLAY",
+                [
+                  "SWAP",
+                  "COLOR_BG",
+                  "COLOR_SECOND"
+                ],
+                "FLIP_H"
+              ],
+              "DOWNSCALE_2X",
+              [
+                "RECOLOR",
+                2,
+                "COLOR_BG"
+              ]
+            ],
+            "EXTRACT_QUADRANT_TL",
+            [
+              "RECOLOR",
+              2,
+              7
+            ],
+            [
+              "FILL_BG",
+              7
+            ]
+          ],
+          [
+            "SEQ",
+            "GRAVITY_RIGHT",
+            "FLIP_V",
+            [
+              "RECOLOR",
+              "COLOR_UNIQUE",
+              "COLOR_MAX"
+            ]
+          ]
+        ],
+        [
+          "RECOLOR",
+          7,
+          0
+        ]
+      ],
+      [
+        "RECOLOR",
+        8,
+        2
+      ],
+      [
+        "RECOLOR",
+        1,
+        8
+      ]
+    ],
+    "source_task": "de1cd16c",
+    "description": "FILL_BG(6) -> EXTRACT_QUADRANT_BR -> OVERLAY(IF(8, DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO, RECOLOR(2,5) -> ROT180 -> SHIFT_UP), FLIP_H) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5) -> RECOLOR(9,5) -> OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7) -> GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> RECOLOR(7,0) -> RECOLOR(8,2) -> RECOLOR(1,8)",
+    "depth": 7
   }
 ]

@@ -811,5 +811,2386 @@
       ]
     ],
     "timestamp": 1775396594
+  },
+  {
+    "module": "learned_5582e5ca_1775397566",
+    "task_id": "5582e5ca",
+    "task_ids": [
+      "5582e5ca"
+    ],
+    "description": "Evolved for 5582e5ca: SEQ(FOR_EACH(FOR_EACH(('CROP_TO_COLOR', 'COLOR_UNIQUE'))) -> SEQ(MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2)) -> SWAP(COLOR_SECOND,COLOR_FG_2))",
+    "ast": [
+      "SEQ",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "CROP_TO_COLOR",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "MASK",
+          "COLOR_FG_1"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_SECOND",
+          "ORIG_COLOR_BG"
+        ],
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "SWAP",
+        "COLOR_SECOND",
+        "COLOR_FG_2"
+      ]
+    ],
+    "timestamp": 1775397566
+  },
+  {
+    "module": "learned_42a50994_1775398428",
+    "task_id": "42a50994",
+    "task_ids": [
+      "42a50994"
+    ],
+    "description": "Evolved for 42a50994: ('DELETE_WHERE', 'SMALLEST_AREA')",
+    "ast": [
+      "DELETE_WHERE",
+      "SMALLEST_AREA"
+    ],
+    "timestamp": 1775398428
+  },
+  {
+    "module": "learned_445eab21_1775398630",
+    "task_id": "445eab21",
+    "task_ids": [
+      "445eab21"
+    ],
+    "description": "Evolved for 445eab21: SEQ(OVERLAY(SEQ(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, FILL_BG(COLOR_MAX), SEQ(DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO)), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2)), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN)) -> RECOLOR(COLOR_UNIQUE,COLOR_BG))",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              [
+                "OVERLAY",
+                "EXTRACT_QUADRANT_TL",
+                "EXTRACT_QUADRANT_BR"
+              ],
+              "EXTRACT_QUADRANT_BL"
+            ],
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TR",
+              "SORT_COLS"
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "FILL_BG",
+                  "COLOR_MAX"
+                ],
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ]
+              ],
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "FILL_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_MIN"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775398630
+  },
+  {
+    "module": "learned_72ca375d_1775398787",
+    "task_id": "72ca375d",
+    "task_ids": [
+      "72ca375d"
+    ],
+    "description": "Evolved for 72ca375d: ('CROP_TO_COLOR', 'COLOR_FG_2')",
+    "ast": [
+      "CROP_TO_COLOR",
+      "COLOR_FG_2"
+    ],
+    "timestamp": 1775398787
+  },
+  {
+    "module": "learned_b94a9452_1775398871",
+    "task_id": "b94a9452",
+    "task_ids": [
+      "b94a9452"
+    ],
+    "description": "Evolved for b94a9452: SEQ(CROP_NONZERO -> FOR_EACH(SWAP(COLOR_FG_1,COLOR_MIN)) -> CROP_NONZERO)",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "SWAP",
+          "COLOR_FG_1",
+          "COLOR_MIN"
+        ]
+      ],
+      "CROP_NONZERO"
+    ],
+    "timestamp": 1775398871
+  },
+  {
+    "module": "learned_5117e062_1775398998",
+    "task_id": "5117e062",
+    "task_ids": [
+      "5117e062"
+    ],
+    "description": "Evolved for 5117e062: SEQ(SEQ(SWAP(COLOR_UNIQUE,COLOR_MAX) -> SEQ(RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX)) -> RECOLOR(COLOR_MIN,COLOR_MAX)) -> RECOLOR_ALL_TO_MAX)",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SWAP",
+          "COLOR_UNIQUE",
+          "COLOR_MAX"
+        ],
+        [
+          "SEQ",
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "ORIG_COLOR_FG_2"
+          ],
+          [
+            "CROP_TO_COLOR",
+            "COLOR_UNIQUE"
+          ],
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_MAX"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ]
+      ],
+      "RECOLOR_ALL_TO_MAX"
+    ],
+    "timestamp": 1775398998
+  },
+  {
+    "module": "learned_ce602527_1775399083",
+    "task_id": "ce602527",
+    "task_ids": [
+      "ce602527"
+    ],
+    "description": "Evolved for ce602527: SEQ(SWAP(COLOR_BG,COLOR_MIN) -> RECOLOR(ORIG_COLOR_BG,COLOR_FG_1) -> SEQ(FOR_EACH(RECOLOR(COLOR_MIN,COLOR_UNIQUE)) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(FOR_EACH(IF_COLOR(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))), SWAP(COLOR_FG_1,COLOR_UNIQUE))) -> RECOLOR(COLOR_MIN,ORIG_COLOR_BG))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_BG",
+        "COLOR_FG_1"
+      ],
+      [
+        "SEQ",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_UNIQUE"
+          ]
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "OVERLAY",
+          [
+            "FOR_EACH_OBJECT",
+            [
+              "IF_COLOR",
+              "ORIG_COLOR_FG_1",
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_MAX"
+              ],
+              [
+                "RECOLOR",
+                "COLOR_MIN",
+                "COLOR_FG_2"
+              ]
+            ]
+          ],
+          [
+            "SWAP",
+            "COLOR_FG_1",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "ORIG_COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775399083
+  },
+  {
+    "module": "learned_7468f01a_1775399115",
+    "task_id": "7468f01a",
+    "task_ids": [
+      "7468f01a"
+    ],
+    "description": "Evolved for 7468f01a: SEQ(SEQ(('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO) -> FLIP_H)",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "CROP_TO_COLOR",
+          "ORIG_COLOR_FG_2"
+        ],
+        "CROP_NONZERO"
+      ],
+      "FLIP_H"
+    ],
+    "timestamp": 1775399115
+  },
+  {
+    "module": "learned_9565186b_1775400898",
+    "task_id": "9565186b",
+    "task_ids": [
+      "9565186b"
+    ],
+    "description": "Evolved for 9565186b: FOR_EACH(SEQ(MASK(ORIG_COLOR_MAX) -> KEEP_MOST_FREQUENT))",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "SEQ",
+        [
+          "MASK",
+          "ORIG_COLOR_MAX"
+        ],
+        "KEEP_MOST_FREQUENT"
+      ]
+    ],
+    "timestamp": 1775400898
+  },
+  {
+    "module": "learned_f25fbde4_1775401165",
+    "task_id": "f25fbde4",
+    "task_ids": [
+      "f25fbde4"
+    ],
+    "description": "Evolved for f25fbde4: SEQ(SWAP(COLOR_MAX,COLOR_SECOND) -> SEQ(SEQ(UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO) -> SEQ(DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO) -> SEQ(DELETE_ROWS_ZERO -> CROP_NONZERO)))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_SECOND"
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "UPSCALE_2X",
+          [
+            "RECOLOR",
+            "COLOR_UNIQUE",
+            "COLOR_MAX"
+          ],
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_COLS_ZERO",
+          "DELETE_COLS_ZERO",
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_ROWS_ZERO",
+          "CROP_NONZERO"
+        ]
+      ]
+    ],
+    "timestamp": 1775401165
+  },
+  {
+    "module": "learned_aabf363d_1775401223",
+    "task_id": "aabf363d",
+    "task_ids": [
+      "aabf363d"
+    ],
+    "description": "Evolved for aabf363d: FOR_EACH(IF_COLOR(ORIG_COLOR_MAX, RECOLOR(COLOR_SECOND,ORIG_COLOR_SECOND), SEQ(MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2))))",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_MAX",
+        [
+          "RECOLOR",
+          "COLOR_SECOND",
+          "ORIG_COLOR_SECOND"
+        ],
+        [
+          "SEQ",
+          [
+            "MASK",
+            "COLOR_FG_1"
+          ],
+          [
+            "RECOLOR",
+            "COLOR_SECOND",
+            "ORIG_COLOR_BG"
+          ],
+          [
+            "SWAP",
+            "COLOR_MAX",
+            "COLOR_FG_2"
+          ]
+        ]
+      ]
+    ],
+    "timestamp": 1775401223
+  },
+  {
+    "module": "learned_75b8110e_1775401230",
+    "task_id": "75b8110e",
+    "task_ids": [
+      "75b8110e"
+    ],
+    "description": "Evolved for 75b8110e: OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS))",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        [
+          "OVERLAY",
+          "EXTRACT_QUADRANT_TL",
+          "EXTRACT_QUADRANT_BR"
+        ],
+        "EXTRACT_QUADRANT_BL"
+      ],
+      [
+        "OVERLAY",
+        "EXTRACT_QUADRANT_TR",
+        "SORT_COLS"
+      ]
+    ],
+    "timestamp": 1775401230
+  },
+  {
+    "module": "learned_1caeab9d_1775401299",
+    "task_id": "1caeab9d",
+    "task_ids": [
+      "1caeab9d"
+    ],
+    "description": "Evolved for 1caeab9d: ('IF_PROPERTY', 'RIGHTMOST', ('SEQ', ('ALIGN_V', 'TOPMOST'), ('ALIGN_V', 'BOTTOMMOST'), ('IF_PROPERTY', 'IS_SOLID', 'GRAVITY_DOWN', ('FOR_EACH_NODE', ('ALIGN_V', 'MOST_FREQUENT_COLOR'))), ('ALIGN_V', 'TOPMOST')), ('ALIGN_V', 'SMALLEST_AREA'))",
+    "ast": [
+      "IF_PROPERTY",
+      "RIGHTMOST",
+      [
+        "SEQ",
+        [
+          "ALIGN_V",
+          "TOPMOST"
+        ],
+        [
+          "ALIGN_V",
+          "BOTTOMMOST"
+        ],
+        [
+          "IF_PROPERTY",
+          "IS_SOLID",
+          "GRAVITY_DOWN",
+          [
+            "FOR_EACH_NODE",
+            [
+              "ALIGN_V",
+              "MOST_FREQUENT_COLOR"
+            ]
+          ]
+        ],
+        [
+          "ALIGN_V",
+          "TOPMOST"
+        ]
+      ],
+      [
+        "ALIGN_V",
+        "SMALLEST_AREA"
+      ]
+    ],
+    "timestamp": 1775401299
+  },
+  {
+    "module": "learned_42a50994_1775401782",
+    "task_id": "42a50994",
+    "task_ids": [
+      "42a50994"
+    ],
+    "description": "Evolved for 42a50994: ('DELETE_WHERE', 'SMALLEST_AREA')",
+    "ast": [
+      "DELETE_WHERE",
+      "SMALLEST_AREA"
+    ],
+    "timestamp": 1775401782
+  },
+  {
+    "module": "learned_445eab21_1775401994",
+    "task_id": "445eab21",
+    "task_ids": [
+      "445eab21"
+    ],
+    "description": "Evolved for 445eab21: SEQ(OVERLAY(SEQ(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, FILL_BG(COLOR_MAX), SEQ(DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO)), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2)), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN)) -> RECOLOR(COLOR_UNIQUE,COLOR_BG))",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              [
+                "OVERLAY",
+                "EXTRACT_QUADRANT_TL",
+                "EXTRACT_QUADRANT_BR"
+              ],
+              "EXTRACT_QUADRANT_BL"
+            ],
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TR",
+              "SORT_COLS"
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "FILL_BG",
+                  "COLOR_MAX"
+                ],
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ]
+              ],
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "FILL_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_MIN"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775401994
+  },
+  {
+    "module": "learned_72ca375d_1775402189",
+    "task_id": "72ca375d",
+    "task_ids": [
+      "72ca375d"
+    ],
+    "description": "Evolved for 72ca375d: ('CROP_TO_COLOR', 'COLOR_FG_2')",
+    "ast": [
+      "CROP_TO_COLOR",
+      "COLOR_FG_2"
+    ],
+    "timestamp": 1775402189
+  },
+  {
+    "module": "learned_b94a9452_1775402262",
+    "task_id": "b94a9452",
+    "task_ids": [
+      "b94a9452"
+    ],
+    "description": "Evolved for b94a9452: SEQ(FILL_BG(ORIG_COLOR_BG) -> SEQ(('CROP_TO_COLOR', 'COLOR_FG_1') -> SEQ(ROT180 -> DELETE_ROWS_ZERO) -> SWAP(COLOR_FG_2,COLOR_BG)))",
+    "ast": [
+      "SEQ",
+      [
+        "FILL_BG",
+        "ORIG_COLOR_BG"
+      ],
+      [
+        "SEQ",
+        [
+          "CROP_TO_COLOR",
+          "COLOR_FG_1"
+        ],
+        [
+          "SEQ",
+          "ROT180",
+          "DELETE_ROWS_ZERO"
+        ],
+        [
+          "SWAP",
+          "COLOR_FG_2",
+          "COLOR_BG"
+        ]
+      ]
+    ],
+    "timestamp": 1775402262
+  },
+  {
+    "module": "learned_5117e062_1775402389",
+    "task_id": "5117e062",
+    "task_ids": [
+      "5117e062"
+    ],
+    "description": "Evolved for 5117e062: SEQ(SWAP(COLOR_UNIQUE,COLOR_MAX) -> SEQ(RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX)) -> RECOLOR(COLOR_MIN,COLOR_MAX))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "ORIG_COLOR_FG_2"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_MAX"
+      ]
+    ],
+    "timestamp": 1775402389
+  },
+  {
+    "module": "learned_ce602527_1775402471",
+    "task_id": "ce602527",
+    "task_ids": [
+      "ce602527"
+    ],
+    "description": "Evolved for ce602527: SEQ(SWAP(COLOR_BG,COLOR_MIN) -> RECOLOR(ORIG_COLOR_BG,COLOR_FG_1) -> SEQ(FOR_EACH(RECOLOR(COLOR_MIN,COLOR_UNIQUE)) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(FOR_EACH(IF_COLOR(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))), SWAP(COLOR_FG_1,COLOR_UNIQUE))) -> RECOLOR(COLOR_MIN,ORIG_COLOR_BG))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_BG",
+        "COLOR_FG_1"
+      ],
+      [
+        "SEQ",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_UNIQUE"
+          ]
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "OVERLAY",
+          [
+            "FOR_EACH_OBJECT",
+            [
+              "IF_COLOR",
+              "ORIG_COLOR_FG_1",
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_MAX"
+              ],
+              [
+                "RECOLOR",
+                "COLOR_MIN",
+                "COLOR_FG_2"
+              ]
+            ]
+          ],
+          [
+            "SWAP",
+            "COLOR_FG_1",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "ORIG_COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775402471
+  },
+  {
+    "module": "learned_7468f01a_1775402506",
+    "task_id": "7468f01a",
+    "task_ids": [
+      "7468f01a"
+    ],
+    "description": "Evolved for 7468f01a: SEQ(CROP_NONZERO -> FLIP_H)",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      "FLIP_H"
+    ],
+    "timestamp": 1775402506
+  },
+  {
+    "module": "learned_0b148d64_1775402686",
+    "task_id": "0b148d64",
+    "task_ids": [
+      "0b148d64"
+    ],
+    "description": "Evolved for 0b148d64: ('CROP_TO_COLOR', 'ORIG_COLOR_MIN')",
+    "ast": [
+      "CROP_TO_COLOR",
+      "ORIG_COLOR_MIN"
+    ],
+    "timestamp": 1775402686
+  },
+  {
+    "module": "learned_5582e5ca_1775403677",
+    "task_id": "5582e5ca",
+    "task_ids": [
+      "5582e5ca"
+    ],
+    "description": "Evolved for 5582e5ca: SEQ(FOR_EACH(FOR_EACH(('CROP_TO_COLOR', 'COLOR_UNIQUE'))) -> SEQ(MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2)) -> SWAP(COLOR_SECOND,COLOR_FG_2))",
+    "ast": [
+      "SEQ",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "CROP_TO_COLOR",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "MASK",
+          "COLOR_FG_1"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_SECOND",
+          "ORIG_COLOR_BG"
+        ],
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "SWAP",
+        "COLOR_SECOND",
+        "COLOR_FG_2"
+      ]
+    ],
+    "timestamp": 1775403677
+  },
+  {
+    "module": "learned_9565186b_1775403677",
+    "task_id": "9565186b",
+    "task_ids": [
+      "9565186b"
+    ],
+    "description": "Evolved for 9565186b: FOR_EACH(FOR_EACH(KEEP_MOST_FREQUENT))",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "FOR_EACH_OBJECT",
+        "KEEP_MOST_FREQUENT"
+      ]
+    ],
+    "timestamp": 1775403677
+  },
+  {
+    "module": "learned_f25fbde4_1775403949",
+    "task_id": "f25fbde4",
+    "task_ids": [
+      "f25fbde4"
+    ],
+    "description": "Evolved for f25fbde4: SEQ(SWAP(COLOR_MAX,COLOR_SECOND) -> SEQ(SEQ(UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO) -> SEQ(DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO) -> SEQ(DELETE_ROWS_ZERO -> CROP_NONZERO)))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_MAX",
+        "COLOR_SECOND"
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "UPSCALE_2X",
+          [
+            "RECOLOR",
+            "COLOR_UNIQUE",
+            "COLOR_MAX"
+          ],
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_COLS_ZERO",
+          "DELETE_COLS_ZERO",
+          "CROP_NONZERO"
+        ],
+        [
+          "SEQ",
+          "DELETE_ROWS_ZERO",
+          "CROP_NONZERO"
+        ]
+      ]
+    ],
+    "timestamp": 1775403949
+  },
+  {
+    "module": "learned_aabf363d_1775403995",
+    "task_id": "aabf363d",
+    "task_ids": [
+      "aabf363d"
+    ],
+    "description": "Evolved for aabf363d: FOR_EACH(FOR_EACH(IF_COLOR(ORIG_COLOR_MAX, RECOLOR(COLOR_SECOND,ORIG_COLOR_SECOND), SEQ(MASK(COLOR_FG_1) -> RECOLOR(COLOR_SECOND,ORIG_COLOR_BG) -> SWAP(COLOR_MAX,COLOR_FG_2)))))",
+    "ast": [
+      "FOR_EACH_OBJECT",
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "IF_COLOR",
+          "ORIG_COLOR_MAX",
+          [
+            "RECOLOR",
+            "COLOR_SECOND",
+            "ORIG_COLOR_SECOND"
+          ],
+          [
+            "SEQ",
+            [
+              "MASK",
+              "COLOR_FG_1"
+            ],
+            [
+              "RECOLOR",
+              "COLOR_SECOND",
+              "ORIG_COLOR_BG"
+            ],
+            [
+              "SWAP",
+              "COLOR_MAX",
+              "COLOR_FG_2"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "timestamp": 1775403995
+  },
+  {
+    "module": "learned_75b8110e_1775404013",
+    "task_id": "75b8110e",
+    "task_ids": [
+      "75b8110e"
+    ],
+    "description": "Evolved for 75b8110e: OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS))",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        [
+          "OVERLAY",
+          "EXTRACT_QUADRANT_TL",
+          "EXTRACT_QUADRANT_BR"
+        ],
+        "EXTRACT_QUADRANT_BL"
+      ],
+      [
+        "OVERLAY",
+        "EXTRACT_QUADRANT_TR",
+        "SORT_COLS"
+      ]
+    ],
+    "timestamp": 1775404013
+  },
+  {
+    "module": "learned_42a50994_1775404553",
+    "task_id": "42a50994",
+    "task_ids": [
+      "42a50994"
+    ],
+    "description": "Evolved for 42a50994: ('DELETE_WHERE', 'SMALLEST_AREA')",
+    "ast": [
+      "DELETE_WHERE",
+      "SMALLEST_AREA"
+    ],
+    "timestamp": 1775404553
+  },
+  {
+    "module": "learned_445eab21_1775404773",
+    "task_id": "445eab21",
+    "task_ids": [
+      "445eab21"
+    ],
+    "description": "Evolved for 445eab21: SEQ(OVERLAY(SEQ(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, FILL_BG(COLOR_MAX), SEQ(DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO)), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2)), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN)) -> RECOLOR(COLOR_UNIQUE,COLOR_BG))",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              [
+                "OVERLAY",
+                "EXTRACT_QUADRANT_TL",
+                "EXTRACT_QUADRANT_BR"
+              ],
+              "EXTRACT_QUADRANT_BL"
+            ],
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TR",
+              "SORT_COLS"
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "FILL_BG",
+                  "COLOR_MAX"
+                ],
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ]
+              ],
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "FILL_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_MIN"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775404773
+  },
+  {
+    "module": "learned_72ca375d_1775404950",
+    "task_id": "72ca375d",
+    "task_ids": [
+      "72ca375d"
+    ],
+    "description": "Evolved for 72ca375d: SEQ(IF_COLOR(COLOR_MAX, SEQ(SEQ(('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO) -> FLIP_H), MASK(COLOR_BG)) -> SEQ(FOR_EACH(MASK(ORIG_COLOR_FG_2)) -> RECOLOR(ORIG_COLOR_MAX,COLOR_FG_2) -> SWAP(COLOR_FG_2,COLOR_SECOND)) -> RECOLOR(COLOR_UNIQUE,COLOR_FG_1))",
+    "ast": [
+      "SEQ",
+      [
+        "IF_COLOR",
+        "COLOR_MAX",
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "CROP_TO_COLOR",
+              "ORIG_COLOR_FG_2"
+            ],
+            "CROP_NONZERO"
+          ],
+          "FLIP_H"
+        ],
+        [
+          "MASK",
+          "COLOR_BG"
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "MASK",
+            "ORIG_COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_MAX",
+          "COLOR_FG_2"
+        ],
+        [
+          "SWAP",
+          "COLOR_FG_2",
+          "COLOR_SECOND"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_UNIQUE",
+        "COLOR_FG_1"
+      ]
+    ],
+    "timestamp": 1775404950
+  },
+  {
+    "module": "learned_b94a9452_1775405018",
+    "task_id": "b94a9452",
+    "task_ids": [
+      "b94a9452"
+    ],
+    "description": "Evolved for b94a9452: IF_COLOR(COLOR_SECOND, SEQ(OVERLAY(SWAP(COLOR_MAX,COLOR_MIN), ('CROP_TO_COLOR', 'COLOR_MIN')) -> DELETE_ROWS_ZERO -> CROP_NONZERO), OVERLAY(CROP_NONZERO, CROP_NONZERO))",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_SECOND",
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            "COLOR_MAX",
+            "COLOR_MIN"
+          ],
+          [
+            "CROP_TO_COLOR",
+            "COLOR_MIN"
+          ]
+        ],
+        "DELETE_ROWS_ZERO",
+        "CROP_NONZERO"
+      ],
+      [
+        "OVERLAY",
+        "CROP_NONZERO",
+        "CROP_NONZERO"
+      ]
+    ],
+    "timestamp": 1775405018
+  },
+  {
+    "module": "learned_5117e062_1775405174",
+    "task_id": "5117e062",
+    "task_ids": [
+      "5117e062"
+    ],
+    "description": "Evolved for 5117e062: SEQ(SWAP(COLOR_UNIQUE,COLOR_MAX) -> SEQ(RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX)) -> RECOLOR(COLOR_MIN,COLOR_MAX))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "ORIG_COLOR_FG_2"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_MAX"
+      ]
+    ],
+    "timestamp": 1775405174
+  },
+  {
+    "module": "learned_2013d3e2_1775405238",
+    "task_id": "2013d3e2",
+    "task_ids": [
+      "2013d3e2"
+    ],
+    "description": "Evolved for 2013d3e2: SEQ(CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), SEQ(OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE)))))",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      [
+        "RECOLOR",
+        "COLOR_FG_1",
+        "ORIG_COLOR_FG_1"
+      ],
+      [
+        "IF_COLOR",
+        "COLOR_UNIQUE",
+        "EXTRACT_QUADRANT_TL",
+        [
+          "OVERLAY",
+          [
+            "IF_COLOR",
+            "COLOR_SECOND",
+            [
+              "IF_COLOR",
+              "COLOR_UNIQUE",
+              "EXTRACT_QUADRANT_TL",
+              [
+                "OVERLAY",
+                "DOWNSCALE_2X",
+                "DELETE_ROWS_ZERO"
+              ]
+            ],
+            [
+              "RECOLOR",
+              "ORIG_COLOR_FG_2",
+              "COLOR_FG_2"
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "OVERLAY",
+              [
+                "MASK",
+                "ORIG_COLOR_UNIQUE"
+              ],
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_FG_2"
+              ]
+            ],
+            [
+              "MASK",
+              "COLOR_UNIQUE"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "timestamp": 1775405238
+  },
+  {
+    "module": "learned_ce602527_1775405258",
+    "task_id": "ce602527",
+    "task_ids": [
+      "ce602527"
+    ],
+    "description": "Evolved for ce602527: SEQ(SWAP(COLOR_BG,COLOR_MIN) -> RECOLOR(ORIG_COLOR_BG,COLOR_FG_1) -> SEQ(FOR_EACH(RECOLOR(COLOR_MIN,COLOR_UNIQUE)) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(FOR_EACH(IF_COLOR(ORIG_COLOR_FG_1, RECOLOR(ORIG_COLOR_BG,COLOR_MAX), RECOLOR(COLOR_MIN,COLOR_FG_2))), SWAP(COLOR_FG_1,COLOR_UNIQUE))) -> RECOLOR(COLOR_MIN,ORIG_COLOR_BG))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_BG",
+        "COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_BG",
+        "COLOR_FG_1"
+      ],
+      [
+        "SEQ",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "RECOLOR",
+            "COLOR_MIN",
+            "COLOR_UNIQUE"
+          ]
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "OVERLAY",
+          [
+            "FOR_EACH_OBJECT",
+            [
+              "IF_COLOR",
+              "ORIG_COLOR_FG_1",
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_MAX"
+              ],
+              [
+                "RECOLOR",
+                "COLOR_MIN",
+                "COLOR_FG_2"
+              ]
+            ]
+          ],
+          [
+            "SWAP",
+            "COLOR_FG_1",
+            "COLOR_UNIQUE"
+          ]
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "ORIG_COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775405258
+  },
+  {
+    "module": "learned_7468f01a_1775405295",
+    "task_id": "7468f01a",
+    "task_ids": [
+      "7468f01a"
+    ],
+    "description": "Evolved for 7468f01a: SEQ(SEQ(('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO) -> FLIP_H)",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "CROP_TO_COLOR",
+          "ORIG_COLOR_FG_2"
+        ],
+        "CROP_NONZERO"
+      ],
+      "FLIP_H"
+    ],
+    "timestamp": 1775405295
+  },
+  {
+    "module": "learned_0b148d64_1775405451",
+    "task_id": "0b148d64",
+    "task_ids": [
+      "0b148d64"
+    ],
+    "description": "Evolved for 0b148d64: SEQ(('CROP_TO_COLOR', 'ORIG_COLOR_UNIQUE') -> DELETE_COLS_ZERO)",
+    "ast": [
+      "SEQ",
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_UNIQUE"
+      ],
+      "DELETE_COLS_ZERO"
+    ],
+    "timestamp": 1775405451
+  },
+  {
+    "module": "learned_1caeab9d_1775406159",
+    "task_id": "1caeab9d",
+    "task_ids": [
+      "1caeab9d"
+    ],
+    "description": "Evolved for 1caeab9d: ('IF_PROPERTY', 'RIGHTMOST', ('SEQ', ('FOR_EACH_NODE', ('ALIGN_H', 'BOTTOMMOST')), ('FOR_EACH_NODE', 'MOVE_RIGHT_3'), ('ALIGN_V', 'LEAST_FREQUENT_COLOR'), ('ALIGN_V', 'TOPMOST')), ('ALIGN_V', 'LARGEST_AREA'))",
+    "ast": [
+      "IF_PROPERTY",
+      "RIGHTMOST",
+      [
+        "SEQ",
+        [
+          "FOR_EACH_NODE",
+          [
+            "ALIGN_H",
+            "BOTTOMMOST"
+          ]
+        ],
+        [
+          "FOR_EACH_NODE",
+          "MOVE_RIGHT_3"
+        ],
+        [
+          "ALIGN_V",
+          "LEAST_FREQUENT_COLOR"
+        ],
+        [
+          "ALIGN_V",
+          "TOPMOST"
+        ]
+      ],
+      [
+        "ALIGN_V",
+        "LARGEST_AREA"
+      ]
+    ],
+    "timestamp": 1775406159
+  },
+  {
+    "module": "learned_5582e5ca_1775407812",
+    "task_id": "5582e5ca",
+    "task_ids": [
+      "5582e5ca"
+    ],
+    "description": "Evolved for 5582e5ca: SEQ(MASK(COLOR_FG_2) -> FOR_EACH(FILL_BG(COLOR_MIN)) -> OVERLAY(RECOLOR(ORIG_COLOR_UNIQUE,COLOR_FG_1), RECOLOR(COLOR_FG_2,ORIG_COLOR_BG)))",
+    "ast": [
+      "SEQ",
+      [
+        "MASK",
+        "COLOR_FG_2"
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FILL_BG",
+          "COLOR_MIN"
+        ]
+      ],
+      [
+        "OVERLAY",
+        [
+          "RECOLOR",
+          "ORIG_COLOR_UNIQUE",
+          "COLOR_FG_1"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_2",
+          "ORIG_COLOR_BG"
+        ]
+      ]
+    ],
+    "timestamp": 1775407812
+  },
+  {
+    "module": "learned_9565186b_1775407812",
+    "task_id": "9565186b",
+    "task_ids": [
+      "9565186b"
+    ],
+    "description": "Evolved for 9565186b: OVERLAY(OVERLAY(SWAP(COLOR_BG,COLOR_MAX), OVERLAY(SWAP(COLOR_MAX,COLOR_SECOND), SEQ(CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), SEQ(OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE))))))), FOR_EACH(FOR_EACH(KEEP_MOST_FREQUENT)))",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_BG",
+          "COLOR_MAX"
+        ],
+        [
+          "OVERLAY",
+          [
+            "SWAP",
+            "COLOR_MAX",
+            "COLOR_SECOND"
+          ],
+          [
+            "SEQ",
+            "CROP_NONZERO",
+            [
+              "RECOLOR",
+              "COLOR_FG_1",
+              "ORIG_COLOR_FG_1"
+            ],
+            [
+              "IF_COLOR",
+              "COLOR_UNIQUE",
+              "EXTRACT_QUADRANT_TL",
+              [
+                "OVERLAY",
+                [
+                  "IF_COLOR",
+                  "COLOR_SECOND",
+                  [
+                    "IF_COLOR",
+                    "COLOR_UNIQUE",
+                    "EXTRACT_QUADRANT_TL",
+                    [
+                      "OVERLAY",
+                      "DOWNSCALE_2X",
+                      "DELETE_ROWS_ZERO"
+                    ]
+                  ],
+                  [
+                    "RECOLOR",
+                    "ORIG_COLOR_FG_2",
+                    "COLOR_FG_2"
+                  ]
+                ],
+                [
+                  "SEQ",
+                  [
+                    "OVERLAY",
+                    [
+                      "MASK",
+                      "ORIG_COLOR_UNIQUE"
+                    ],
+                    [
+                      "RECOLOR",
+                      "ORIG_COLOR_BG",
+                      "COLOR_FG_2"
+                    ]
+                  ],
+                  [
+                    "MASK",
+                    "COLOR_UNIQUE"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        "FOR_EACH_OBJECT",
+        [
+          "FOR_EACH_OBJECT",
+          "KEEP_MOST_FREQUENT"
+        ]
+      ]
+    ],
+    "timestamp": 1775407812
+  },
+  {
+    "module": "learned_f25fbde4_1775413337",
+    "task_id": "f25fbde4",
+    "task_ids": [
+      "f25fbde4"
+    ],
+    "description": "Evolved for f25fbde4: SEQ(SEQ(SWAP(COLOR_UNIQUE,COLOR_MIN) -> RECOLOR(ORIG_COLOR_SECOND,COLOR_SECOND) -> SEQ(SEQ(UPSCALE_2X -> RECOLOR(COLOR_UNIQUE,COLOR_MAX) -> CROP_NONZERO) -> SEQ(DELETE_COLS_ZERO -> DELETE_COLS_ZERO -> CROP_NONZERO) -> SEQ(DELETE_ROWS_ZERO -> CROP_NONZERO))) -> IF_COLOR(ORIG_COLOR_MIN, RECOLOR(COLOR_UNIQUE,COLOR_MAX), SORT_COLS))",
+    "ast": [
+      "SEQ",
+      [
+        "SEQ",
+        [
+          "SWAP",
+          "COLOR_UNIQUE",
+          "COLOR_MIN"
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_SECOND",
+          "COLOR_SECOND"
+        ],
+        [
+          "SEQ",
+          [
+            "SEQ",
+            "UPSCALE_2X",
+            [
+              "RECOLOR",
+              "COLOR_UNIQUE",
+              "COLOR_MAX"
+            ],
+            "CROP_NONZERO"
+          ],
+          [
+            "SEQ",
+            "DELETE_COLS_ZERO",
+            "DELETE_COLS_ZERO",
+            "CROP_NONZERO"
+          ],
+          [
+            "SEQ",
+            "DELETE_ROWS_ZERO",
+            "CROP_NONZERO"
+          ]
+        ]
+      ],
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_MIN",
+        [
+          "RECOLOR",
+          "COLOR_UNIQUE",
+          "COLOR_MAX"
+        ],
+        "SORT_COLS"
+      ]
+    ],
+    "timestamp": 1775413337
+  },
+  {
+    "module": "learned_75b8110e_1775413454",
+    "task_id": "75b8110e",
+    "task_ids": [
+      "75b8110e"
+    ],
+    "description": "Evolved for 75b8110e: OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS))",
+    "ast": [
+      "OVERLAY",
+      [
+        "OVERLAY",
+        [
+          "OVERLAY",
+          "EXTRACT_QUADRANT_TL",
+          "EXTRACT_QUADRANT_BR"
+        ],
+        "EXTRACT_QUADRANT_BL"
+      ],
+      [
+        "OVERLAY",
+        "EXTRACT_QUADRANT_TR",
+        "SORT_COLS"
+      ]
+    ],
+    "timestamp": 1775413454
+  },
+  {
+    "module": "learned_42a50994_1775414154",
+    "task_id": "42a50994",
+    "task_ids": [
+      "42a50994"
+    ],
+    "description": "Evolved for 42a50994: ('DELETE_WHERE', 'SMALLEST_AREA')",
+    "ast": [
+      "DELETE_WHERE",
+      "SMALLEST_AREA"
+    ],
+    "timestamp": 1775414154
+  },
+  {
+    "module": "learned_445eab21_1775414532",
+    "task_id": "445eab21",
+    "task_ids": [
+      "445eab21"
+    ],
+    "description": "Evolved for 445eab21: SEQ(OVERLAY(SEQ(OVERLAY(OVERLAY(OVERLAY(EXTRACT_QUADRANT_TL, EXTRACT_QUADRANT_BR), EXTRACT_QUADRANT_BL), OVERLAY(EXTRACT_QUADRANT_TR, SORT_COLS)) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, FILL_BG(COLOR_MAX), SEQ(DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO)), DELETE_ROWS_ZERO)) -> FILL_BG(COLOR_FG_2)), RECOLOR(COLOR_FG_1,ORIG_COLOR_MIN)) -> RECOLOR_ALL_TO_MAX)",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SEQ",
+          [
+            "OVERLAY",
+            [
+              "OVERLAY",
+              [
+                "OVERLAY",
+                "EXTRACT_QUADRANT_TL",
+                "EXTRACT_QUADRANT_BR"
+              ],
+              "EXTRACT_QUADRANT_BL"
+            ],
+            [
+              "OVERLAY",
+              "EXTRACT_QUADRANT_TR",
+              "SORT_COLS"
+            ]
+          ],
+          [
+            "IF_COLOR",
+            "COLOR_UNIQUE",
+            "EXTRACT_QUADRANT_TL",
+            [
+              "OVERLAY",
+              [
+                "IF_COLOR",
+                "COLOR_SECOND",
+                [
+                  "FILL_BG",
+                  "COLOR_MAX"
+                ],
+                [
+                  "SEQ",
+                  "DELETE_ROWS_ZERO",
+                  [
+                    "SWAP",
+                    "COLOR_MIN",
+                    "COLOR_MAX"
+                  ],
+                  "DELETE_COLS_ZERO"
+                ]
+              ],
+              "DELETE_ROWS_ZERO"
+            ]
+          ],
+          [
+            "FILL_BG",
+            "COLOR_FG_2"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "COLOR_FG_1",
+          "ORIG_COLOR_MIN"
+        ]
+      ],
+      "RECOLOR_ALL_TO_MAX"
+    ],
+    "timestamp": 1775414532
+  },
+  {
+    "module": "learned_b94a9452_1775414887",
+    "task_id": "b94a9452",
+    "task_ids": [
+      "b94a9452"
+    ],
+    "description": "Evolved for b94a9452: SEQ(OVERLAY(SWAP(COLOR_MAX,COLOR_UNIQUE), DELETE_COLS_ZERO) -> SEQ(OVERLAY(CROP_TO_NONBG, RECOLOR(COLOR_MAX,COLOR_SECOND)) -> IF_COLOR(ORIG_COLOR_FG_2, DELETE_ROWS_ZERO, DELETE_COLS_ZERO)))",
+    "ast": [
+      "SEQ",
+      [
+        "OVERLAY",
+        [
+          "SWAP",
+          "COLOR_MAX",
+          "COLOR_UNIQUE"
+        ],
+        "DELETE_COLS_ZERO"
+      ],
+      [
+        "SEQ",
+        [
+          "OVERLAY",
+          "CROP_TO_NONBG",
+          [
+            "RECOLOR",
+            "COLOR_MAX",
+            "COLOR_SECOND"
+          ]
+        ],
+        [
+          "IF_COLOR",
+          "ORIG_COLOR_FG_2",
+          "DELETE_ROWS_ZERO",
+          "DELETE_COLS_ZERO"
+        ]
+      ]
+    ],
+    "timestamp": 1775414887
+  },
+  {
+    "module": "learned_5117e062_1775415123",
+    "task_id": "5117e062",
+    "task_ids": [
+      "5117e062"
+    ],
+    "description": "Evolved for 5117e062: SEQ(SWAP(COLOR_UNIQUE,COLOR_MAX) -> SEQ(RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> RECOLOR(COLOR_MIN,COLOR_MAX)) -> RECOLOR(COLOR_MIN,COLOR_MAX))",
+    "ast": [
+      "SEQ",
+      [
+        "SWAP",
+        "COLOR_UNIQUE",
+        "COLOR_MAX"
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "ORIG_COLOR_FG_2"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_UNIQUE"
+        ],
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "COLOR_MAX"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MIN",
+        "COLOR_MAX"
+      ]
+    ],
+    "timestamp": 1775415123
+  },
+  {
+    "module": "learned_39a8645d_1775415175",
+    "task_id": "39a8645d",
+    "task_ids": [
+      "39a8645d"
+    ],
+    "description": "Evolved for 39a8645d: SEQ(IF_COLOR(COLOR_SECOND, IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)) -> SEQ(RECOLOR(COLOR_MIN,ORIG_COLOR_FG_2) -> ('CROP_TO_COLOR', 'COLOR_MAX') -> ('CROP_TO_COLOR', 'COLOR_MIN')) -> ('CROP_TO_COLOR', 'ORIG_COLOR_SECOND') -> ('CROP_TO_COLOR', 'ORIG_COLOR_MIN') -> RECOLOR(COLOR_MAX,COLOR_MIN))",
+    "ast": [
+      "SEQ",
+      [
+        "IF_COLOR",
+        "COLOR_SECOND",
+        [
+          "IF_COLOR",
+          "COLOR_UNIQUE",
+          "EXTRACT_QUADRANT_TL",
+          [
+            "OVERLAY",
+            "DOWNSCALE_2X",
+            "DELETE_ROWS_ZERO"
+          ]
+        ],
+        [
+          "RECOLOR",
+          "ORIG_COLOR_FG_2",
+          "COLOR_FG_2"
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "RECOLOR",
+          "COLOR_MIN",
+          "ORIG_COLOR_FG_2"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_MAX"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_MIN"
+        ]
+      ],
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_SECOND"
+      ],
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_MIN"
+      ],
+      [
+        "RECOLOR",
+        "COLOR_MAX",
+        "COLOR_MIN"
+      ]
+    ],
+    "timestamp": 1775415175
+  },
+  {
+    "module": "learned_2013d3e2_1775415196",
+    "task_id": "2013d3e2",
+    "task_ids": [
+      "2013d3e2"
+    ],
+    "description": "Evolved for 2013d3e2: SEQ(CROP_NONZERO -> RECOLOR(COLOR_FG_1,ORIG_COLOR_FG_1) -> IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(IF_COLOR(COLOR_SECOND, IF_COLOR(COLOR_UNIQUE, EXTRACT_QUADRANT_TL, OVERLAY(DOWNSCALE_2X, DELETE_ROWS_ZERO)), RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2)), SEQ(OVERLAY(MASK(ORIG_COLOR_UNIQUE), RECOLOR(ORIG_COLOR_BG,COLOR_FG_2)) -> MASK(COLOR_UNIQUE)))))",
+    "ast": [
+      "SEQ",
+      "CROP_NONZERO",
+      [
+        "RECOLOR",
+        "COLOR_FG_1",
+        "ORIG_COLOR_FG_1"
+      ],
+      [
+        "IF_COLOR",
+        "COLOR_UNIQUE",
+        "EXTRACT_QUADRANT_TL",
+        [
+          "OVERLAY",
+          [
+            "IF_COLOR",
+            "COLOR_SECOND",
+            [
+              "IF_COLOR",
+              "COLOR_UNIQUE",
+              "EXTRACT_QUADRANT_TL",
+              [
+                "OVERLAY",
+                "DOWNSCALE_2X",
+                "DELETE_ROWS_ZERO"
+              ]
+            ],
+            [
+              "RECOLOR",
+              "ORIG_COLOR_FG_2",
+              "COLOR_FG_2"
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "OVERLAY",
+              [
+                "MASK",
+                "ORIG_COLOR_UNIQUE"
+              ],
+              [
+                "RECOLOR",
+                "ORIG_COLOR_BG",
+                "COLOR_FG_2"
+              ]
+            ],
+            [
+              "MASK",
+              "COLOR_UNIQUE"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "timestamp": 1775415196
+  },
+  {
+    "module": "learned_7468f01a_1775415268",
+    "task_id": "7468f01a",
+    "task_ids": [
+      "7468f01a"
+    ],
+    "description": "Evolved for 7468f01a: IF_COLOR(COLOR_MAX, SEQ(SEQ(('CROP_TO_COLOR', 'ORIG_COLOR_FG_2') -> CROP_NONZERO) -> FLIP_H), MASK(COLOR_BG))",
+    "ast": [
+      "IF_COLOR",
+      "COLOR_MAX",
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "CROP_TO_COLOR",
+            "ORIG_COLOR_FG_2"
+          ],
+          "CROP_NONZERO"
+        ],
+        "FLIP_H"
+      ],
+      [
+        "MASK",
+        "COLOR_BG"
+      ]
+    ],
+    "timestamp": 1775415268
+  },
+  {
+    "module": "learned_0b148d64_1775415457",
+    "task_id": "0b148d64",
+    "task_ids": [
+      "0b148d64"
+    ],
+    "description": "Evolved for 0b148d64: SEQ(('CROP_TO_COLOR', 'ORIG_COLOR_MIN') -> SEQ(DELETE_COLS_ZERO -> CROP_NONZERO))",
+    "ast": [
+      "SEQ",
+      [
+        "CROP_TO_COLOR",
+        "ORIG_COLOR_MIN"
+      ],
+      [
+        "SEQ",
+        "DELETE_COLS_ZERO",
+        "CROP_NONZERO"
+      ]
+    ],
+    "timestamp": 1775415457
+  },
+  {
+    "module": "learned_9ecd008a_1775440944",
+    "task_id": "9ecd008a",
+    "task_ids": [
+      "9ecd008a"
+    ],
+    "description": "Evolved for 9ecd008a: SEQ(('MASK_DIFF', ('MASK_XOR', ('RECOLOR', 'COLOR_BG', 'ORIG_COLOR_BG'), ('OVERLAY', ('SWAP', 'COLOR_BG', 'COLOR_SECOND'), 'FLIP_H')), ('IF_COLOR', 'ORIG_COLOR_BG', ('RECOLOR', 'ORIG_COLOR_MIN', 'COLOR_FG_2'), ('SWAP', 'COLOR_MIN', 'COLOR_SECOND'))) -> DELETE_COLS_ZERO -> DELETE_ROWS_ZERO)",
+    "ast": [
+      "SEQ",
+      [
+        "MASK_DIFF",
+        [
+          "MASK_XOR",
+          [
+            "RECOLOR",
+            "COLOR_BG",
+            "ORIG_COLOR_BG"
+          ],
+          [
+            "OVERLAY",
+            [
+              "SWAP",
+              "COLOR_BG",
+              "COLOR_SECOND"
+            ],
+            "FLIP_H"
+          ]
+        ],
+        [
+          "IF_COLOR",
+          "ORIG_COLOR_BG",
+          [
+            "RECOLOR",
+            "ORIG_COLOR_MIN",
+            "COLOR_FG_2"
+          ],
+          [
+            "SWAP",
+            "COLOR_MIN",
+            "COLOR_SECOND"
+          ]
+        ]
+      ],
+      "DELETE_COLS_ZERO",
+      "DELETE_ROWS_ZERO"
+    ],
+    "timestamp": 1775440944
+  },
+  {
+    "module": "learned_ff805c23_1775441149",
+    "task_id": "ff805c23",
+    "task_ids": [
+      "ff805c23"
+    ],
+    "description": "Evolved for ff805c23: SEQ(('MASK_AND', 'ROT270', ('IF_COLOR', 'COLOR_FG_2', ('MASK', 'COLOR_MIN'), ('MASK_XOR', ('RECOLOR', 'COLOR_FG_2', 'COLOR_FG_1'), ('RECOLOR', 'ORIG_COLOR_FG_1', 'COLOR_FG_1')))) -> ('CROP_TO_COLOR', 'COLOR_UNIQUE') -> OVERLAY(RECOLOR(ORIG_COLOR_FG_2,COLOR_FG_2), ('MASK_AND', ('RECOLOR', 'ORIG_COLOR_FG_2', 'COLOR_MIN'), 'DELETE_COLS_ZERO')) -> RECOLOR(COLOR_SECOND,COLOR_UNIQUE) -> RECOLOR(ORIG_COLOR_FG_1,COLOR_FG_2) -> IF_COLOR(ORIG_COLOR_UNIQUE, RECOLOR(COLOR_UNIQUE,ORIG_COLOR_UNIQUE), ('CROP_TO_COLOR', 'COLOR_BG')) -> ('MASK_DIFF', 'TESSELLATE_2X2', ('RECOLOR', 'COLOR_BG', 'ORIG_COLOR_FG_2')))",
+    "ast": [
+      "SEQ",
+      [
+        "MASK_AND",
+        "ROT270",
+        [
+          "IF_COLOR",
+          "COLOR_FG_2",
+          [
+            "MASK",
+            "COLOR_MIN"
+          ],
+          [
+            "MASK_XOR",
+            [
+              "RECOLOR",
+              "COLOR_FG_2",
+              "COLOR_FG_1"
+            ],
+            [
+              "RECOLOR",
+              "ORIG_COLOR_FG_1",
+              "COLOR_FG_1"
+            ]
+          ]
+        ]
+      ],
+      [
+        "CROP_TO_COLOR",
+        "COLOR_UNIQUE"
+      ],
+      [
+        "OVERLAY",
+        [
+          "RECOLOR",
+          "ORIG_COLOR_FG_2",
+          "COLOR_FG_2"
+        ],
+        [
+          "MASK_AND",
+          [
+            "RECOLOR",
+            "ORIG_COLOR_FG_2",
+            "COLOR_MIN"
+          ],
+          "DELETE_COLS_ZERO"
+        ]
+      ],
+      [
+        "RECOLOR",
+        "COLOR_SECOND",
+        "COLOR_UNIQUE"
+      ],
+      [
+        "RECOLOR",
+        "ORIG_COLOR_FG_1",
+        "COLOR_FG_2"
+      ],
+      [
+        "IF_COLOR",
+        "ORIG_COLOR_UNIQUE",
+        [
+          "RECOLOR",
+          "COLOR_UNIQUE",
+          "ORIG_COLOR_UNIQUE"
+        ],
+        [
+          "CROP_TO_COLOR",
+          "COLOR_BG"
+        ]
+      ],
+      [
+        "MASK_DIFF",
+        "TESSELLATE_2X2",
+        [
+          "RECOLOR",
+          "COLOR_BG",
+          "ORIG_COLOR_FG_2"
+        ]
+      ]
+    ],
+    "timestamp": 1775441149
+  },
+  {
+    "module": "learned_test_mirror_roundtrip_1775480844",
+    "task_id": "test_mirror_roundtrip",
+    "task_ids": [
+      "test_mirror_roundtrip"
+    ],
+    "description": "MIRROR_V(MIRROR_H(INPUT))",
+    "ast": [
+      "MIRROR_V",
+      [
+        "MIRROR_H",
+        "INPUT"
+      ]
+    ],
+    "timestamp": 1775480844
+  },
+  {
+    "module": "learned_28bf18c6_1775481321",
+    "task_id": "28bf18c6",
+    "task_ids": [
+      "28bf18c6"
+    ],
+    "description": "PHASE2-TYPED: TILE_1X2(CROP_NONZERO(INPUT))",
+    "ast": [
+      "TILE_1X2",
+      [
+        "CROP_NONZERO",
+        "INPUT"
+      ]
+    ],
+    "timestamp": 1775481321
+  },
+  {
+    "module": "learned_2dee498d_1775481403",
+    "task_id": "2dee498d",
+    "task_ids": [
+      "2dee498d"
+    ],
+    "description": "PHASE2-TYPED: DEDUP_COLS(INPUT)",
+    "ast": [
+      "DEDUP_COLS",
+      "INPUT"
+    ],
+    "timestamp": 1775481403
+  },
+  {
+    "module": "learned_3af2c5a8_1775481536",
+    "task_id": "3af2c5a8",
+    "task_ids": [
+      "3af2c5a8"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_V(MIRROR_H(INPUT))",
+    "ast": [
+      "MIRROR_V",
+      [
+        "MIRROR_H",
+        "INPUT"
+      ]
+    ],
+    "timestamp": 1775481536
+  },
+  {
+    "module": "learned_4c4377d9_1775481763",
+    "task_id": "4c4377d9",
+    "task_ids": [
+      "4c4377d9"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_V(FLIP_V(INPUT))",
+    "ast": [
+      "MIRROR_V",
+      [
+        "FLIP_V",
+        "INPUT"
+      ]
+    ],
+    "timestamp": 1775481763
+  },
+  {
+    "module": "learned_62c24649_1775481951",
+    "task_id": "62c24649",
+    "task_ids": [
+      "62c24649"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_V(MIRROR_H(INPUT))",
+    "ast": [
+      "MIRROR_V",
+      [
+        "MIRROR_H",
+        "INPUT"
+      ]
+    ],
+    "timestamp": 1775481951
+  },
+  {
+    "module": "learned_67e8384a_1775482013",
+    "task_id": "67e8384a",
+    "task_ids": [
+      "67e8384a"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_V(MIRROR_H(INPUT))",
+    "ast": [
+      "MIRROR_V",
+      [
+        "MIRROR_H",
+        "INPUT"
+      ]
+    ],
+    "timestamp": 1775482013
+  },
+  {
+    "module": "learned_6d0aefbc_1775482105",
+    "task_id": "6d0aefbc",
+    "task_ids": [
+      "6d0aefbc"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_H(INPUT)",
+    "ast": [
+      "MIRROR_H",
+      "INPUT"
+    ],
+    "timestamp": 1775482105
+  },
+  {
+    "module": "learned_6fa7a44f_1775482146",
+    "task_id": "6fa7a44f",
+    "task_ids": [
+      "6fa7a44f"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_V(INPUT)",
+    "ast": [
+      "MIRROR_V",
+      "INPUT"
+    ],
+    "timestamp": 1775482146
+  },
+  {
+    "module": "learned_8be77c9e_1775482408",
+    "task_id": "8be77c9e",
+    "task_ids": [
+      "8be77c9e"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_V(INPUT)",
+    "ast": [
+      "MIRROR_V",
+      "INPUT"
+    ],
+    "timestamp": 1775482408
+  },
+  {
+    "module": "learned_c9e6f938_1775483092",
+    "task_id": "c9e6f938",
+    "task_ids": [
+      "c9e6f938"
+    ],
+    "description": "PHASE2-TYPED: MIRROR_H(INPUT)",
+    "ast": [
+      "MIRROR_H",
+      "INPUT"
+    ],
+    "timestamp": 1775483092
+  },
+  {
+    "module": "learned_bda2d7a6_1775509551",
+    "task_id": "bda2d7a6",
+    "task_ids": [
+      "bda2d7a6"
+    ],
+    "description": "Evolved for bda2d7a6: ('MASK_XOR', ('MASK_DIFF', ('FOR_EACH_OBJECT', ('FILL_BG', 'COLOR_MIN')), ('FOR_EACH_OBJECT', ('IF_COLOR', 'ORIG_COLOR_MAX', ('MASK_AND', 'ROT90', ('MASK_AND', ('RECOLOR', 'ORIG_COLOR_MIN', 'COLOR_FG_2'), ('MASK', 'COLOR_MIN'))), ('SEQ', ('MASK', 'ORIG_COLOR_MIN'), ('RECOLOR', 'COLOR_SECOND', 'ORIG_COLOR_BG'), ('RECOLOR', 'COLOR_MAX', 'ORIG_COLOR_FG_2'), ('FOR_EACH_OBJECT', ('FOR_EACH_OBJECT', 'KEEP_MOST_FREQUENT')))))), ('SWAP', 'COLOR_FG_1', 'COLOR_MAX'))",
+    "ast": [
+      "MASK_XOR",
+      [
+        "MASK_DIFF",
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "FILL_BG",
+            "COLOR_MIN"
+          ]
+        ],
+        [
+          "FOR_EACH_OBJECT",
+          [
+            "IF_COLOR",
+            "ORIG_COLOR_MAX",
+            [
+              "MASK_AND",
+              "ROT90",
+              [
+                "MASK_AND",
+                [
+                  "RECOLOR",
+                  "ORIG_COLOR_MIN",
+                  "COLOR_FG_2"
+                ],
+                [
+                  "MASK",
+                  "COLOR_MIN"
+                ]
+              ]
+            ],
+            [
+              "SEQ",
+              [
+                "MASK",
+                "ORIG_COLOR_MIN"
+              ],
+              [
+                "RECOLOR",
+                "COLOR_SECOND",
+                "ORIG_COLOR_BG"
+              ],
+              [
+                "RECOLOR",
+                "COLOR_MAX",
+                "ORIG_COLOR_FG_2"
+              ],
+              [
+                "FOR_EACH_OBJECT",
+                [
+                  "FOR_EACH_OBJECT",
+                  "KEEP_MOST_FREQUENT"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        "SWAP",
+        "COLOR_FG_1",
+        "COLOR_MAX"
+      ]
+    ],
+    "timestamp": 1775509551
+  },
+  {
+    "module": "learned_de1cd16c_1775516957",
+    "task_id": "de1cd16c",
+    "task_ids": [
+      "de1cd16c"
+    ],
+    "description": "PHASE3-EVOLVED: SEQ(FILL_BG(6) -> SEQ(SEQ(EXTRACT_QUADRANT_BR -> OVERLAY(IF_COLOR(8, SEQ(DELETE_ROWS_ZERO -> SWAP(COLOR_MIN,COLOR_MAX) -> DELETE_COLS_ZERO), SEQ(RECOLOR(2,5) -> ROT180 -> SHIFT_UP)), FLIP_H)) -> SHIFT_RIGHT -> EXTRACT_QUADRANT_BR -> RECOLOR(0,5)) -> SEQ(SEQ(SEQ(RECOLOR(9,5)) -> SEQ(SEQ(OVERLAY(SWAP(COLOR_BG,COLOR_SECOND), FLIP_H) -> DOWNSCALE_2X -> RECOLOR(2,COLOR_BG)) -> EXTRACT_QUADRANT_TL -> RECOLOR(2,7) -> FILL_BG(7)) -> SEQ(GRAVITY_RIGHT -> FLIP_V -> RECOLOR(COLOR_UNIQUE,COLOR_MAX))) -> RECOLOR(7,0)) -> RECOLOR(8,2) -> RECOLOR(1,8))",
+    "ast": [
+      "SEQ",
+      [
+        "FILL_BG",
+        6
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          "EXTRACT_QUADRANT_BR",
+          [
+            "OVERLAY",
+            [
+              "IF_COLOR",
+              8,
+              [
+                "SEQ",
+                "DELETE_ROWS_ZERO",
+                [
+                  "SWAP",
+                  "COLOR_MIN",
+                  "COLOR_MAX"
+                ],
+                "DELETE_COLS_ZERO"
+              ],
+              [
+                "SEQ",
+                [
+                  "RECOLOR",
+                  2,
+                  5
+                ],
+                "ROT180",
+                "SHIFT_UP"
+              ]
+            ],
+            "FLIP_H"
+          ]
+        ],
+        "SHIFT_RIGHT",
+        "EXTRACT_QUADRANT_BR",
+        [
+          "RECOLOR",
+          0,
+          5
+        ]
+      ],
+      [
+        "SEQ",
+        [
+          "SEQ",
+          [
+            "SEQ",
+            [
+              "RECOLOR",
+              9,
+              5
+            ]
+          ],
+          [
+            "SEQ",
+            [
+              "SEQ",
+              [
+                "OVERLAY",
+                [
+                  "SWAP",
+                  "COLOR_BG",
+                  "COLOR_SECOND"
+                ],
+                "FLIP_H"
+              ],
+              "DOWNSCALE_2X",
+              [
+                "RECOLOR",
+                2,
+                "COLOR_BG"
+              ]
+            ],
+            "EXTRACT_QUADRANT_TL",
+            [
+              "RECOLOR",
+              2,
+              7
+            ],
+            [
+              "FILL_BG",
+              7
+            ]
+          ],
+          [
+            "SEQ",
+            "GRAVITY_RIGHT",
+            "FLIP_V",
+            [
+              "RECOLOR",
+              "COLOR_UNIQUE",
+              "COLOR_MAX"
+            ]
+          ]
+        ],
+        [
+          "RECOLOR",
+          7,
+          0
+        ]
+      ],
+      [
+        "RECOLOR",
+        8,
+        2
+      ],
+      [
+        "RECOLOR",
+        1,
+        8
+      ]
+    ],
+    "timestamp": 1775516957
   }
 ]
